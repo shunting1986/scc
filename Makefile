@@ -25,13 +25,19 @@ obj/%.o: src/%.c
 	@mkdir -p $(@D)
 	@gcc -c $^ -o $@ $(CFLAGS)
 
-build-lib: $(LIB_OBJ_LIST)
+build-lib: $(LIB_SCC)
+
+$(LIB_SCC): $(LIB_OBJ_LIST)
 	@ar -r $(LIB_SCC) $^
 
 build-test: $(LIB_SCC)
 	g++ $(CFLAGS) $(GTEST_CFLAGS) $(GTEST_LDFLAGS) -o test/runtest $(TEST_SRC_LIST) $(LIB_SCC)
 	./test/runtest
 
+clean:
+	rm -rf obj
+	rm $(LIB_SCC)
+	rm test/runtest
 
 ################## SPLIT LINE #######################
 # build:

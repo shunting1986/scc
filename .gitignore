@@ -4,3 +4,5 @@ a.out
 
 obj/
 tags
+libscc.a
+test/runtest
