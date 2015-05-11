@@ -1,3 +1,6 @@
 .*.swp
 a.out
 3rdParty
+
+obj/
+tags
