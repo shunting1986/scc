@@ -1,1 +1,5 @@
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
+
+- TODO: be able to do lexicial analyzer first..
+
+- HERE: add 'struct FileReader' to encapsulate file reading

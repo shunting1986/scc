@@ -1,4 +1,4 @@
-#include "util.h"
+#include <inc/util.h>
 
 int
 main(int argc, char **argv) {
