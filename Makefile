@@ -8,7 +8,8 @@ CFLAGS+=-Isrc
 
 # NOTE: should not add quote around each path
 LIB_SRC_LIST := util/file_reader.c \
-	util/util.c
+	util/util.c \
+	lex/lexer.c
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))
@@ -17,7 +18,9 @@ LIB_OBJ_LIST := $(patsubst src/%.c,obj/%.o,$(wildcard $(LIB_SRC_LIST)))
 LIB_SCC := libscc.a
 
 TEST_SRC_LIST := main.cc \
-	test-file-reader.cc
+	test-file-reader.cc \
+	test-lexer.cc
+
 TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 
 obj/%.o: src/%.c
@@ -38,8 +41,3 @@ clean:
 	rm -rf obj
 	rm $(LIB_SCC)
 	rm test/runtest
-
-################## SPLIT LINE #######################
-# build:
-# 	find src -name "*.c" | xargs gcc $(CFLAGS)
-
