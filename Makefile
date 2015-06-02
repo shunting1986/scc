@@ -11,7 +11,8 @@ LIB_SRC_LIST := util/file_reader.c \
 	util/util.c \
 	util/cbuf.c \
 	lex/lexer.c \
-	lex/keyword.c
+	lex/keyword.c \
+	lex/token.c
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))

@@ -8,6 +8,7 @@ TEST(lexer, lexer) {
 	union token tok;
 	while ((tok = lexer_next_token(lexer)).token_tag != TOK_EOF) {
 		token_dump(tok);
+		token_destroy(tok);
 	}
 
 	lexer_destroy(lexer);

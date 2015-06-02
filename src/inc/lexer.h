@@ -2,6 +2,7 @@
 #define _INC_LEXER_H
 
 #include <inc/file_reader.h>
+#include <inc/token.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,29 +12,9 @@ struct lexer {
 	struct file_reader *cstream;
 };
 
-enum {
-	TOK_INT,
-
-	TOK_IDENTIFIER,
-
-	TOK_EOF,
-	TOK_UNDEF,
-};
-
-union token {
-	int token_tag;
-
-	struct {
-		int token_tag;
-		char *s;
-	} id_token;
-};
-
 struct lexer *lexer_init(struct file_reader *cstream);
 union token lexer_next_token(struct lexer *lexer);
 void lexer_destroy(struct lexer *lexer);
-void token_destroy(union token token);
-void token_dump(union token token);
 
 #ifdef __cplusplus
 }

@@ -13,33 +13,15 @@ void lexer_destroy(struct lexer *lexer) {
 	free(lexer);
 }
 
-void token_destroy(union token token) {
-	switch (token.token_tag) {
-	case TOK_INT:
-		break;
-	default:
-		panic("token_destroy %d ni", token.token_tag);
-		break;
-	}
-}
-
-void token_dump(union token token) {
-	switch (token.token_tag) {
-	case TOK_INT:
-		printf("tok_int\n");
-		break;
-	default:
-		panic("token_dump %d ni", token.token_tag);
-	}
-}
-
 union token lexer_next_token(struct lexer *lexer) {
-	char ch = file_reader_next_char(lexer->cstream);	
+	char ch;
 	union token tok;
 	struct cbuf *cbuf;
 	char *s;
 	int token_tag;
 
+repeat:
+	ch = file_reader_next_char(lexer->cstream);	
 	switch (ch) {
 	case 'a' ... 'z':
 	case 'A' ... 'Z':
@@ -65,6 +47,9 @@ union token lexer_next_token(struct lexer *lexer) {
 	case EOF:
 		tok.token_tag = TOK_EOF;
 		break;
+	case ' ':
+	case '\n':
+		goto repeat;
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}
