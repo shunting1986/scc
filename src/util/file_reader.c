@@ -9,6 +9,8 @@ struct file_reader {
 	char *path;
 	int fd;
 
+	int putback;
+
 	char buf[256];
 	int pos;
 	int len;
@@ -20,10 +22,22 @@ struct file_reader *file_reader_init(const char *path) {
 	fr->fd = open(path, O_RDONLY);
 	assert(fr->fd >= 0);
 	fr->pos = fr->len = 0;
+	fr->putback = -1;
 	return fr;
 }
 
+void file_reader_put_back(struct file_reader *fr, char putback) {
+	assert(fr->putback < 0);
+	fr->putback = putback;
+}
+
 int file_reader_next_char(struct file_reader *fr) {
+	if (fr->putback >= 0) {
+		char ch = fr->putback;
+		fr->putback = -1;
+		return ch;
+	}
+
 	if (fr->pos >= fr->len) {
 		int r = read(fr->fd, fr->buf, sizeof(fr->buf));
 		assert(r >= 0);
