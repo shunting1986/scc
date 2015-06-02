@@ -35,7 +35,19 @@ void token_dump(union token token) {
 
 union token lexer_next_token(struct lexer *lexer) {
 	char ch = file_reader_next_char(lexer->cstream);	
-	printf("ch = %c\n", ch);
-	panic("lexer_next_token ni"); // TODO
+	union token tok;
+	switch (ch) {
+	case 'a' ... 'z':
+	case 'A' ... 'Z':
+	case '_': // identifier
+		panic("lexer_next_token: identifier parsing ni");
+
+	case EOF:
+		tok.token_tag = TOK_EOF;
+		break;
+	default:
+		panic("lexer_next_token unexpected character %c", ch);
+	}
+	return tok;
 }
 

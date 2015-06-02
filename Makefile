@@ -9,6 +9,7 @@ CFLAGS+=-Isrc
 # NOTE: should not add quote around each path
 LIB_SRC_LIST := util/file_reader.c \
 	util/util.c \
+	util/cbuf.c \
 	lex/lexer.c
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
@@ -19,7 +20,8 @@ LIB_SCC := libscc.a
 
 TEST_SRC_LIST := main.cc \
 	test-file-reader.cc \
-	test-lexer.cc
+	test-cbuf.cc \
+	test-lexer.cc 
 
 TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 

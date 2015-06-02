@@ -1,3 +1,6 @@
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
 
 - HERE: be able to do lexicial analyzer first..
+
+- First: be able to parse basic identifier
+- Second: treat key words specially
