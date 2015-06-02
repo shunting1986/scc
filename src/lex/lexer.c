@@ -38,6 +38,8 @@ union token lexer_next_token(struct lexer *lexer) {
 	union token tok;
 	struct cbuf *cbuf;
 	char *s;
+	int token_tag;
+
 	switch (ch) {
 	case 'a' ... 'z':
 	case 'A' ... 'Z':
@@ -51,9 +53,15 @@ union token lexer_next_token(struct lexer *lexer) {
 		s = cbuf_transfer(cbuf);
 		cbuf_destroy(cbuf);
 
-		// TODO need to handle identifier s
-		panic("lexer_next_token: identifier parsing %s ni", s);
-
+		token_tag = check_keyword_token(s);
+		if (token_tag == TOK_UNDEF) {
+			// this is an identifier
+			tok.token_tag = TOK_IDENTIFIER;
+			tok.id_token.s = s;
+		} else {
+			tok.token_tag = token_tag;
+		}
+		break;
 	case EOF:
 		tok.token_tag = TOK_EOF;
 		break;

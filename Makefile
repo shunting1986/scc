@@ -10,7 +10,8 @@ CFLAGS+=-Isrc
 LIB_SRC_LIST := util/file_reader.c \
 	util/util.c \
 	util/cbuf.c \
-	lex/lexer.c
+	lex/lexer.c \
+	lex/keyword.c
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))

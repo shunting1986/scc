@@ -14,11 +14,19 @@ struct lexer {
 enum {
 	TOK_INT,
 
+	TOK_IDENTIFIER,
+
 	TOK_EOF,
+	TOK_UNDEF,
 };
 
 union token {
 	int token_tag;
+
+	struct {
+		int token_tag;
+		char *s;
+	} id_token;
 };
 
 struct lexer *lexer_init(struct file_reader *cstream);
