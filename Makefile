@@ -12,7 +12,9 @@ LIB_SRC_LIST := util/file_reader.c \
 	util/cbuf.c \
 	lex/lexer.c \
 	lex/keyword.c \
-	lex/token.c
+	lex/token.c \
+	parser/parser.c \
+	parser/syntree.c 
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))
@@ -23,7 +25,10 @@ LIB_SCC := libscc.a
 TEST_SRC_LIST := main.cc \
 	test-file-reader.cc \
 	test-cbuf.cc \
-	test-lexer.cc 
+	test-parser.cc
+
+	# XXX ignore the cases temporarily to make the output less
+	# test-lexer.cc \
 
 TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 
