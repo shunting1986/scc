@@ -28,6 +28,10 @@ void parse_string_literal(struct lexer *lexer, union token *ptok) {
 	ptok->str_token.s = cbuf_transfer(buf);
 }
 
+void parse_number(struct lexer *lexer, union token *ptok) {
+	panic("parse_number ni"); // TODO
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	char ch;
 	union token tok;
@@ -38,6 +42,10 @@ union token lexer_next_token(struct lexer *lexer) {
 repeat:
 	ch = file_reader_next_char(lexer->cstream);	
 	switch (ch) {
+	case '0' ... '9':
+		file_reader_put_back(lexer->cstream, ch);
+		parse_number(lexer, &tok);
+		break;
 	case 'a' ... 'z':
 	case 'A' ... 'Z':
 	case '_': // identifier
@@ -67,7 +75,8 @@ repeat:
 	case '\t':
 		goto repeat;
 	case '(': case ')': case '{': case '}':
-	case ',': case ';':
+	case ',': case ';': case '&': case '=':
+	case '+':
 		tok.token_tag = ch;
 		break;
 	case '"':

@@ -6,7 +6,8 @@
 void token_destroy(union token token) {
 	switch (token.token_tag) {
 	case TOK_INT: case TOK_LPAREN: case TOK_RPAREN: case TOK_LBRACE:
-	case TOK_RBRACE: case TOK_COMMA: case TOK_SEMICOLON:
+	case TOK_RBRACE: case TOK_COMMA: case TOK_SEMICOLON: case TOK_AMPERSAND:
+	case TOK_ASSIGN: case TOK_ADD: case TOK_RETURN:
 		break;
 	case TOK_IDENTIFIER:
 		free(token.id_token.s);
@@ -24,6 +25,9 @@ void token_dump(union token token) {
 	switch (token.token_tag) {
 	case TOK_INT:
 		printf("[int]\n");
+		break;
+	case TOK_RETURN:
+		printf("[return]\n");
 		break;
 	case TOK_IDENTIFIER:
 		printf("[id]: %s\n", token.id_token.s);
@@ -45,6 +49,15 @@ void token_dump(union token token) {
 		break;
 	case TOK_SEMICOLON:
 		printf("';'\n");
+		break;
+	case TOK_AMPERSAND:
+		printf("'&'\n");
+		break;
+	case TOK_ASSIGN:
+		printf("'='\n");
+		break;
+	case TOK_ADD:
+		printf("'+'\n");
 		break;
 	case TOK_STRING_LITERAL:
 		printf("[string_literal] %s\n", token.str_token.s);

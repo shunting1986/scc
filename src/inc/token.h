@@ -22,8 +22,12 @@ enum {
 	TOK_RBRACE = '}',
 	TOK_COMMA = ',',
 	TOK_SEMICOLON = ';',
+	TOK_AMPERSAND = '&',
+	TOK_ASSIGN = '=',
+	TOK_ADD = '+',
 
 	TOK_INT = 256,
+	TOK_RETURN,
 	TOK_IDENTIFIER,
 	TOK_STRING_LITERAL,
 
