@@ -6,7 +6,7 @@ TEST(lexer, lexer) {
 	struct lexer *lexer = lexer_init(fr);
 
 	union token tok;
-	while ((tok = lexer_next_token(lexer)).token_tag != TOK_EOF) {
+	while ((tok = lexer_next_token(lexer)).tok_tag != TOK_EOF) {
 		token_dump(tok);
 		token_destroy(tok);
 	}

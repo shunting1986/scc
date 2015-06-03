@@ -24,12 +24,21 @@ void parse_string_literal(struct lexer *lexer, union token *ptok) {
 	if (ch == EOF) {
 		panic("unterminated string literal");
 	}
-	ptok->token_tag = TOK_STRING_LITERAL;
-	ptok->str_token.s = cbuf_transfer(buf);
+	ptok->tok_tag = TOK_STRING_LITERAL;
+	ptok->str.s = cbuf_transfer(buf);
 }
 
+// XXX: only handle decimal integer right now
 void parse_number(struct lexer *lexer, union token *ptok) {
-	panic("parse_number ni"); // TODO
+	char ch = file_reader_next_char(lexer->cstream);
+	int val = 0;
+	while (ch >= '0' && ch <= '9') {
+		val = val * 10 + (ch - '0');
+		ch = file_reader_next_char(lexer->cstream);
+	}
+	file_reader_put_back(lexer->cstream, ch);
+	ptok->tok_tag = TOK_CONSTANT_VALUE;
+	ptok->const_val.ival = val;
 }
 
 union token lexer_next_token(struct lexer *lexer) {
@@ -61,14 +70,14 @@ repeat:
 		token_tag = check_keyword_token(s);
 		if (token_tag == TOK_UNDEF) {
 			// this is an identifier
-			tok.token_tag = TOK_IDENTIFIER;
-			tok.id_token.s = s;
+			tok.tok_tag = TOK_IDENTIFIER;
+			tok.id.s = s;
 		} else {
-			tok.token_tag = token_tag;
+			tok.tok_tag = token_tag;
 		}
 		break;
 	case EOF:
-		tok.token_tag = TOK_EOF;
+		tok.tok_tag = TOK_EOF;
 		break;
 	case ' ':
 	case '\n':
@@ -77,7 +86,7 @@ repeat:
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '&': case '=':
 	case '+':
-		tok.token_tag = ch;
+		tok.tok_tag = ch;
 		break;
 	case '"':
 		parse_string_literal(lexer, &tok);

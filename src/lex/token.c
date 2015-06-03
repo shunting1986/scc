@@ -4,25 +4,25 @@
 #include <inc/token.h>
 
 void token_destroy(union token token) {
-	switch (token.token_tag) {
+	switch (token.tok_tag) {
 	case TOK_INT: case TOK_LPAREN: case TOK_RPAREN: case TOK_LBRACE:
 	case TOK_RBRACE: case TOK_COMMA: case TOK_SEMICOLON: case TOK_AMPERSAND:
-	case TOK_ASSIGN: case TOK_ADD: case TOK_RETURN:
+	case TOK_ASSIGN: case TOK_ADD: case TOK_RETURN: case TOK_CONSTANT_VALUE:
 		break;
 	case TOK_IDENTIFIER:
-		free(token.id_token.s);
+		free(token.id.s);
 		break;
 	case TOK_STRING_LITERAL:
-		free(token.str_token.s);
+		free(token.str.s);
 		break;
 	default:
-		panic("token_destroy %d ni", token.token_tag);
+		panic("token_destroy %d ni", token.tok_tag);
 		break;
 	}
 }
 
 void token_dump(union token token) {
-	switch (token.token_tag) {
+	switch (token.tok_tag) {
 	case TOK_INT:
 		printf("[int]\n");
 		break;
@@ -30,7 +30,7 @@ void token_dump(union token token) {
 		printf("[return]\n");
 		break;
 	case TOK_IDENTIFIER:
-		printf("[id]: %s\n", token.id_token.s);
+		printf("[id]: %s\n", token.id.s);
 		break;
 	case TOK_LPAREN:
 		printf("'('\n");
@@ -60,10 +60,13 @@ void token_dump(union token token) {
 		printf("'+'\n");
 		break;
 	case TOK_STRING_LITERAL:
-		printf("[string_literal] %s\n", token.str_token.s);
+		printf("[string_literal] %s\n", token.str.s);
+		break;
+	case TOK_CONSTANT_VALUE:
+		printf("[const_val] %d\n", token.const_val.ival);
 		break;
 	default:
-		panic("token_dump %d ni", token.token_tag);
+		panic("token_dump %d ni", token.tok_tag);
 	}
 }
 

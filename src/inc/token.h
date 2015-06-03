@@ -6,13 +6,20 @@ extern "C" {
 #endif
 
 union token {
-	int token_tag;
+	int tok_tag;
 
 	struct {
-		int token_tag;
+		int tok_tag;
 		char *s;
-	} id_token;
-#define str_token id_token // for string literal, the s does not contains the quotes
+	} id;
+
+	struct {
+		int tok_tag;
+		union {
+			int ival;
+		};
+	} const_val;
+#define str id // for string literal, the s does not contains the quotes
 };
 
 enum {
@@ -30,6 +37,7 @@ enum {
 	TOK_RETURN,
 	TOK_IDENTIFIER,
 	TOK_STRING_LITERAL,
+	TOK_CONSTANT_VALUE,
 
 	TOK_EOF,
 	TOK_UNDEF,

@@ -1,4 +1,5 @@
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
+- TODO: let the make file support dependency on header file
 
 - HERE: be able to do lexicial analyzer first..
 
