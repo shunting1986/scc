@@ -13,6 +13,10 @@ void lexer_destroy(struct lexer *lexer) {
 	free(lexer);
 }
 
+void parse_string_literal(union token *ptok) {
+	panic("parse_string_literal ni"); // TODO
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	char ch;
 	union token tok;
@@ -49,7 +53,15 @@ repeat:
 		break;
 	case ' ':
 	case '\n':
+	case '\t':
 		goto repeat;
+	case '(': case ')': case '{': case '}':
+	case ',': case ';':
+		tok.token_tag = ch;
+		break;
+	case '"':
+		parse_string_literal(&tok);
+		break;
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}

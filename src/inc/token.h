@@ -15,8 +15,15 @@ union token {
 };
 
 enum {
-	TOK_INT,
+	TOK_LPAREN = '(',
+	TOK_RPAREN = ')',
+	TOK_LBRACE = '{',
+	TOK_RBRACE = '}',
+	TOK_COMMA = ',',
+	TOK_SEMICOLON = ';',
+	TOK_STRING_LITERAL = '"',
 
+	TOK_INT = 256,
 	TOK_IDENTIFIER,
 
 	TOK_EOF,
