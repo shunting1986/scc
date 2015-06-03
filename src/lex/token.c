@@ -11,6 +11,9 @@ void token_destroy(union token token) {
 	case TOK_IDENTIFIER:
 		free(token.id_token.s);
 		break;
+	case TOK_STRING_LITERAL:
+		free(token.str_token.s);
+		break;
 	default:
 		panic("token_destroy %d ni", token.token_tag);
 		break;
@@ -42,6 +45,9 @@ void token_dump(union token token) {
 		break;
 	case TOK_SEMICOLON:
 		printf("';'\n");
+		break;
+	case TOK_STRING_LITERAL:
+		printf("[string_literal] %s\n", token.str_token.s);
 		break;
 	default:
 		panic("token_dump %d ni", token.token_tag);

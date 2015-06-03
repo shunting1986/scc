@@ -13,8 +13,19 @@ void lexer_destroy(struct lexer *lexer) {
 	free(lexer);
 }
 
-void parse_string_literal(union token *ptok) {
-	panic("parse_string_literal ni"); // TODO
+/* XXX: escape is not handled yet */
+void parse_string_literal(struct lexer *lexer, union token *ptok) {
+	struct cbuf *buf = cbuf_init();
+	char ch = file_reader_next_char(lexer->cstream);
+	while (ch != '"' && ch != EOF) {
+		cbuf_add(buf, ch);
+		ch = file_reader_next_char(lexer->cstream);
+	}
+	if (ch == EOF) {
+		panic("unterminated string literal");
+	}
+	ptok->token_tag = TOK_STRING_LITERAL;
+	ptok->str_token.s = cbuf_transfer(buf);
 }
 
 union token lexer_next_token(struct lexer *lexer) {
@@ -60,7 +71,7 @@ repeat:
 		tok.token_tag = ch;
 		break;
 	case '"':
-		parse_string_literal(&tok);
+		parse_string_literal(lexer, &tok);
 		break;
 	default:
 		panic("lexer_next_token unexpected character %c", ch);

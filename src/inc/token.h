@@ -12,6 +12,7 @@ union token {
 		int token_tag;
 		char *s;
 	} id_token;
+#define str_token id_token // for string literal, the s does not contains the quotes
 };
 
 enum {
@@ -21,10 +22,10 @@ enum {
 	TOK_RBRACE = '}',
 	TOK_COMMA = ',',
 	TOK_SEMICOLON = ';',
-	TOK_STRING_LITERAL = '"',
 
 	TOK_INT = 256,
 	TOK_IDENTIFIER,
+	TOK_STRING_LITERAL,
 
 	TOK_EOF,
 	TOK_UNDEF,
