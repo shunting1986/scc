@@ -45,8 +45,9 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 	ptok->const_val.ival = val;
 }
 
-void lexer_put_back(union token token) {
-	panic("lexer_put_back ni");
+void lexer_put_back(struct lexer *lexer, union token token) {
+	assert(lexer->put_back.tok_tag == TOK_UNDEF);
+	lexer->put_back = token;
 }
 
 union token lexer_next_token(struct lexer *lexer) {

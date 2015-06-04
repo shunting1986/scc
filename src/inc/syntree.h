@@ -12,6 +12,7 @@ void syntree_dump(struct syntree *tree);
 
 enum syntree_node_type {
 	TRANSLATION_UNIT,
+	EXTERNAL_DECL,
 };
 
 struct syntreebasenode {
@@ -23,11 +24,16 @@ struct translation_unit_node {
 	struct dynarr *external_decl_list;
 };
 
+struct external_decl_node {
+	int nodeType;
+};
+
 // I decide to put the syntreenode definition in .h file.
 // May revise to put in .c file later
 union syntreenode {
 	struct syntreebasenode base;
 	struct translation_unit_node translation_unit;
+	struct external_decl_node external_decl;
 };
 
 #ifdef __cplusplus

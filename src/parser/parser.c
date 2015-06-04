@@ -12,20 +12,22 @@ struct parser *parser_init(struct lexer *lexer) {
 	return parser;
 }
 
-static struct translation_unit_node *parse_translation_unit(struct parser *parser) {
-	panic("parse_translation_unit"); // assume no EOF found
+void parser_destroy(struct parser *parser) {
+	free(parser);
+}
+
+// assume no EOF found
+static struct external_decl_node *parse_external_decl(struct parser *parser) {
+	panic("parse_external_decl ni"); // assume no EOF found
 }
 
 struct syntree *parse(struct parser *parser) {
 	union token tok;
 	while ((tok = lexer_next_token(parser->lexer)).tok_tag != TOK_EOF) {
 		// lexer put back, should not destroy tok
-		lexer_put_back(tok);
-		struct translation_unit_node *unit_node = parse_translation_unit(parser);
+		lexer_put_back(parser->lexer, tok);
+		struct external_decl_node *external_decl = parse_external_decl(parser);
 	}
 	panic("parse ni"); // TODO
 }
 
-void parser_destroy(struct parser *parser) {
-	panic("parser_destroy ni"); // TODO
-}
