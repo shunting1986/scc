@@ -1,15 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 #include <inc/lexer.h>
 #include <inc/cbuf.h>
 
 struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = malloc(sizeof(*lexer));
 	lexer->cstream = cstream;
+	lexer->put_back.tok_tag = TOK_UNDEF;
 	return lexer;
 }
 
 void lexer_destroy(struct lexer *lexer) {
+	token_destroy(lexer->put_back);
 	free(lexer);
 }
 
@@ -41,12 +45,23 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 	ptok->const_val.ival = val;
 }
 
+void lexer_put_back(union token token) {
+	panic("lexer_put_back ni");
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	char ch;
 	union token tok;
 	struct cbuf *cbuf;
 	char *s;
 	int token_tag;
+
+	if (lexer->put_back.tok_tag != TOK_UNDEF) {
+		union token ret = lexer->put_back;
+		memset(&lexer->put_back, 0, sizeof(lexer->put_back));
+		lexer->put_back.tok_tag = TOK_UNDEF;
+		return ret;
+	}
 
 repeat:
 	ch = file_reader_next_char(lexer->cstream);	

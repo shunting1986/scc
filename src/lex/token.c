@@ -5,6 +5,7 @@
 
 void token_destroy(union token token) {
 	switch (token.tok_tag) {
+	case TOK_UNDEF: // special rule for undef
 	case TOK_INT: case TOK_LPAREN: case TOK_RPAREN: case TOK_LBRACE:
 	case TOK_RBRACE: case TOK_COMMA: case TOK_SEMICOLON: case TOK_AMPERSAND:
 	case TOK_ASSIGN: case TOK_ADD: case TOK_RETURN: case TOK_CONSTANT_VALUE:
