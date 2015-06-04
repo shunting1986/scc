@@ -3,8 +3,7 @@ GTEST_ROOT=/media/shunting/disk/compiler/3rdParty/gtest-1.7.0
 GTEST_CFLAGS=-isystem $(GTEST_ROOT)/include
 GTEST_LDFLAGS=$(GTEST_ROOT)/make/gtest-all.o -lpthread
 
-CFLAGS+=-Isrc
-
+CFLAGS += -Isrc $(MCFLAGS)
 
 # NOTE: should not add quote around each path
 LIB_SRC_LIST := util/file_reader.c \
@@ -33,6 +32,11 @@ TEST_SRC_LIST := main.cc \
 
 TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 
+PROG_NAME := scc
+
+$(PROG_NAME): $(LIB_SCC) obj/main.o
+	gcc $(CFLAGS) -o $@ obj/main.o $(LIB_SCC)
+
 obj/%.o: src/%.c
 	@echo build $@
 	@mkdir -p $(@D)
@@ -49,5 +53,6 @@ build-test: $(LIB_SCC)
 
 clean:
 	rm -rf obj
-	rm $(LIB_SCC)
-	rm test/runtest
+	rm -f $(LIB_SCC)
+	rm -f test/runtest
+	rm -f scc

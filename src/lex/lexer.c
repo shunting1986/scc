@@ -61,6 +61,7 @@ union token lexer_next_token(struct lexer *lexer) {
 		union token ret = lexer->put_back;
 		memset(&lexer->put_back, 0, sizeof(lexer->put_back));
 		lexer->put_back.tok_tag = TOK_UNDEF;
+		// printf("lexer_next_token %d\n", tok.tok_tag);
 		return ret;
 	}
 
@@ -110,6 +111,7 @@ repeat:
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}
+	// printf("lexer_next_token %d\n", tok.tok_tag);
 	return tok;
 }
 

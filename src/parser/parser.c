@@ -31,10 +31,12 @@ struct syntree *parse(struct parser *parser) {
 }
 
 static struct declaration_specifiers *parse_decl_specifiers(struct parser *parser) {
-	union token tok = lexer_next_token(parser->lexer);
+	union token tok;
+	void *nd;
 	struct dynarr *darr = dynarr_init();
+
 	while (1) { // TODO handle more cases
-		void *nd;
+		tok = lexer_next_token(parser->lexer);
 		if (tok.tok_tag == TOK_INT) {
 			nd = type_specifier_init(tok.tok_tag);
 			token_destroy(tok);
