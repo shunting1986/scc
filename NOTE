@@ -1,3 +1,4 @@
+- NOTE: the only external resource I refer is the grammar of C language
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
 - TODO: let the make file support dependency on header file
 

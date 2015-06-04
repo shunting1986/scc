@@ -1,0 +1,33 @@
+external_declaration: function_definition
+	| declaration;
+
+function_definition: declaration_specifiers declarator compound_statement ;
+
+declaration: declaration_specifiers init_declarator_list;
+
+init_declarator_list: init_declarator
+	| init_declarator_list ',' init_declarator
+	;
+
+init_declarator: declarator
+	| declarator '=' initializer
+	;
+
+compound_statement
+  : '{' '}'
+	| '{' statement_list '}'
+	| '{' declaration_list '}'
+	| '{' declaration_list statement_list '}'
+	;
+
+declaration_specifiers 
+  : storage_class_specifier
+	| storage_class_specifier declaration_specifiers
+	| type_specifier
+	| type_specifier declaration_specifiers
+	| type_qualifier 
+	| type_qualifier declaration_specifiers
+	;
+
+
+

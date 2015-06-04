@@ -10,6 +10,7 @@ CFLAGS+=-Isrc
 LIB_SRC_LIST := util/file_reader.c \
 	util/util.c \
 	util/cbuf.c \
+	util/dynarr.c \
 	lex/lexer.c \
 	lex/keyword.c \
 	lex/token.c \
