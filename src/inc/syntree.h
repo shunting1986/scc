@@ -19,6 +19,7 @@ enum syntree_node_type {
 	TYPE_SPECIFIER,
 	DIRECT_DECLARATOR,
 	DECLARATOR,
+	COMPOUND_STATEMENT,
 };
 
 struct syntreebasenode {
@@ -62,6 +63,12 @@ struct type_specifier {
 };
 
 struct type_specifier *type_specifier_init(int tok_tag);
+
+struct compound_statement {
+	int nodeType;
+	struct dynarr *declList;
+	struct dynarr *stmtList;
+};
 
 // I decide to put the syntreenode definition in .h file.
 // May revise to put in .c file later

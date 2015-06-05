@@ -71,9 +71,17 @@ void token_dump(union token token) {
 	}
 }
 
-// TODO return informative information
-char *token_tag_str(int tok_tag) {
-	static char buf[256]; // TODO avoid this static array	
-	sprintf(buf, "%d", tok_tag);
-	return buf;
+static const char *token_tag_str_list[] = {
+#define DEF(tok) [tok] = #tok,
+#define DEFV(tok, val) DEF(tok)
+#include <lex/token.def>
+#undef DEFV
+#undef DEF
+};
+
+const char *token_tag_str(int tok_tag) {
+	if (tok_tag < 0 || tok_tag >= TOK_TOTAL_NUM || token_tag_str_list[tok_tag] == NULL) {
+		panic("Invalid token tag: %d", tok_tag);
+	}
+	return token_tag_str_list[tok_tag];
 }

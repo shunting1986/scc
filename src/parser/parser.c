@@ -69,6 +69,11 @@ static struct declarator *parse_declarator(struct parser *parser) {
 	return declarator;
 }
 
+static struct compound_statement *parse_compound_statement(struct parser *parser) {
+	expect(parser->lexer, TOK_LBRACE);
+	panic("parse_compound_statement ni");
+}
+
 // assume no EOF found; 
 static struct external_decl_node *parse_external_decl(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
@@ -76,7 +81,7 @@ static struct external_decl_node *parse_external_decl(struct parser *parser) {
 
 	// TODO: parse general declaration here, right now this function only focus on function definition
 
-	// TODO parse compound statement
+	struct compound_statement *compoundStmt = parse_compound_statement(parser);
 
 	panic("parse_external_decl ni"); 
 }

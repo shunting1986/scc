@@ -23,29 +23,17 @@ union token {
 };
 
 enum {
-	TOK_LPAREN = '(',
-	TOK_RPAREN = ')',
-	TOK_LBRACE = '{',
-	TOK_RBRACE = '}',
-	TOK_COMMA = ',',
-	TOK_SEMICOLON = ';',
-	TOK_AMPERSAND = '&',
-	TOK_ASSIGN = '=',
-	TOK_ADD = '+',
-
-	TOK_INT = 256,
-	TOK_RETURN,
-	TOK_IDENTIFIER,
-	TOK_STRING_LITERAL,
-	TOK_CONSTANT_VALUE,
-
-	TOK_EOF,
-	TOK_UNDEF,
+#define DEFV(tok, v) tok = v,
+#define DEF(tok) tok,
+#include "lex/token.def"
+#undef DEFV
+#undef DEF
+	TOK_TOTAL_NUM,
 };
 
 void token_destroy(union token token);
 void token_dump(union token token);
-char *token_tag_str(int tok_tag);
+const char *token_tag_str(int tok_tag);
 
 #ifdef __cplusplus
 }
