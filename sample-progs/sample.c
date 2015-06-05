@@ -1,5 +1,5 @@
 int
-main(void) {
+main() {
 	int a, b;
 	scanf("%d%d", &a, &b);
 	int c;

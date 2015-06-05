@@ -58,6 +58,13 @@ static struct direct_declarator *parse_direct_declarator(struct parser *parser) 
 	union token tok = expect(parser->lexer, TOK_IDENTIFIER);
 	struct direct_declarator *dd = direct_declarator_init();
 	dd->id = tok.id.s;
+
+	tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_LPAREN) {
+		expect(parser->lexer, TOK_RPAREN);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+	}
 	return dd;
 }
 
@@ -69,9 +76,42 @@ static struct declarator *parse_declarator(struct parser *parser) {
 	return declarator;
 }
 
+static struct declaration *parse_declaration(struct parser *parser) {
+	lexer_dump_remaining(parser->lexer); // TODO
+	panic("parse_declaration ni");
+}
+
+static struct statement *parse_statement(struct parser *parser) {
+	panic("parse_statement ni");
+}
+
+/*
+ * Checks if the token initiates a declaration (or statement). Used by parse_compound_statement
+ */
+static int initiateDeclaration(union token tok) {
+	return tok.tok_tag == TOK_INT; // TODO: refine this
+}
+
 static struct compound_statement *parse_compound_statement(struct parser *parser) {
 	expect(parser->lexer, TOK_LBRACE);
-	panic("parse_compound_statement ni");
+
+	// look one token ahead to determing if this is a declaration or statement or empty block
+	union token tok = lexer_next_token(parser->lexer);
+	struct dynarr *declList = dynarr_init();
+	struct dynarr *stmtList = dynarr_init();
+	while (tok.tok_tag != TOK_RBRACE) {
+		if (initiateDeclaration(tok)) {
+			if (dynarr_size(stmtList) > 0) {
+				panic("encounter declaration after statement");
+			}
+			lexer_put_back(parser->lexer, tok);
+			dynarr_add(declList, parse_declaration(parser));
+		} else { // initiate a statement
+			lexer_put_back(parser->lexer, tok);
+			dynarr_add(stmtList, parse_statement(parser));
+		}
+	}
+	return compound_statement_init(declList, stmtList);
 }
 
 // assume no EOF found; 
@@ -80,6 +120,7 @@ static struct external_decl_node *parse_external_decl(struct parser *parser) {
 	struct declarator *declarator = parse_declarator(parser);
 
 	// TODO: parse general declaration here, right now this function only focus on function definition
+	// TODO: can reuse the code in parse_declaration
 
 	struct compound_statement *compoundStmt = parse_compound_statement(parser);
 

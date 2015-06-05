@@ -10,6 +10,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	util/util.c \
 	util/cbuf.c \
 	util/dynarr.c \
+	util/malloc.c \
 	lex/lexer.c \
 	lex/keyword.c \
 	lex/token.c \

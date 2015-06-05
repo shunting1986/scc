@@ -1,8 +1,11 @@
 #include <inc/syntree.h>
+#include <inc/util.h>
 
 void syntree_dump(struct syntree *tree) {
 	panic("syntree_dump ni"); // TODO
 }
+
+// TODO add sth like syntree_free
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr) {
 	struct declaration_specifiers *specs = malloc(sizeof(*specs));
@@ -28,4 +31,12 @@ struct declarator *declarator_init() {
 	struct declarator *declarator = calloc(1, sizeof(*declarator));
 	declarator->nodeType = DECLARATOR;
 	return declarator;
+}
+
+struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList) {
+	struct compound_statement *stmt = mallocz(sizeof(*stmt));
+	stmt->nodeType = COMPOUND_STATEMENT;
+	stmt->declList = declList;
+	stmt->stmtList = stmtList;
+	return stmt;
 }

@@ -70,6 +70,8 @@ struct compound_statement {
 	struct dynarr *stmtList;
 };
 
+struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+
 // I decide to put the syntreenode definition in .h file.
 // May revise to put in .c file later
 union syntreenode {

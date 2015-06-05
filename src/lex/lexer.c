@@ -50,6 +50,18 @@ void lexer_put_back(struct lexer *lexer, union token token) {
 	lexer->put_back = token;
 }
 
+// for debugging
+void lexer_dump_remaining(struct lexer *lexer) {
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(lexer);
+		if (tok.tok_tag == TOK_EOF) {
+			break;
+		}
+		token_dump(tok);
+	}
+}
+
 union token expect(struct lexer *lexer, int tok_tag) {
 	union token tok = lexer_next_token(lexer);
 	if (tok.tok_tag != tok_tag) {

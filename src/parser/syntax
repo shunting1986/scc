@@ -33,3 +33,12 @@ declarator
   : direct_declarator
 	| pointer direct_declarator;
 
+direct_declarator
+  : IDENTIFIER
+	| '(' declarator ')'
+	| direct_declarator '[' constant_expression ']'
+	| direct_declarator '[' ']'
+	| direct_declarator '(' parameter_type_list ')'
+	| direct_declarator '(' ')'
+	;
+

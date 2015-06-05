@@ -18,6 +18,7 @@ union token lexer_next_token(struct lexer *lexer);
 union token expect(struct lexer *lexer, int tok_tag);
 void lexer_put_back(struct lexer *lexer, union token token);
 void lexer_destroy(struct lexer *lexer);
+void lexer_dump_remaining(struct lexer *lexer);
 
 #ifdef __cplusplus
 }
