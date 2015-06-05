@@ -18,4 +18,14 @@ struct type_specifier *type_specifier_init(int tok_tag) {
 	return sp;
 }
 
+struct direct_declarator *direct_declarator_init() {
+	struct direct_declarator *dd = malloc(sizeof(*dd));
+	dd->nodeType = DIRECT_DECLARATOR;
+	return dd;
+}
 
+struct declarator *declarator_init() {
+	struct declarator *declarator = calloc(1, sizeof(*declarator));
+	declarator->nodeType = DECLARATOR;
+	return declarator;
+}

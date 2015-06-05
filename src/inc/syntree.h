@@ -17,6 +17,8 @@ enum syntree_node_type {
 	TRANSLATION_UNIT,
 	EXTERNAL_DECL,
 	TYPE_SPECIFIER,
+	DIRECT_DECLARATOR,
+	DECLARATOR,
 };
 
 struct syntreebasenode {
@@ -38,6 +40,20 @@ struct declaration_specifiers {
 };
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr);
+
+struct direct_declarator {
+	int nodeType;
+	char *id;
+};
+
+struct direct_declarator *direct_declarator_init();
+
+struct declarator {
+	int nodeType;
+	struct direct_declarator *directDeclarator;
+};
+
+struct declarator *declarator_init();
 
 struct type_specifier {
 	int nodeType;

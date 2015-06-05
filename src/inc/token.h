@@ -45,6 +45,7 @@ enum {
 
 void token_destroy(union token token);
 void token_dump(union token token);
+char *token_tag_str(int tok_tag);
 
 #ifdef __cplusplus
 }

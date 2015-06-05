@@ -29,5 +29,7 @@ declaration_specifiers
 	| type_qualifier declaration_specifiers
 	;
 
-
+declarator
+  : direct_declarator
+	| pointer direct_declarator;
 

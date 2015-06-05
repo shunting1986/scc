@@ -52,10 +52,32 @@ static struct declaration_specifiers *parse_decl_specifiers(struct parser *parse
 	return declaration_specifiers_init(darr);
 }
 
+// TODO parse trailing '[' or '('
+// TODO parse '(' declarator ')'
+static struct direct_declarator *parse_direct_declarator(struct parser *parser) {
+	union token tok = expect(parser->lexer, TOK_IDENTIFIER);
+	struct direct_declarator *dd = direct_declarator_init();
+	dd->id = tok.id.s;
+	return dd;
+}
+
+// TODO: handle pointer here
+static struct declarator *parse_declarator(struct parser *parser) {
+	struct direct_declarator *direct_declarator = parse_direct_declarator(parser);
+	struct declarator *declarator = declarator_init();
+	declarator->directDeclarator = direct_declarator;
+	return declarator;
+}
+
 // assume no EOF found; 
-// XXX: only handle function definition right now
 static struct external_decl_node *parse_external_decl(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
-	panic("parse_external_decl ni"); // assume no EOF found
+	struct declarator *declarator = parse_declarator(parser);
+
+	// TODO: parse general declaration here, right now this function only focus on function definition
+
+	// TODO parse compound statement
+
+	panic("parse_external_decl ni"); 
 }
 

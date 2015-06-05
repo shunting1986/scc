@@ -71,4 +71,9 @@ void token_dump(union token token) {
 	}
 }
 
-
+// TODO return informative information
+char *token_tag_str(int tok_tag) {
+	static char buf[256]; // TODO avoid this static array	
+	sprintf(buf, "%d", tok_tag);
+	return buf;
+}
