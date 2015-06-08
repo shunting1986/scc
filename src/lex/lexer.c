@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <inc/lexer.h>
 #include <inc/cbuf.h>
+#include <inc/util.h>
 
 struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = malloc(sizeof(*lexer));

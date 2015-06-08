@@ -48,4 +48,10 @@ struct init_declarator_list *init_declarator_list_init(struct dynarr *darr) {
 	return declarator_list;
 }
 
-
+struct init_declarator *init_declarator_init(struct declarator *declarator, struct initializer *initializer) {
+	struct init_declarator *init_declarator = mallocz(sizeof(*init_declarator));
+	init_declarator->nodeType = INIT_DECLARATOR;
+	init_declarator->declarator = declarator;
+	init_declarator->initializer = initializer;
+	return init_declarator;
+}

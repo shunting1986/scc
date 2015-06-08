@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <inc/parser.h>
 #include <inc/dynarr.h>
+#include <inc/util.h>
 
 struct parser {
 	struct lexer *lexer;
@@ -76,8 +77,20 @@ static struct declarator *parse_declarator(struct parser *parser) {
 	return declarator;
 }
 
+static struct initializer *parse_initializer(struct parser *parser) {
+	panic("parse_initializer ni");
+}
+
 static struct init_declarator *parse_init_declarator(struct parser *parser) {
-	panic("parse_init_declarator ni");
+	struct declarator *declarator = parse_declarator(parser);	
+	union token tok = lexer_next_token(parser->lexer);
+	struct initializer *initializer = NULL;
+	if (tok.tok_tag == TOK_ASSIGN) {
+		initializer = parse_initializer(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok); // put back the look ahead token
+	}
+	return init_declarator_init(declarator, initializer);
 }
 
 // parse init declarator util meeting a ';'

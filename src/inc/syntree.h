@@ -11,6 +11,8 @@ extern "C" {
 struct syntree;
 struct dynarr;
 
+struct declarator;
+
 void syntree_dump(struct syntree *tree);
 
 enum syntree_node_type {
@@ -21,6 +23,8 @@ enum syntree_node_type {
 	DECLARATOR,
 	COMPOUND_STATEMENT,
 	INIT_DECLARATOR_LIST,
+	INIT_DECLARATOR,
+	INITIALIZER,
 };
 
 struct syntreebasenode {
@@ -36,9 +40,18 @@ struct external_decl_node {
 	int nodeType;
 };
 
-struct init_declarator {
+struct initializer {
 	int nodeType;
 };
+
+struct init_declarator {
+	int nodeType;
+	struct declarator *declarator;
+	struct initializer *initializer;
+};
+
+struct init_declarator *init_declarator_init(struct declarator *declarator, struct initializer *initializer);
+
 
 struct init_declarator_list {
 	int nodeType;

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <inc/token.h>
+#include <inc/util.h>
 
 void token_destroy(union token token) {
 	switch (token.tok_tag) {
