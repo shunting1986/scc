@@ -76,7 +76,16 @@ static struct declarator *parse_declarator(struct parser *parser) {
 	return declarator;
 }
 
+// parse init declarator util meeting a ';'
+static struct init_declarator_list *parse_init_declarator_list(struct parser *parser) {
+	panic("parse_init_declarator_list ni");
+}
+
 static struct declaration *parse_declaration(struct parser *parser) {
+	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
+	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
+
+	// int a, b;
 	lexer_dump_remaining(parser->lexer); // TODO
 	panic("parse_declaration ni");
 }

@@ -35,6 +35,16 @@ struct external_decl_node {
 	int nodeType;
 };
 
+struct init_declarator_list {
+	int nodeType;
+};
+
+struct declaration {
+	int nodeType;
+	struct declaration_specifiers *decl_specifiers;
+	struct init_declarator_list *init_declarator_list;
+};
+
 struct declaration_specifiers {
 	int nodeType;
 	struct dynarr *darr;
