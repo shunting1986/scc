@@ -2,6 +2,8 @@
   + parse declaration specifiers
 	+ parse declarators
 	+ parse initializer
+
+* after succeed to do parsing, dump/format the syntree as C source code
 =====================
 
 - NOTE: the only external resource I refer is the grammar of C language

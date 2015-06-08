@@ -20,6 +20,7 @@ enum syntree_node_type {
 	DIRECT_DECLARATOR,
 	DECLARATOR,
 	COMPOUND_STATEMENT,
+	INIT_DECLARATOR_LIST,
 };
 
 struct syntreebasenode {
@@ -35,9 +36,16 @@ struct external_decl_node {
 	int nodeType;
 };
 
-struct init_declarator_list {
+struct init_declarator {
 	int nodeType;
 };
+
+struct init_declarator_list {
+	int nodeType;
+	struct dynarr *darr;
+};
+
+struct init_declarator_list *init_declarator_list_init(struct dynarr *darr);
 
 struct declaration {
 	int nodeType;

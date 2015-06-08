@@ -40,3 +40,12 @@ struct compound_statement *compound_statement_init(struct dynarr *declList, stru
 	stmt->stmtList = stmtList;
 	return stmt;
 }
+
+struct init_declarator_list *init_declarator_list_init(struct dynarr *darr) {
+	struct init_declarator_list *declarator_list = mallocz(sizeof(*declarator_list));
+	declarator_list->nodeType = INIT_DECLARATOR_LIST;
+	declarator_list->darr = darr;
+	return declarator_list;
+}
+
+

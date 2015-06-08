@@ -76,9 +76,29 @@ static struct declarator *parse_declarator(struct parser *parser) {
 	return declarator;
 }
 
+static struct init_declarator *parse_init_declarator(struct parser *parser) {
+	panic("parse_init_declarator ni");
+}
+
 // parse init declarator util meeting a ';'
 static struct init_declarator_list *parse_init_declarator_list(struct parser *parser) {
-	panic("parse_init_declarator_list ni");
+	struct dynarr *darr = dynarr_init();
+	struct init_declarator *init_declarator;
+	union token tok;
+	while (1) {
+		init_declarator = parse_init_declarator(parser);
+		dynarr_add(darr, init_declarator);
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag == TOK_COMMA) {
+			// go on for next init_declarator
+		} else 
+		if (tok.tok_tag == TOK_SEMICOLON) {
+			break;
+		} else {
+			expect(parser->lexer, TOK_COMMA);
+		}
+	}
+	return init_declarator_list_init(darr);
 }
 
 static struct declaration *parse_declaration(struct parser *parser) {
