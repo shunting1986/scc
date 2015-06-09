@@ -48,6 +48,8 @@ build-lib: $(LIB_SCC)
 $(LIB_SCC): $(LIB_OBJ_LIST)
 	@ar -r $(LIB_SCC) $^
 
+rebuild-test: clean build-test
+
 build-test: $(LIB_SCC)
 	g++ $(CFLAGS) $(GTEST_CFLAGS) $(GTEST_LDFLAGS) -o test/runtest $(TEST_SRC_LIST) $(LIB_SCC)
 	./test/runtest

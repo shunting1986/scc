@@ -1,3 +1,5 @@
+??? should we use a queue or stack for the put back ???
+
 - parse declaration
   + parse declaration specifiers
 	+ parse declarators
@@ -11,6 +13,3 @@
 - TODO: let the make file support dependency on header file
 
 - HERE: be able to do lexicial analyzer first..
-
-- First: be able to parse basic identifier
-- Second: treat key words specially

@@ -7,14 +7,18 @@
 #include <inc/util.h>
 
 struct lexer *lexer_init(struct file_reader *cstream) {
-	struct lexer *lexer = malloc(sizeof(*lexer));
+	struct lexer *lexer = mallocz(sizeof(*lexer));
 	lexer->cstream = cstream;
-	lexer->put_back.tok_tag = TOK_UNDEF;
 	return lexer;
 }
 
 void lexer_destroy(struct lexer *lexer) {
-	token_destroy(lexer->put_back);
+	int i;
+	// order is not important here
+	for (i = 0; i < lexer->nputback; i++) {
+		token_destroy(lexer->putback_stk[i]);
+	}
+	lexer->nputback = 0;
 	free(lexer);
 }
 
@@ -47,8 +51,8 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 }
 
 void lexer_put_back(struct lexer *lexer, union token token) {
-	assert(lexer->put_back.tok_tag == TOK_UNDEF);
-	lexer->put_back = token;
+	assert(lexer->nputback < LOOKAHEAD_NUM);
+	lexer->putback_stk[lexer->nputback++] = token;
 }
 
 // for debugging
@@ -79,12 +83,8 @@ union token lexer_next_token(struct lexer *lexer) {
 	char *s;
 	int token_tag;
 
-	if (lexer->put_back.tok_tag != TOK_UNDEF) {
-		union token ret = lexer->put_back;
-		memset(&lexer->put_back, 0, sizeof(lexer->put_back));
-		lexer->put_back.tok_tag = TOK_UNDEF;
-		// printf("lexer_next_token %d\n", tok.tok_tag);
-		return ret;
+	if (lexer->nputback > 0) {
+		return lexer->putback_stk[--lexer->nputback];
 	}
 
 repeat:
