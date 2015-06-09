@@ -1,6 +1,6 @@
 # setting for gtest
 GTEST_ROOT=/media/shunting/disk/compiler/3rdParty/gtest-1.7.0
-GTEST_CFLAGS=-isystem $(GTEST_ROOT)/include
+GTEST_CFLAGS=-isystem $(GTEST_ROOT)/include -g
 GTEST_LDFLAGS=$(GTEST_ROOT)/make/gtest-all.o -lpthread
 
 CFLAGS += -Isrc $(MCFLAGS)

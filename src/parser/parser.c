@@ -117,10 +117,7 @@ static struct init_declarator_list *parse_init_declarator_list(struct parser *pa
 static struct declaration *parse_declaration(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
-
-	// int a, b;
-	lexer_dump_remaining(parser->lexer); // TODO
-	panic("parse_declaration ni");
+	return declaration_init(decl_specifiers, init_declarator_list);
 }
 
 static struct statement *parse_statement(struct parser *parser) {
@@ -152,6 +149,7 @@ static struct compound_statement *parse_compound_statement(struct parser *parser
 			lexer_put_back(parser->lexer, tok);
 			dynarr_add(stmtList, parse_statement(parser));
 		}
+		tok = lexer_next_token(parser->lexer);
 	}
 	return compound_statement_init(declList, stmtList);
 }

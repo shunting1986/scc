@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include <inc/util.h>
 
@@ -13,5 +14,6 @@ _panic(const char *fname, int line, char *fmt, ...) {
 	vprintf(fmt, va);
 	va_end(va);
 	putchar('\n');
+	// assert(0 && "_panic");
 	exit(1);
 }

@@ -16,6 +16,8 @@ struct declarator;
 void syntree_dump(struct syntree *tree);
 
 enum syntree_node_type {
+	DECLARATION_SPECIFIERS,
+	DECLARATION,
 	TRANSLATION_UNIT,
 	EXTERNAL_DECL,
 	TYPE_SPECIFIER,
@@ -65,6 +67,8 @@ struct declaration {
 	struct declaration_specifiers *decl_specifiers;
 	struct init_declarator_list *init_declarator_list;
 };
+
+struct declaration *declaration_init(struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 
 struct declaration_specifiers {
 	int nodeType;

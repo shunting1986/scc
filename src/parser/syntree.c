@@ -9,6 +9,7 @@ void syntree_dump(struct syntree *tree) {
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr) {
 	struct declaration_specifiers *specs = malloc(sizeof(*specs));
+	specs->nodeType = DECLARATION_SPECIFIERS;
 	specs->darr = darr;
 	return specs;
 }
@@ -55,3 +56,13 @@ struct init_declarator *init_declarator_init(struct declarator *declarator, stru
 	init_declarator->initializer = initializer;
 	return init_declarator;
 }
+
+struct declaration *declaration_init(struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
+	struct declaration *decl = mallocz(sizeof(*decl));
+	decl->nodeType = DECLARATION;
+	decl->decl_specifiers = decl_specifiers;
+	decl->init_declarator_list = init_declarator_list;
+	return decl;
+}
+
+
