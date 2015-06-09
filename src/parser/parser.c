@@ -110,7 +110,7 @@ static struct init_declarator_list *parse_init_declarator_list(struct parser *pa
 	return init_declarator_list_init(darr);
 }
 
-static struct declaration *parse_declaration(struct parser *parser) {
+struct declaration *parse_declaration(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
 	return declaration_init(decl_specifiers, init_declarator_list);
@@ -119,31 +119,8 @@ static struct declaration *parse_declaration(struct parser *parser) {
 /*
  * Checks if the token initiates a declaration (or statement). Used by parse_compound_statement
  */
-static int initiateDeclaration(union token tok) {
+int initiate_declaration(union token tok) {
 	return tok.tok_tag == TOK_INT; // TODO: refine this
-}
-
-static struct compound_statement *parse_compound_statement(struct parser *parser) {
-	expect(parser->lexer, TOK_LBRACE);
-
-	// look one token ahead to determing if this is a declaration or statement or empty block
-	union token tok = lexer_next_token(parser->lexer);
-	struct dynarr *declList = dynarr_init();
-	struct dynarr *stmtList = dynarr_init();
-	while (tok.tok_tag != TOK_RBRACE) {
-		if (initiateDeclaration(tok)) {
-			if (dynarr_size(stmtList) > 0) {
-				panic("encounter declaration after statement");
-			}
-			lexer_put_back(parser->lexer, tok);
-			dynarr_add(declList, parse_declaration(parser));
-		} else { // initiate a statement
-			lexer_put_back(parser->lexer, tok);
-			dynarr_add(stmtList, parse_statement(parser));
-		}
-		tok = lexer_next_token(parser->lexer);
-	}
-	return compound_statement_init(declList, stmtList);
 }
 
 // assume no EOF found; 

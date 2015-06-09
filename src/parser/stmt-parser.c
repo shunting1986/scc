@@ -3,17 +3,37 @@
  */
 #include <inc/parser.h>
 #include <inc/util.h>
+#include <inc/dynarr.h>
 
 static int initiate_compound_statement(union token tok) {
-	panic("initiate_compound_statement ni");
+	return tok.tok_tag == TOK_LBRACE;
 }
 
-static struct compound_statement *parse_compound_statement(struct parser *parser) {
-	panic("parse_compound_statement ni"); // TODO: move from parser.c
+struct compound_statement *parse_compound_statement(struct parser *parser) {
+	expect(parser->lexer, TOK_LBRACE);
+
+	// look one token ahead to determing if this is a declaration or statement or empty block
+	union token tok = lexer_next_token(parser->lexer);
+	struct dynarr *declList = dynarr_init();
+	struct dynarr *stmtList = dynarr_init();
+	while (tok.tok_tag != TOK_RBRACE) {
+		if (initiate_declaration(tok)) {
+			if (dynarr_size(stmtList) > 0) {
+				panic("encounter declaration after statement");
+			}
+			lexer_put_back(parser->lexer, tok);
+			dynarr_add(declList, parse_declaration(parser));
+		} else { // initiate a statement
+			lexer_put_back(parser->lexer, tok);
+			dynarr_add(stmtList, parse_statement(parser));
+		}
+		tok = lexer_next_token(parser->lexer);
+	}
+	return compound_statement_init(declList, stmtList);
 }
 
 static int initiate_iteration_statement(union token tok) {
-	panic("initiate_iteration_statement ni");
+	return tok.tok_tag == TOK_WHILE || tok.tok_tag == TOK_FOR || tok.tok_tag == TOK_DO;
 }
 
 static struct iteration_statement *parse_iteration_statement(struct parser *parser) {
@@ -21,7 +41,8 @@ static struct iteration_statement *parse_iteration_statement(struct parser *pars
 }
 
 static int initiate_jump_statement(union token tok) {
-	panic("initiate_jump_statement ni");
+	return tok.tok_tag == TOK_GOTO || tok.tok_tag == TOK_CONTINUE
+			|| tok.tok_tag == TOK_BREAK || tok.tok_tag == TOK_RETURN;
 }
 
 static struct jump_statement *parse_jump_statement(struct parser *parser) {
@@ -29,7 +50,7 @@ static struct jump_statement *parse_jump_statement(struct parser *parser) {
 }
 
 static int initiate_selection_statement(union token tok) {
-	panic("initiate_selection_statement ni");
+	return tok.tok_tag == TOK_IF || tok.tok_tag == TOK_SWITCH;
 }
 
 static struct selection_statement *parse_selection_statement(struct parser *parser) {
@@ -37,7 +58,8 @@ static struct selection_statement *parse_selection_statement(struct parser *pars
 }
 
 static int initiate_labeled_statement(union token tok, union token tok2) {
-	panic("initiate_labeled_statement ni");
+	return tok.tok_tag == TOK_CASE || tok.tok_tag == TOK_DEFAULT ||
+		(tok.tok_tag == TOK_IDENTIFIER && tok2.tok_tag == TOK_COLON);
 }
 
 static struct labeled_statement *parse_labeled_statement(struct parser *parser) {

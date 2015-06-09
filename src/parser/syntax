@@ -20,6 +20,33 @@ compound_statement
 	| '{' declaration_list statement_list '}'
 	;
 
+iteration_statement
+	: WHILE '(' expression ')' statement
+	| DO statement WHILE '( expression ')' ';'
+	| FOR '(' expression_statement expression_statement ')' statement
+	| FOR '(' expression_statement expression_statement ')' statement
+	;
+
+jump_statement
+	: GOTO IDENTIFIER ';'
+	| CONTINUE ';'
+	| BREAK ';'
+	| RETURN ';'
+	| RETURN expression ';'
+	;
+
+selection_statement
+	: IF '(' expression ')' statement
+	| IF '(' expression ')' statement ELSE statement
+	| SWITCH '(' expression ')' statement
+	;
+
+labeled_statement
+	: IDENTIFIER ':' statement
+	| CASE constant_expression ':' statement
+	| DEFAULT ':' statement
+	;
+
 declaration_specifiers 
   : storage_class_specifier
 	| storage_class_specifier declaration_specifiers

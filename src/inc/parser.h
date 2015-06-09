@@ -18,6 +18,10 @@ void parser_destroy(struct parser *parser);
 // parse methods
 struct syntree *parse(struct parser *parser);
 struct syntreebasenode *parse_statement(struct parser *parser);
+struct compound_statement *parse_compound_statement(struct parser *parser);
+
+int initiate_declaration(union token tok);
+struct declaration *parse_declaration(struct parser *parser);
 
 #ifdef __cplusplus
 }
