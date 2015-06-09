@@ -8,11 +8,16 @@
 extern "C" {
 #endif
 
-struct parser;
+struct parser {
+	struct lexer *lexer;
+};
 
 struct parser *parser_init(struct lexer *lexer);
-struct syntree *parse(struct parser *parser);
 void parser_destroy(struct parser *parser);
+
+// parse methods
+struct syntree *parse(struct parser *parser);
+struct syntreebasenode *parse_statement(struct parser *parser);
 
 #ifdef __cplusplus
 }

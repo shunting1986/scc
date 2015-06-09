@@ -42,3 +42,12 @@ direct_declarator
 	| direct_declarator '(' ')'
 	;
 
+statement
+	: compound_statement
+	| expression_statement
+	| iteration_statement
+	| selection_statement
+	| jump_statement
+	| labeled_statement
+	;
+

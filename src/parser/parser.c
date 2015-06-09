@@ -5,10 +5,6 @@
 #include <inc/dynarr.h>
 #include <inc/util.h>
 
-struct parser {
-	struct lexer *lexer;
-};
-
 static struct external_decl_node *parse_external_decl(struct parser *parser);
 
 struct parser *parser_init(struct lexer *lexer) {
@@ -118,10 +114,6 @@ static struct declaration *parse_declaration(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
 	return declaration_init(decl_specifiers, init_declarator_list);
-}
-
-static struct statement *parse_statement(struct parser *parser) {
-	panic("parse_statement ni");
 }
 
 /*
