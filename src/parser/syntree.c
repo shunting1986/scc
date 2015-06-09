@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <inc/syntree.h>
 #include <inc/util.h>
 
@@ -70,5 +71,13 @@ struct expression_statement *expression_statement_init(struct expression *expr) 
 	stmt->nodeType = EXPRESSION_STATEMENT;
 	stmt->expr = expr;
 	return stmt;
+}
+
+struct expression *expression_init(struct dynarr *darr) {
+	struct expression *expr = mallocz(sizeof(*expr));
+	assert(dynarr_size(darr) > 0);
+	expr->nodeType = EXPRESSION;
+	expr->darr = darr;
+	return expr;
 }
 

@@ -21,6 +21,7 @@ enum syntree_node_type {
 	TRANSLATION_UNIT,
 	EXTERNAL_DECL,
 	EXPRESSION_STATEMENT,
+	EXPRESSION,
 	TYPE_SPECIFIER,
 	DIRECT_DECLARATOR,
 	DECLARATOR,
@@ -108,9 +109,16 @@ struct compound_statement {
 
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
 
-struct expression {
+struct assignment_expression {
 	int nodeType;
 };
+
+struct expression {
+	int nodeType;
+	struct dynarr *darr; // list of assignment expressions, evaluate from left to right
+};
+
+struct expression *expression_init(struct dynarr *darr);
 
 struct expression_statement {
 	int nodeType;

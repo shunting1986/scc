@@ -69,6 +69,15 @@ direct_declarator
 	| direct_declarator '(' ')'
 	;
 
+expression
+	: assignment_expression
+	| expression ',' assignment_expression
+
+expression_statement
+	: ';'
+	| expression ';'
+	;
+
 statement
 	: compound_statement
 	| expression_statement
