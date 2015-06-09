@@ -22,6 +22,7 @@ struct compound_statement *parse_compound_statement(struct parser *parser);
 
 int initiate_declaration(union token tok);
 struct declaration *parse_declaration(struct parser *parser);
+struct expression *parse_expression(struct parser *parser);
 
 #ifdef __cplusplus
 }

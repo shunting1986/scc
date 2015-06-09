@@ -67,7 +67,8 @@ static struct labeled_statement *parse_labeled_statement(struct parser *parser) 
 }
 
 static struct expression_statement *parse_expression_statement(struct parser *parser) {
-	panic("parse_expression_statement ni");
+	struct expression *expr = parse_expression(parser);
+	return expression_statement_init(expr);
 }
 
 /**

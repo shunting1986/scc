@@ -65,4 +65,10 @@ struct declaration *declaration_init(struct declaration_specifiers *decl_specifi
 	return decl;
 }
 
+struct expression_statement *expression_statement_init(struct expression *expr) {
+	struct expression_statement *stmt = mallocz(sizeof(*stmt));
+	stmt->nodeType = EXPRESSION_STATEMENT;
+	stmt->expr = expr;
+	return stmt;
+}
 

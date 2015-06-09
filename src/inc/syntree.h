@@ -20,6 +20,7 @@ enum syntree_node_type {
 	DECLARATION,
 	TRANSLATION_UNIT,
 	EXTERNAL_DECL,
+	EXPRESSION_STATEMENT,
 	TYPE_SPECIFIER,
 	DIRECT_DECLARATOR,
 	DECLARATOR,
@@ -106,6 +107,17 @@ struct compound_statement {
 };
 
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+
+struct expression {
+	int nodeType;
+};
+
+struct expression_statement {
+	int nodeType;
+	struct expression *expr;
+};
+
+struct expression_statement *expression_statement_init(struct expression *expr);
 
 // I decide to put the syntreenode definition in .h file.
 // May revise to put in .c file later
