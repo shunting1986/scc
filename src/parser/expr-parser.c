@@ -23,6 +23,61 @@ static struct cast_expression *parse_cast_expression(struct parser *parser) {
 	return cast_expr;
 }
 
+static struct multiplicative_expression *parse_multiplicative_expression(struct parser *parser) {
+	struct cast_expression *cast_expr = parse_cast_expression(parser);
+	panic("parse_multiplicative_expression ni");
+}
+
+static struct additive_expression *parse_additive_expression(struct parser *parser) {
+	struct multiplicative_expression *mul_expr = parse_multiplicative_expression(parser);
+	panic("parse_additive_expression ni");
+}
+
+static struct shift_expression *parse_shift_expression(struct parser *parser) {
+	struct additive_expression *add_expr = parse_additive_expression(parser);
+	panic("parse_shift_expression ni");
+}
+
+static struct relational_expression *parse_relational_expression(struct parser *parser) {
+	struct shift_expression *shift_expr = parse_shift_expression(parser);
+	panic("parse_relational_expression ni");
+}
+
+static struct equality_expression *parse_equality_expression(struct parser *parser) {
+	struct relational_expression *rel_expr = parse_relational_expression(parser);
+	panic("parse_equality_expression ni");
+}
+
+static struct and_expression *parse_and_expression(struct parser *parser) {
+	struct equality_expression *eq_expr = parse_equality_expression(parser);
+	panic("parse_and_expression ni");
+}
+
+static struct exclusive_or_expression *parse_exclusive_or_expression(struct parser *parser) {
+	struct and_expression *and_expr = parse_and_expression(parser);
+	panic("parse_exclusive_or_expression ni");
+}
+
+static struct inclusive_or_expression *parse_inclusive_or_expression(struct parser *parser) {
+	struct exclusive_or_expression *ex_expr = parse_exclusive_or_expression(parser);
+	panic("parse_inclusive_or_expression ni");
+}
+
+static struct logical_and_expression *parse_logical_and_expression(struct parser *parser) {
+	struct inclusive_or_expression *or_expr = parse_inclusive_or_expression(parser);
+	panic("parse_logical_and_expression ni");
+}
+
+static struct logical_or_expression *parse_logical_or_expression(struct parser *parser) {
+	struct logical_and_expression *and_expr = parse_logical_and_expression(parser);
+	panic("parse_logical_or_expression ni");
+}
+
+static struct conditional_expression *parse_conditional_expression(struct parser *parser) {
+	struct logical_or_expression *or_expr = parse_logical_or_expression(parser);
+	panic("parse_conditional_expression ni");
+}
+
 /*
  * assignment_expression
  *   : conditional_expression
@@ -37,12 +92,16 @@ static struct cast_expression *parse_cast_expression(struct parser *parser) {
  * 2) We can parse cast_expression which is the first *FORK* node for conditional_expression and 
  *    also a parent of unary_expression
  *
- * I'll choose 2) solution since the first one will nest a unary_expression deeply in the 
- * expression tree which is not so efficient. We need make expression parsing efficient since
- * it's common.
+ * XX I'll choose 2) solution since the first one will nest a unary_expression deeply in the 
+ * XX expression tree which is not so efficient. We need make expression parsing efficient since
+ * XX it's common.
+ *
+ * I choose 1). 1) has the drawback to nest a unary_expression deeply in the expression tree. However,
+ * that's not a problem since anyway this happens a lot: f(a, 1), a and 1 will be nested in
+ * assignment expression. The benefit we get is a cleaner function definitions.
  */
 static struct assignment_expression *parse_assignment_expression(struct parser *parser) {
-	struct cast_expression *cast_expression = parse_cast_expression(parser);
+	struct conditional_expression *cond_expr = parse_conditional_expression(parser);
 	panic("parse_assignment_expression ni");
 }
 
