@@ -15,11 +15,15 @@ union token {
 
 	struct {
 		int tok_tag;
+		char *s;
+	} str; // the same as id
+
+	struct {
+		int tok_tag;
 		union {
 			int ival;
 		};
 	} const_val;
-#define str id // for string literal, the s does not contains the quotes
 };
 
 enum {

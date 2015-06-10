@@ -14,6 +14,9 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 	if (tok.tok_tag == TOK_IDENTIFIER) {
 		prim_expr->id = tok.id.s;
 		return prim_expr;
+	} else if (tok.tok_tag == TOK_STRING_LITERAL) {
+		prim_expr->str = tok.str.s;
+		return prim_expr;
 	}
 	panic("parse_primary_expression ni");
 }
@@ -59,7 +62,10 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 static struct unary_expression *parse_unary_expression(struct parser *parser) {
 	// TODO handle other alternatives
 	struct postfix_expression *post_expr = parse_postfix_expression(parser);
-	panic("parse_unary_expression ni");
+
+	struct unary_expression *unary_expr = unary_expression_init(parser);
+	unary_expr->postfix_expr = post_expr;
+	return unary_expr;
 }
 
 // only handle the case for unary_expression right now
