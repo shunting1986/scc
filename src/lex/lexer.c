@@ -127,6 +127,40 @@ repeat:
 	case '+':
 		tok.tok_tag = ch;
 		break;
+	case '<':
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '<') {
+			ch = file_reader_next_char(lexer->cstream);
+			if (ch == '=') {
+				tok.tok_tag = TOK_LSHIFT_ASSIGN;
+			} else {
+				file_reader_put_back(lexer->cstream, ch);
+				tok.tok_tag = TOK_LSHIFT;	
+			}
+		} else if (ch == '=') {
+			tok.tok_tag = TOK_LE;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			tok.tok_tag = TOK_LT;
+		}
+		break;
+	case '>':
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '>') {
+			ch = file_reader_next_char(lexer->cstream);
+			if (ch == '=') {
+				tok.tok_tag = TOK_RSHIFT_ASSIGN;
+			} else {
+				file_reader_put_back(lexer->cstream, ch);
+				tok.tok_tag = TOK_RSHIFT;	
+			}
+		} else if (ch == '=') {
+			tok.tok_tag = TOK_GE;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			tok.tok_tag = TOK_GT;
+		}
+		break;
 	case '"':
 		parse_string_literal(lexer, &tok);
 		break;
