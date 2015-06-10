@@ -123,9 +123,26 @@ repeat:
 	case '\t':
 		goto repeat;
 	case '(': case ')': case '{': case '}':
-	case ',': case ';': case '&': case '=':
-	case '+':
+	case ',': case ';': case '&': case '+':
 		tok.tok_tag = ch;
+		break;
+	case '=':
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '=') {
+			tok.tok_tag = TOK_EQ;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			tok.tok_tag = TOK_ASSIGN;
+		}
+		break;
+	case '!':
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '=') {
+			tok.tok_tag = TOK_NE;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			tok.tok_tag = TOK_EXCLAMATION;
+		}
 		break;
 	case '<':
 		ch = file_reader_next_char(lexer->cstream);
