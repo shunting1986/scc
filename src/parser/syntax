@@ -69,6 +69,21 @@ direct_declarator
 	| direct_declarator '(' ')'
 	;
 
+type_name
+  : specifier_qualifier_list
+	| specifier_qualifier_list abstract_declarator
+	;
+
+cast_expression
+  : unary_expression
+	| '(' type_name ')' cast_expression
+	;
+
+assignment_expression
+  : conditional_expression
+	| unary_expression assignment_operator assignment_expression
+	;
+
 expression
 	: assignment_expression
 	| expression ',' assignment_expression

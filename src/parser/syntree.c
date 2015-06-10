@@ -81,3 +81,10 @@ struct expression *expression_init(struct dynarr *darr) {
 	return expr;
 }
 
+struct cast_expression *cast_expression_init() {
+	struct cast_expression *expr = mallocz(sizeof(*expr));
+	expr->nodeType = CAST_EXPRESSION;
+	return expr;
+}
+
+

@@ -15,6 +15,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	lex/keyword.c \
 	lex/token.c \
 	parser/parser.c \
+	parser/type-parser.c \
 	parser/stmt-parser.c \
 	parser/expr-parser.c \
 	parser/syntree.c 

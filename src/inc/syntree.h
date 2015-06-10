@@ -16,6 +16,7 @@ struct declarator;
 void syntree_dump(struct syntree *tree);
 
 enum syntree_node_type {
+	CAST_EXPRESSION,
 	DECLARATION_SPECIFIERS,
 	DECLARATION,
 	TRANSLATION_UNIT,
@@ -108,6 +109,13 @@ struct compound_statement {
 };
 
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+
+struct cast_expression {
+	int nodeType;
+	struct unary_expression *unary_expr;
+};
+
+struct cast_expression *cast_expression_init();
 
 struct assignment_expression {
 	int nodeType;
