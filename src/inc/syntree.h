@@ -35,6 +35,7 @@ enum syntree_node_type {
 	ARGUMENT_EXPRESSION_LIST,
 	UNARY_EXPRESSION,
 	MULTIPLICATIVE_EXPRESSION,
+	ADDITIVE_EXPRESSION,
 };
 
 struct syntreebasenode {
@@ -114,6 +115,15 @@ struct compound_statement {
 };
 
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+
+struct additive_expression {
+	int nodeType;
+	struct multiplicative_expression *first_expr;
+	struct dynarr *oplist;
+	struct dynarr *mul_expr_list;
+};
+
+struct additive_expression *additive_expression_init(struct multiplicative_expression *mul_expr);
 
 struct multiplicative_expression {
 	int nodeType;

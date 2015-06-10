@@ -123,3 +123,15 @@ struct multiplicative_expression *multiplicative_expression_init(struct cast_exp
 	multi_expr->cast_expr_list = dynarr_init();
 	return multi_expr;
 }
+
+struct additive_expression *additive_expression_init(struct multiplicative_expression *mul_expr) {
+	struct additive_expression *add_expr = mallocz(sizeof(*add_expr));
+	add_expr->nodeType = ADDITIVE_EXPRESSION;
+	add_expr->first_expr = mul_expr;
+	add_expr->oplist = dynarr_init();
+	add_expr->mul_expr_list = dynarr_init();
+	return add_expr;
+}
+
+
+

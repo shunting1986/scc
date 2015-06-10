@@ -101,7 +101,20 @@ static struct multiplicative_expression *parse_multiplicative_expression(struct 
 
 static struct additive_expression *parse_additive_expression(struct parser *parser) {
 	struct multiplicative_expression *mul_expr = parse_multiplicative_expression(parser);
-	panic("parse_additive_expression ni");
+	struct additive_expression *add_expr = additive_expression_init(mul_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_ADD && tok.tok_tag != TOK_SUB) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(add_expr->oplist, (void *) (long) tok.tok_tag);
+		dynarr_add(add_expr->mul_expr_list, parse_multiplicative_expression(parser));
+	}
+	return add_expr;
 }
 
 static struct shift_expression *parse_shift_expression(struct parser *parser) {
