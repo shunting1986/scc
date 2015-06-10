@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <inc/syntree.h>
 #include <inc/util.h>
+#include <inc/dynarr.h>
 
 void syntree_dump(struct syntree *tree) {
 	panic("syntree_dump ni"); // TODO
@@ -87,4 +88,16 @@ struct cast_expression *cast_expression_init() {
 	return expr;
 }
 
+struct primary_expression *primary_expression_init() {
+	struct primary_expression *expr = mallocz(sizeof(*expr));
+	expr->nodeType = PRIMARY_EXPRESSION;
+	return expr;
+}
 
+struct postfix_expression *postfix_expression_init(struct primary_expression *prim_expr) {
+	struct postfix_expression *post_expr = mallocz(sizeof(*post_expr));
+	post_expr->nodeType = POSTFIX_EXPRESSION;
+	post_expr->prim_expr = prim_expr;
+	post_expr->suff_list = dynarr_init();
+	return post_expr;
+}

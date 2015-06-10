@@ -30,6 +30,8 @@ enum syntree_node_type {
 	INIT_DECLARATOR_LIST,
 	INIT_DECLARATOR,
 	INITIALIZER,
+	PRIMARY_EXPRESSION,
+	POSTFIX_EXPRESSION,
 };
 
 struct syntreebasenode {
@@ -109,6 +111,32 @@ struct compound_statement {
 };
 
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+
+struct primary_expression {
+	int nodeType;
+	char *id;
+};
+
+struct primary_expression *primary_expression_init();
+
+struct postfix_expression_suffix {
+	struct expression *ind;
+	struct argument_expression_list *arg_list; // contains an empty list if the argument list is empty
+		// be NULL if the suffix is in other form
+	char *dot_id;
+	char *ptr_id;
+	int is_inc;
+	int is_dec;
+};
+
+struct postfix_expression {
+	int nodeType;
+	struct primary_expression *prim_expr;
+	struct dynarr *suff_list;
+};
+
+struct postfix_expression *postfix_expression_init(struct primary_expression *prim_expr);
+
 
 struct cast_expression {
 	int nodeType;

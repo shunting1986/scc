@@ -6,7 +6,41 @@
 #include <inc/util.h>
 #include <inc/dynarr.h>
 
+static struct primary_expression *parse_primary_expression(struct parser *parser) {
+	union token tok = lexer_next_token(parser->lexer);
+	struct primary_expression *prim_expr = primary_expression_init();
+	if (tok.tok_tag == TOK_IDENTIFIER) {
+		prim_expr->id = tok.id.s;
+		return prim_expr;
+	}
+	panic("parse_primary_expression ni");
+}
+
+static struct argument_expression_list *parse_argument_expression_list(struct parser *parser) {
+	panic("parse_argument_expression_list ni");
+}
+
+static struct postfix_expression *parse_postfix_expression(struct parser *parser) {
+	struct primary_expression *prim_expr = parse_primary_expression(parser);
+	struct postfix_expression *post_expr = postfix_expression_init(prim_expr);
+	union token tok = lexer_next_token(parser->lexer);
+	while (1) {
+		if (tok.tok_tag == TOK_LPAREN) {
+			struct argument_expression_list *arg_expr_list = parse_argument_expression_list(parser);
+			struct postfix_expression_suffix *suf = mallocz(sizeof(*suf));
+			suf->arg_list = arg_expr_list;
+			dynarr_add(post_expr->suff_list, suf);
+		} else {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+	}
+	return post_expr;
+}
+
 static struct unary_expression *parse_unary_expression(struct parser *parser) {
+	// TODO handle other alternatives
+	struct postfix_expression *post_expr = parse_postfix_expression(parser);
 	panic("parse_unary_expression ni");
 }
 

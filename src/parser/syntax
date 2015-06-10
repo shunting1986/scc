@@ -74,6 +74,15 @@ type_name
 	| specifier_qualifier_list abstract_declarator
 	;
 
+unary_expression
+  : postfix_expression
+	| INC_OP unary_expression
+	| DEC_OP unary_expression
+	| unary_operator cast_expression
+	| SIZEOF unary_expression
+	| SIZEOF '(' type_name ')'
+	;
+
 cast_expression
   : unary_expression
 	| '(' type_name ')' cast_expression
