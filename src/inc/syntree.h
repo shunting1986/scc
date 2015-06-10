@@ -32,6 +32,7 @@ enum syntree_node_type {
 	INITIALIZER,
 	PRIMARY_EXPRESSION,
 	POSTFIX_EXPRESSION,
+	ARGUMENT_EXPRESSION_LIST,
 };
 
 struct syntreebasenode {
@@ -118,6 +119,13 @@ struct primary_expression {
 };
 
 struct primary_expression *primary_expression_init();
+
+struct argument_expression_list {
+	int nodeType;
+	struct dynarr *list;
+};
+
+struct argument_expression_list *argument_expression_list_init();
 
 struct postfix_expression_suffix {
 	struct expression *ind;

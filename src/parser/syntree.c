@@ -101,3 +101,11 @@ struct postfix_expression *postfix_expression_init(struct primary_expression *pr
 	post_expr->suff_list = dynarr_init();
 	return post_expr;
 }
+
+struct argument_expression_list *argument_expression_list_init() {
+	struct argument_expression_list *arg_list = mallocz(sizeof(*arg_list));
+	arg_list->nodeType = ARGUMENT_EXPRESSION_LIST;
+	arg_list->list = dynarr_init();
+	return arg_list;
+}
+

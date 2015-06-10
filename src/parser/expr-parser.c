@@ -6,6 +6,8 @@
 #include <inc/util.h>
 #include <inc/dynarr.h>
 
+static struct assignment_expression *parse_assignment_expression(struct parser *parser);
+
 static struct primary_expression *parse_primary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
 	struct primary_expression *prim_expr = primary_expression_init();
@@ -17,7 +19,23 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 }
 
 static struct argument_expression_list *parse_argument_expression_list(struct parser *parser) {
-	panic("parse_argument_expression_list ni");
+	struct argument_expression_list *arg_list = argument_expression_list_init();
+	union token tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_RPAREN) {
+		return arg_list;
+	}
+	lexer_put_back(parser->lexer, tok);
+	while (1) {
+		struct assignment_expression *assign_expr = parse_assignment_expression(parser);
+		dynarr_add(arg_list->list, assign_expr);
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag == TOK_RPAREN) {
+			break;
+		} else if (tok.tok_tag != TOK_COMMA) {
+			panic("argument expression list expects ',', but %s found", token_tag_str(tok.tok_tag));
+		}
+	}
+	return arg_list;
 }
 
 static struct postfix_expression *parse_postfix_expression(struct parser *parser) {
