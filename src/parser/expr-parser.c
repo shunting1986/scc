@@ -155,7 +155,20 @@ static struct relational_expression *parse_relational_expression(struct parser *
 
 static struct equality_expression *parse_equality_expression(struct parser *parser) {
 	struct relational_expression *rel_expr = parse_relational_expression(parser);
-	panic("parse_equality_expression ni");
+	struct equality_expression *eq_expr = equality_expression_init(rel_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_EQ && tok.tok_tag != TOK_NE) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(eq_expr->oplist, (void *) (long) tok.tok_tag);
+		dynarr_add(eq_expr->rel_expr_list, parse_relational_expression(parser));
+	}
+	return eq_expr;
 }
 
 static struct and_expression *parse_and_expression(struct parser *parser) {

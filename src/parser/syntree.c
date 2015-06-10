@@ -151,3 +151,11 @@ struct relational_expression *relational_expression_init(struct shift_expression
 	return rel_expr;
 }
 
+struct equality_expression *equality_expression_init(struct relational_expression *rel_expr) {
+	struct equality_expression *eq_expr = mallocz(sizeof(*eq_expr));
+	eq_expr->nodeType = EQUALITY_EXPRESSION;
+	eq_expr->first_expr = rel_expr;
+	eq_expr->oplist = dynarr_init();
+	eq_expr->rel_expr_list = dynarr_init();
+	return eq_expr;
+}
