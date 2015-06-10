@@ -37,6 +37,7 @@ enum syntree_node_type {
 	MULTIPLICATIVE_EXPRESSION,
 	ADDITIVE_EXPRESSION,
 	SHIFT_EXPRESSION,
+	RELATIONAL_EXPRESSION,
 };
 
 struct syntreebasenode {
@@ -116,6 +117,15 @@ struct compound_statement {
 };
 
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+
+struct relational_expression {
+	int nodeType;
+	struct shift_expression *first_expr;
+	struct dynarr *oplist;
+	struct dynarr *shift_expr_list;
+};
+
+struct relational_expression *relational_expression_init(struct shift_expression *shift_expr);
 
 struct shift_expression {
 	int nodeType;

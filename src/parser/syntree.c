@@ -142,3 +142,12 @@ struct shift_expression *shift_expression_init(struct additive_expression *add_e
 	return shift_expr;
 }
 
+struct relational_expression *relational_expression_init(struct shift_expression *shift_expr) {
+	struct relational_expression *rel_expr = mallocz(sizeof(*rel_expr));
+	rel_expr->nodeType = RELATIONAL_EXPRESSION;
+	rel_expr->first_expr = shift_expr;
+	rel_expr->oplist = dynarr_init();
+	rel_expr->shift_expr_list = dynarr_init();
+	return rel_expr;
+}
+

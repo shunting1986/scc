@@ -137,7 +137,20 @@ static struct shift_expression *parse_shift_expression(struct parser *parser) {
 
 static struct relational_expression *parse_relational_expression(struct parser *parser) {
 	struct shift_expression *shift_expr = parse_shift_expression(parser);
-	panic("parse_relational_expression ni");
+	struct relational_expression *rel_expr = relational_expression_init(shift_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_LT && tok.tok_tag != TOK_LE && tok.tok_tag != TOK_GT && tok.tok_tag != TOK_GE) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(rel_expr->oplist, (void *) (long) tok.tok_tag);
+		dynarr_add(rel_expr->shift_expr_list, parse_shift_expression(parser));
+	}
+	return rel_expr;
 }
 
 static struct equality_expression *parse_equality_expression(struct parser *parser) {
