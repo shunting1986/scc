@@ -133,5 +133,12 @@ struct additive_expression *additive_expression_init(struct multiplicative_expre
 	return add_expr;
 }
 
-
+struct shift_expression *shift_expression_init(struct additive_expression *add_expr) {
+	struct shift_expression *shift_expr = mallocz(sizeof(*shift_expr));
+	shift_expr->nodeType = SHIFT_EXPRESSION;
+	shift_expr->first_expr = add_expr;
+	shift_expr->oplist = dynarr_init();
+	shift_expr->add_expr_list = dynarr_init();
+	return shift_expr;
+}
 

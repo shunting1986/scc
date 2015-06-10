@@ -119,7 +119,20 @@ static struct additive_expression *parse_additive_expression(struct parser *pars
 
 static struct shift_expression *parse_shift_expression(struct parser *parser) {
 	struct additive_expression *add_expr = parse_additive_expression(parser);
-	panic("parse_shift_expression ni");
+	struct shift_expression *shift_expr = shift_expression_init(add_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_LSHIFT && tok.tok_tag != TOK_RSHIFT) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(shift_expr->oplist, (void *) (long) tok.tok_tag);
+		dynarr_add(shift_expr->add_expr_list, parse_shift_expression(parser));
+	}
+	return shift_expr;
 }
 
 static struct relational_expression *parse_relational_expression(struct parser *parser) {
