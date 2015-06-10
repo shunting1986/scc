@@ -83,7 +83,20 @@ static struct cast_expression *parse_cast_expression(struct parser *parser) {
 
 static struct multiplicative_expression *parse_multiplicative_expression(struct parser *parser) {
 	struct cast_expression *cast_expr = parse_cast_expression(parser);
-	panic("parse_multiplicative_expression ni");
+	struct multiplicative_expression *mul_expr = multiplicative_expression_init(cast_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_STAR && tok.tok_tag != TOK_DIV && tok.tok_tag != TOK_MOD) {
+			lexer_put_back(parser->lexer, tok);
+			break; 
+		}
+
+		dynarr_add(mul_expr->oplist, (void *) (long) tok.tok_tag);
+		dynarr_add(mul_expr->cast_expr_list, parse_cast_expression(parser));
+	}
+	return mul_expr;
 }
 
 static struct additive_expression *parse_additive_expression(struct parser *parser) {

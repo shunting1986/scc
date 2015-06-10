@@ -114,3 +114,12 @@ struct unary_expression *unary_expression_init() {
 	unary_expr->nodeType = UNARY_EXPRESSION;
 	return unary_expr;
 }
+
+struct multiplicative_expression *multiplicative_expression_init(struct cast_expression *cast_expr) {
+	struct multiplicative_expression *multi_expr = mallocz(sizeof(*multi_expr));
+	multi_expr->nodeType = MULTIPLICATIVE_EXPRESSION;
+	multi_expr->first_expr = cast_expr;
+	multi_expr->oplist = dynarr_init();
+	multi_expr->cast_expr_list = dynarr_init();
+	return multi_expr;
+}

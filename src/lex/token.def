@@ -8,6 +8,10 @@ DEFV(TOK_AMPERSAND, '&')
 DEFV(TOK_ASSIGN, '=')
 DEFV(TOK_ADD, '+')
 DEFV(TOK_COLON, ':')
+// TOK_STAR can be used as multiplicative or dereference
+DEFV(TOK_STAR, '*')
+DEFV(TOK_DIV, '/')
+DEFV(TOK_MOD, '%')
 
 // key words
 DEFV(TOK_INT, 256)
