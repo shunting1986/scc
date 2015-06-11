@@ -1,16 +1,22 @@
 /*
  * Handle the parsing for expression
  */
+#include <assert.h>
 #include <inc/parser.h>
 #include <inc/lexer.h>
 #include <inc/util.h>
 #include <inc/dynarr.h>
+
+#define D 0
 
 static struct assignment_expression *parse_assignment_expression(struct parser *parser);
 static struct cast_expression *parse_cast_expression(struct parser *parser);
 
 static struct primary_expression *parse_primary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
+	if (D) {
+		printf("parse_primary_expression token is %s\n", token_tag_str(tok.tok_tag)); 
+	}
 	struct primary_expression *prim_expr = primary_expression_init();
 	if (tok.tok_tag == TOK_IDENTIFIER) {
 		prim_expr->id = tok.id.s;
@@ -20,8 +26,6 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 		return prim_expr;
 	}
 
-	token_dump(tok); // TODO
-	lexer_dump_remaining(parser->lexer); // TODO
 	panic("parse_primary_expression ni");
 }
 
@@ -48,8 +52,9 @@ static struct argument_expression_list *parse_argument_expression_list(struct pa
 static struct postfix_expression *parse_postfix_expression(struct parser *parser) {
 	struct primary_expression *prim_expr = parse_primary_expression(parser);
 	struct postfix_expression *post_expr = postfix_expression_init(prim_expr);
-	union token tok = lexer_next_token(parser->lexer);
+	union token tok;
 	while (1) {
+		tok = lexer_next_token(parser->lexer);
 		if (tok.tok_tag == TOK_LPAREN) {
 			struct argument_expression_list *arg_expr_list = parse_argument_expression_list(parser);
 			struct postfix_expression_suffix *suf = mallocz(sizeof(*suf));
@@ -89,6 +94,7 @@ static struct unary_expression *parse_unary_expression(struct parser *parser) {
 	} else if (tok.tok_tag == TOK_SIZEOF) {
 		panic("parse_unary_expression: sizeof not supported");
 	} else {
+		lexer_put_back(parser->lexer, tok);
 		struct postfix_expression *post_expr = parse_postfix_expression(parser);
 		unary_expr->postfix_expr = post_expr;
 		return unary_expr;

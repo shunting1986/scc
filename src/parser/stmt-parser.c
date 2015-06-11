@@ -67,7 +67,15 @@ static struct labeled_statement *parse_labeled_statement(struct parser *parser) 
 }
 
 static struct expression_statement *parse_expression_statement(struct parser *parser) {
-	struct expression *expr = parse_expression(parser);
+	union token tok = lexer_next_token(parser->lexer);
+	struct expression *expr;
+	if (tok.tok_tag == TOK_SEMICOLON) {
+		expr = NULL;
+	} else {
+		lexer_put_back(parser->lexer, tok);
+		expr = parse_expression(parser);
+		expect(parser->lexer, TOK_SEMICOLON);
+	}
 	return expression_statement_init(expr);
 }
 
