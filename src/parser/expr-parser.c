@@ -241,7 +241,19 @@ static struct logical_and_expression *parse_logical_and_expression(struct parser
 
 static struct logical_or_expression *parse_logical_or_expression(struct parser *parser) {
 	struct logical_and_expression *and_expr = parse_logical_and_expression(parser);
-	panic("parse_logical_or_expression ni");
+	struct logical_or_expression *or_expr = logical_or_expression_init(and_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_LOGIC_OR) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(or_expr->and_expr_list, parse_logical_and_expression(parser));
+	}
+	return or_expr;
 }
 
 static struct conditional_expression *parse_conditional_expression(struct parser *parser) {
