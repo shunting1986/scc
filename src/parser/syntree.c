@@ -2,6 +2,7 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 #include <inc/dynarr.h>
+#include <inc/lexer.h>
 
 void syntree_dump(struct syntree *tree) {
 	panic("syntree_dump ni"); // TODO
@@ -112,6 +113,7 @@ struct argument_expression_list *argument_expression_list_init() {
 struct unary_expression *unary_expression_init(void) {
 	struct unary_expression *unary_expr = mallocz(sizeof(*unary_expr));
 	unary_expr->nodeType = UNARY_EXPRESSION;
+	unary_expr->unary_op = TOK_UNDEF;
 	return unary_expr;
 }
 

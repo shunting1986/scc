@@ -7,6 +7,7 @@
 #include <inc/dynarr.h>
 
 static struct assignment_expression *parse_assignment_expression(struct parser *parser);
+static struct cast_expression *parse_cast_expression(struct parser *parser);
 
 static struct primary_expression *parse_primary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
@@ -54,7 +55,7 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 			struct postfix_expression_suffix *suf = mallocz(sizeof(*suf));
 			suf->arg_list = arg_expr_list;
 			dynarr_add(post_expr->suff_list, suf);
-		} else {
+		} else { // TODO need handle more cases
 			lexer_put_back(parser->lexer, tok);
 			break;
 		}
@@ -62,19 +63,36 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 	return post_expr;
 }
 
+static int is_unary_op(int tok_tag) {
+	return tok_tag == TOK_AMPERSAND ||
+		tok_tag == TOK_STAR ||
+		tok_tag == TOK_ADD ||
+		tok_tag == TOK_SUB ||
+		tok_tag == TOK_BITREVERSE ||
+		tok_tag == TOK_EXCLAMATION;
+}
+
 static struct unary_expression *parse_unary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
-	panic("parse_unary_expression ni");
-	/*
-	if (tok->tok_tag == TOK_INC) {
-		// TODO
-	} */
-	// TODO handle other alternatives
-	struct postfix_expression *post_expr = parse_postfix_expression(parser);
-
 	struct unary_expression *unary_expr = unary_expression_init();
-	unary_expr->postfix_expr = post_expr;
-	return unary_expr;
+
+	if (tok.tok_tag == TOK_INC) {
+		unary_expr->inc_unary = parse_unary_expression(parser);
+		return unary_expr;
+	} else if (tok.tok_tag == TOK_DEC) {
+		unary_expr->dec_unary = parse_unary_expression(parser);
+		return unary_expr;
+	} else if (is_unary_op(tok.tok_tag)) {
+		unary_expr->unary_op	= tok.tok_tag;
+		unary_expr->unary_op_cast = parse_cast_expression(parser);
+		return unary_expr;
+	} else if (tok.tok_tag == TOK_SIZEOF) {
+		panic("parse_unary_expression: sizeof not supported");
+	} else {
+		struct postfix_expression *post_expr = parse_postfix_expression(parser);
+		unary_expr->postfix_expr = post_expr;
+		return unary_expr;
+	}
 }
 
 // only handle the case for unary_expression right now

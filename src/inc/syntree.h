@@ -249,6 +249,13 @@ struct postfix_expression *postfix_expression_init(struct primary_expression *pr
 
 struct unary_expression {
 	int nodeType;
+	struct unary_expression *inc_unary;
+	struct unary_expression *dec_unary;
+
+	// unary_operator cast_expression
+	int unary_op;
+	struct cast_expression *unary_op_cast;
+
 	struct postfix_expression *postfix_expr;
 };
 struct unary_expression *unary_expression_init(void);
