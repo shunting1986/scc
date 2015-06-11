@@ -190,7 +190,19 @@ static struct and_expression *parse_and_expression(struct parser *parser) {
 
 static struct exclusive_or_expression *parse_exclusive_or_expression(struct parser *parser) {
 	struct and_expression *and_expr = parse_and_expression(parser);
-	panic("parse_exclusive_or_expression ni");
+	struct exclusive_or_expression *xor_expr = exclusive_or_expression_init(and_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_XOR) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(xor_expr->and_expr_list, parse_and_expression(parser));
+	}
+	return xor_expr;
 }
 
 static struct inclusive_or_expression *parse_inclusive_or_expression(struct parser *parser) {

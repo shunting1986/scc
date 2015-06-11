@@ -16,6 +16,7 @@ DEFV(TOK_DIV, '/')
 DEFV(TOK_MOD, '%')
 DEFV(TOK_LT, '<')
 DEFV(TOK_GT, '>')
+DEFV(TOK_XOR, '^')
 
 // key words
 DEFV(TOK_INT, 256)

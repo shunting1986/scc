@@ -167,3 +167,11 @@ struct and_expression *and_expression_init(struct equality_expression *eq_expr) 
 	dynarr_add(and_expr->eq_expr_list, eq_expr);
 	return and_expr;
 }
+
+struct exclusive_or_expression *exclusive_or_expression_init(struct and_expression *and_expr) {
+	struct exclusive_or_expression *xor_expr = mallocz(sizeof(*xor_expr));
+	xor_expr->nodeType = EXCLUSIVE_OR_EXPRESSION;
+	xor_expr->and_expr_list = dynarr_init();
+	dynarr_add(xor_expr->and_expr_list, and_expr);
+	return xor_expr;
+}
