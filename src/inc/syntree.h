@@ -12,6 +12,11 @@ struct syntree;
 struct dynarr;
 
 struct declarator;
+struct relational_expression;
+struct shift_expression;
+struct additive_expression;
+struct multiplicative_expression;
+struct cast_expression;
 
 void syntree_dump(struct syntree *tree);
 
@@ -121,7 +126,6 @@ struct compound_statement *compound_statement_init(struct dynarr *declList, stru
 
 struct equality_expression {
 	int nodeType;
-	struct relational_expression *first_expr;
 	struct dynarr *oplist;
 	struct dynarr *rel_expr_list;
 };
@@ -130,7 +134,6 @@ struct equality_expression *equality_expression_init(struct relational_expressio
 
 struct relational_expression {
 	int nodeType;
-	struct shift_expression *first_expr;
 	struct dynarr *oplist;
 	struct dynarr *shift_expr_list;
 };
@@ -139,7 +142,6 @@ struct relational_expression *relational_expression_init(struct shift_expression
 
 struct shift_expression {
 	int nodeType;
-	struct additive_expression *first_expr;
 	struct dynarr *oplist;
 	struct dynarr *add_expr_list;
 };
@@ -148,7 +150,6 @@ struct shift_expression *shift_expression_init(struct additive_expression *add_e
 
 struct additive_expression {
 	int nodeType;
-	struct multiplicative_expression *first_expr;
 	struct dynarr *oplist;
 	struct dynarr *mul_expr_list;
 };
@@ -157,7 +158,6 @@ struct additive_expression *additive_expression_init(struct multiplicative_expre
 
 struct multiplicative_expression {
 	int nodeType;
-	struct cast_expression *first_expr;
 	struct dynarr *oplist;
 	struct dynarr *cast_expr_list;
 };

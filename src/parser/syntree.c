@@ -118,44 +118,44 @@ struct unary_expression *unary_expression_init() {
 struct multiplicative_expression *multiplicative_expression_init(struct cast_expression *cast_expr) {
 	struct multiplicative_expression *multi_expr = mallocz(sizeof(*multi_expr));
 	multi_expr->nodeType = MULTIPLICATIVE_EXPRESSION;
-	multi_expr->first_expr = cast_expr;
 	multi_expr->oplist = dynarr_init();
 	multi_expr->cast_expr_list = dynarr_init();
+	dynarr_add(multi_expr->cast_expr_list, cast_expr);
 	return multi_expr;
 }
 
 struct additive_expression *additive_expression_init(struct multiplicative_expression *mul_expr) {
 	struct additive_expression *add_expr = mallocz(sizeof(*add_expr));
 	add_expr->nodeType = ADDITIVE_EXPRESSION;
-	add_expr->first_expr = mul_expr;
 	add_expr->oplist = dynarr_init();
 	add_expr->mul_expr_list = dynarr_init();
+	dynarr_add(add_expr->mul_expr_list, mul_expr);
 	return add_expr;
 }
 
 struct shift_expression *shift_expression_init(struct additive_expression *add_expr) {
 	struct shift_expression *shift_expr = mallocz(sizeof(*shift_expr));
 	shift_expr->nodeType = SHIFT_EXPRESSION;
-	shift_expr->first_expr = add_expr;
 	shift_expr->oplist = dynarr_init();
 	shift_expr->add_expr_list = dynarr_init();
+	dynarr_add(shift_expr->add_expr_list, add_expr);
 	return shift_expr;
 }
 
 struct relational_expression *relational_expression_init(struct shift_expression *shift_expr) {
 	struct relational_expression *rel_expr = mallocz(sizeof(*rel_expr));
 	rel_expr->nodeType = RELATIONAL_EXPRESSION;
-	rel_expr->first_expr = shift_expr;
 	rel_expr->oplist = dynarr_init();
 	rel_expr->shift_expr_list = dynarr_init();
+	dynarr_add(rel_expr->shift_expr_list, shift_expr);
 	return rel_expr;
 }
 
 struct equality_expression *equality_expression_init(struct relational_expression *rel_expr) {
 	struct equality_expression *eq_expr = mallocz(sizeof(*eq_expr));
 	eq_expr->nodeType = EQUALITY_EXPRESSION;
-	eq_expr->first_expr = rel_expr;
 	eq_expr->oplist = dynarr_init();
 	eq_expr->rel_expr_list = dynarr_init();
+	dynarr_add(eq_expr->rel_expr_list, rel_expr);
 	return eq_expr;
 }

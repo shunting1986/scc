@@ -173,6 +173,9 @@ static struct equality_expression *parse_equality_expression(struct parser *pars
 
 static struct and_expression *parse_and_expression(struct parser *parser) {
 	struct equality_expression *eq_expr = parse_equality_expression(parser);
+	// struct and_expression *and_expr = and_expression_init( 
+
+	// TODO
 	panic("parse_and_expression ni");
 }
 
