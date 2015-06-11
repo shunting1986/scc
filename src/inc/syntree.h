@@ -49,6 +49,7 @@ enum syntree_node_type {
 	INCLUSIVE_OR_EXPRESSION,
 	LOGICAL_AND_EXPRESSION,
 	LOGICAL_OR_EXPRESSION,
+	CONDITIONAL_EXPRESSION,
 };
 
 struct syntreebasenode {
@@ -171,6 +172,14 @@ struct logical_or_expression {
 };
 
 struct logical_or_expression *logical_or_expression_init(struct logical_and_expression *and_expr);
+
+struct conditional_expression {
+	int nodeType;
+	struct dynarr *or_expr_list;
+	struct dynarr *inner_expr_list;
+};
+
+struct conditional_expression *conditional_expression_init(struct logical_or_expression *or_expr);
 
 struct relational_expression {
 	int nodeType;

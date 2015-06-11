@@ -200,4 +200,11 @@ struct logical_or_expression *logical_or_expression_init(struct logical_and_expr
 	return or_expr;
 }
 
-
+struct conditional_expression *conditional_expression_init(struct logical_or_expression *or_expr) {
+	struct conditional_expression *cond_expr = mallocz(sizeof(*cond_expr));
+	cond_expr->nodeType = CONDITIONAL_EXPRESSION;
+	cond_expr->or_expr_list = dynarr_init();
+	cond_expr->inner_expr_list = dynarr_init();
+	dynarr_add(cond_expr->or_expr_list, or_expr);
+	return cond_expr;
+}
