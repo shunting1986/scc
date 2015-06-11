@@ -109,7 +109,7 @@ struct argument_expression_list *argument_expression_list_init() {
 	return arg_list;
 }
 
-struct unary_expression *unary_expression_init() {
+struct unary_expression *unary_expression_init(void) {
 	struct unary_expression *unary_expr = mallocz(sizeof(*unary_expr));
 	unary_expr->nodeType = UNARY_EXPRESSION;
 	return unary_expr;

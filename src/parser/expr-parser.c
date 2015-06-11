@@ -18,6 +18,9 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 		prim_expr->str = tok.str.s;
 		return prim_expr;
 	}
+
+	token_dump(tok); // TODO
+	lexer_dump_remaining(parser->lexer); // TODO
 	panic("parse_primary_expression ni");
 }
 
@@ -60,10 +63,16 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 }
 
 static struct unary_expression *parse_unary_expression(struct parser *parser) {
+	union token tok = lexer_next_token(parser->lexer);
+	panic("parse_unary_expression ni");
+	/*
+	if (tok->tok_tag == TOK_INC) {
+		// TODO
+	} */
 	// TODO handle other alternatives
 	struct postfix_expression *post_expr = parse_postfix_expression(parser);
 
-	struct unary_expression *unary_expr = unary_expression_init(parser);
+	struct unary_expression *unary_expr = unary_expression_init();
 	unary_expr->postfix_expr = post_expr;
 	return unary_expr;
 }

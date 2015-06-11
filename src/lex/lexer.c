@@ -76,10 +76,22 @@ union token expect(struct lexer *lexer, int tok_tag) {
 	return tok;
 }
 
-static int handle_bigram(struct lexer *lexer, int follow_ch, int compound_tok, int simple_tok) {
+static int handle_bicase(struct lexer *lexer, int follow_ch, int compound_tok, int simple_tok) {
 	int ch = file_reader_next_char(lexer->cstream);
 	if (ch == follow_ch) {
 		return compound_tok;
+	} else {
+		file_reader_put_back(lexer->cstream, ch);
+		return simple_tok;
+	}
+}
+
+static int handle_tricase(struct lexer *lexer, int folone, int compone, int foltwo, int comptwo, int simple_tok) {
+	int ch = file_reader_next_char(lexer->cstream);
+	if (ch == folone) {
+		return compone;
+	} else if (ch == foltwo) {
+		return comptwo;
 	} else {
 		file_reader_put_back(lexer->cstream, ch);
 		return simple_tok;
@@ -137,25 +149,25 @@ repeat:
 		tok.tok_tag = ch;
 		break;
 	case '+':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_ADD_ASSIGN, TOK_ADD);
+		tok.tok_tag = handle_tricase(lexer, '=', TOK_ADD_ASSIGN, '+', TOK_INC, TOK_ADD);
 		break;
 	case '-':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_SUB_ASSIGN, TOK_SUB);
+		tok.tok_tag = handle_tricase(lexer, '=', TOK_SUB_ASSIGN, '-', TOK_DEC, TOK_SUB);
 		break;
 	case '%':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_MOD_ASSIGN, TOK_MOD);
+		tok.tok_tag = handle_bicase(lexer, '=', TOK_MOD_ASSIGN, TOK_MOD);
 		break;
 	case '*':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_MUL_ASSIGN, TOK_STAR);
+		tok.tok_tag = handle_bicase(lexer, '=', TOK_MUL_ASSIGN, TOK_STAR);
 		break;
 	case '^':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_XOR_ASSIGN, TOK_XOR);
+		tok.tok_tag = handle_bicase(lexer, '=', TOK_XOR_ASSIGN, TOK_XOR);
 		break;
 	case '=':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_EQ, TOK_ASSIGN);
+		tok.tok_tag = handle_bicase(lexer, '=', TOK_EQ, TOK_ASSIGN);
 		break;
 	case '!':
-		tok.tok_tag = handle_bigram(lexer, '=', TOK_NE, TOK_EXCLAMATION);
+		tok.tok_tag = handle_bicase(lexer, '=', TOK_NE, TOK_EXCLAMATION);
 	case '/':
 		// XXX not support comments yet
 		ch = file_reader_next_char(lexer->cstream);

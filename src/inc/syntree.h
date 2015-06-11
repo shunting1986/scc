@@ -251,7 +251,7 @@ struct unary_expression {
 	int nodeType;
 	struct postfix_expression *postfix_expr;
 };
-struct unary_expression *unary_expression_init();
+struct unary_expression *unary_expression_init(void);
 
 struct cast_expression {
 	int nodeType;
