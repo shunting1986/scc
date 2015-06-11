@@ -224,7 +224,19 @@ static struct inclusive_or_expression *parse_inclusive_or_expression(struct pars
 
 static struct logical_and_expression *parse_logical_and_expression(struct parser *parser) {
 	struct inclusive_or_expression *or_expr = parse_inclusive_or_expression(parser);
-	panic("parse_logical_and_expression ni");
+	struct logical_and_expression *logic_and_expr = logical_and_expression_init(or_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_LOGIC_AND) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(logic_and_expr->or_expr_list, parse_inclusive_or_expression(parser));
+	}
+	return logic_and_expr;
 }
 
 static struct logical_or_expression *parse_logical_or_expression(struct parser *parser) {

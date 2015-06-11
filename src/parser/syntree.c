@@ -183,3 +183,13 @@ struct inclusive_or_expression *inclusive_or_expression_init(struct exclusive_or
 	dynarr_add(or_expr->xor_expr_list, xor_expr);
 	return or_expr;
 }
+
+struct logical_and_expression *logical_and_expression_init(struct inclusive_or_expression *or_expr) {
+	struct logical_and_expression *logic_and_expr = mallocz(sizeof(*logic_and_expr));
+	logic_and_expr->nodeType = LOGICAL_AND_EXPRESSION;
+	logic_and_expr->or_expr_list = dynarr_init();
+	dynarr_add(logic_and_expr->or_expr_list, or_expr);
+	return logic_and_expr;
+}
+
+
