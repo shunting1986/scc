@@ -277,6 +277,7 @@ static struct conditional_expression *parse_conditional_expression(struct parser
 	return cond_expr;
 }
 
+// TODO this can be put in another file
 struct unary_expression *degen_cond_to_unary_expr(struct conditional_expression *cond_expr) {
 	panic("degen_cond_to_unary_expr ni"); // TODO
 }

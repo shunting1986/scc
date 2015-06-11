@@ -76,8 +76,18 @@ union token expect(struct lexer *lexer, int tok_tag) {
 	return tok;
 }
 
+static int handle_bigram(struct lexer *lexer, int follow_ch, int compound_tok, int simple_tok) {
+	int ch = file_reader_next_char(lexer->cstream);
+	if (ch == follow_ch) {
+		return compound_tok;
+	} else {
+		file_reader_put_back(lexer->cstream, ch);
+		return simple_tok;
+	}
+}
+
 union token lexer_next_token(struct lexer *lexer) {
-	char ch;
+	int ch;
 	union token tok;
 	struct cbuf *cbuf;
 	char *s;
@@ -123,8 +133,38 @@ repeat:
 	case '\t':
 		goto repeat;
 	case '(': case ')': case '{': case '}':
-	case ',': case ';': case '+': case '?':
+	case ',': case ';': case '?':
 		tok.tok_tag = ch;
+		break;
+	case '+':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_ADD_ASSIGN, TOK_ADD);
+		break;
+	case '-':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_SUB_ASSIGN, TOK_SUB);
+		break;
+	case '%':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_MOD_ASSIGN, TOK_MOD);
+		break;
+	case '*':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_MUL_ASSIGN, TOK_STAR);
+		break;
+	case '^':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_XOR_ASSIGN, TOK_XOR);
+		break;
+	case '=':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_EQ, TOK_ASSIGN);
+		break;
+	case '!':
+		tok.tok_tag = handle_bigram(lexer, '=', TOK_NE, TOK_EXCLAMATION);
+	case '/':
+		// XXX not support comments yet
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '=') {
+			tok.tok_tag = TOK_DIV_ASSIGN;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			tok.tok_tag = TOK_DIV;
+		}
 		break;
 	case '&':
 		ch = file_reader_next_char(lexer->cstream);
@@ -146,33 +186,6 @@ repeat:
 		} else {
 			file_reader_put_back(lexer->cstream, ch);
 			tok.tok_tag = TOK_VERT_BAR;
-		}
-		break;
-	case '^':
-		ch = file_reader_next_char(lexer->cstream);
-		if (ch == '=') {
-			tok.tok_tag = TOK_XOR_ASSIGN;
-		} else {
-			file_reader_put_back(lexer->cstream, ch);
-			tok.tok_tag = TOK_XOR;
-		}
-		break;
-	case '=':
-		ch = file_reader_next_char(lexer->cstream);
-		if (ch == '=') {
-			tok.tok_tag = TOK_EQ;
-		} else {
-			file_reader_put_back(lexer->cstream, ch);
-			tok.tok_tag = TOK_ASSIGN;
-		}
-		break;
-	case '!':
-		ch = file_reader_next_char(lexer->cstream);
-		if (ch == '=') {
-			tok.tok_tag = TOK_NE;
-		} else {
-			file_reader_put_back(lexer->cstream, ch);
-			tok.tok_tag = TOK_EXCLAMATION;
 		}
 		break;
 	case '<':
