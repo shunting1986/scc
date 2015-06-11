@@ -206,8 +206,20 @@ static struct exclusive_or_expression *parse_exclusive_or_expression(struct pars
 }
 
 static struct inclusive_or_expression *parse_inclusive_or_expression(struct parser *parser) {
-	struct exclusive_or_expression *ex_expr = parse_exclusive_or_expression(parser);
-	panic("parse_inclusive_or_expression ni");
+	struct exclusive_or_expression *xor_expr = parse_exclusive_or_expression(parser);
+	struct inclusive_or_expression *or_expr = inclusive_or_expression_init(xor_expr);
+
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_VERT_BAR) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(or_expr->xor_expr_list, parse_exclusive_or_expression(parser));
+	}
+	return or_expr;
 }
 
 static struct logical_and_expression *parse_logical_and_expression(struct parser *parser) {

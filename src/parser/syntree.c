@@ -175,3 +175,11 @@ struct exclusive_or_expression *exclusive_or_expression_init(struct and_expressi
 	dynarr_add(xor_expr->and_expr_list, and_expr);
 	return xor_expr;
 }
+
+struct inclusive_or_expression *inclusive_or_expression_init(struct exclusive_or_expression *xor_expr) {
+	struct inclusive_or_expression *or_expr = mallocz(sizeof(*or_expr));
+	or_expr->nodeType = INCLUSIVE_OR_EXPRESSION;
+	or_expr->xor_expr_list = dynarr_init();
+	dynarr_add(or_expr->xor_expr_list, xor_expr);
+	return or_expr;
+}

@@ -46,6 +46,7 @@ enum syntree_node_type {
 	EQUALITY_EXPRESSION,
 	AND_EXPRESSION,
 	EXCLUSIVE_OR_EXPRESSION,
+	INCLUSIVE_OR_EXPRESSION,
 };
 
 struct syntreebasenode {
@@ -147,6 +148,13 @@ struct exclusive_or_expression {
 };
 
 struct exclusive_or_expression *exclusive_or_expression_init(struct and_expression *and_expr);
+
+struct inclusive_or_expression {
+	int nodeType;
+	struct dynarr *xor_expr_list;
+};
+
+struct inclusive_or_expression *inclusive_or_expression_init(struct exclusive_or_expression *xor_expr);
 
 struct relational_expression {
 	int nodeType;
