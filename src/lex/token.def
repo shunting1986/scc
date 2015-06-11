@@ -18,6 +18,7 @@ DEFV(TOK_LT, '<')
 DEFV(TOK_GT, '>')
 DEFV(TOK_XOR, '^')
 DEFV(TOK_VERT_BAR, '|')
+DEFV(TOK_QUESTION, '?')
 
 // key words
 DEFV(TOK_INT, 256)
