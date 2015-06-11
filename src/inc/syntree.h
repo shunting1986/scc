@@ -38,6 +38,7 @@ enum syntree_node_type {
 	PRIMARY_EXPRESSION,
 	POSTFIX_EXPRESSION,
 	ARGUMENT_EXPRESSION_LIST,
+	ASSIGNMENT_EXPRESSION,
 	UNARY_EXPRESSION,
 	MULTIPLICATIVE_EXPRESSION,
 	ADDITIVE_EXPRESSION,
@@ -261,7 +262,12 @@ struct cast_expression *cast_expression_init();
 
 struct assignment_expression {
 	int nodeType;
+	struct dynarr *unary_expr_list;
+	struct dynarr *oplist;
+	struct conditional_expression *cond_expr;
 };
+
+struct assignment_expression *assignment_expression_init();
 
 struct expression {
 	int nodeType;

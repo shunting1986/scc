@@ -301,6 +301,7 @@ static struct conditional_expression *parse_conditional_expression(struct parser
  */
 static struct assignment_expression *parse_assignment_expression(struct parser *parser) {
 	struct conditional_expression *cond_expr = parse_conditional_expression(parser);
+	lexer_dump_remaining(parser->lexer); // TODO
 	panic("parse_assignment_expression ni");
 }
 

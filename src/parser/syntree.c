@@ -208,3 +208,13 @@ struct conditional_expression *conditional_expression_init(struct logical_or_exp
 	dynarr_add(cond_expr->or_expr_list, or_expr);
 	return cond_expr;
 }
+
+struct assignment_expression *assignment_expression_init() {
+	struct assignment_expression *assign_expr = mallocz(sizeof(*assign_expr));
+	assign_expr->nodeType = ASSIGNMENT_EXPRESSION;
+	assign_expr->unary_expr_list = dynarr_init();
+	assign_expr->oplist = dynarr_init();
+	return assign_expr;
+}
+
+
