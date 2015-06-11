@@ -16,3 +16,5 @@ exprssion
 - TODO: let the make file support dependency on header file
 
 - HERE: be able to do lexicial analyzer first..
+
+NOTE: we can try to compile mongoose/memcached with my compiler :)

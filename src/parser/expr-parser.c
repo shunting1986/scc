@@ -277,6 +277,14 @@ static struct conditional_expression *parse_conditional_expression(struct parser
 	return cond_expr;
 }
 
+struct unary_expression *degen_cond_to_unary_expr(struct conditional_expression *cond_expr) {
+	panic("degen_cond_to_unary_expr ni"); // TODO
+}
+
+static int is_assign_op(int tok_tag) {
+	panic("is_assign_op ni");
+}
+
 /*
  * assignment_expression
  *   : conditional_expression
@@ -301,8 +309,28 @@ static struct conditional_expression *parse_conditional_expression(struct parser
  */
 static struct assignment_expression *parse_assignment_expression(struct parser *parser) {
 	struct conditional_expression *cond_expr = parse_conditional_expression(parser);
-	lexer_dump_remaining(parser->lexer); // TODO
-	panic("parse_assignment_expression ni");
+	struct assignment_expression *assign_expr = assignment_expression_init();
+	union token tok;
+	struct unary_expression *unary_expr;
+
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (!is_assign_op(tok.tok_tag)) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		// cond_expr will be in invalid state after this, memory will be released
+		unary_expr = degen_cond_to_unary_expr(cond_expr); 
+
+		dynarr_add(assign_expr->unary_expr_list, unary_expr);
+		dynarr_add(assign_expr->oplist, (void *) (long) tok.tok_tag);
+
+		cond_expr = parse_conditional_expression(parser);
+	}
+	
+	assign_expr->cond_expr = cond_expr;
+	return assign_expr;
 }
 
 struct expression *parse_expression(struct parser *parser) {
