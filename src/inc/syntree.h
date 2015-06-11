@@ -44,6 +44,7 @@ enum syntree_node_type {
 	SHIFT_EXPRESSION,
 	RELATIONAL_EXPRESSION,
 	EQUALITY_EXPRESSION,
+	AND_EXPRESSION,
 };
 
 struct syntreebasenode {
@@ -131,6 +132,13 @@ struct equality_expression {
 };
 
 struct equality_expression *equality_expression_init(struct relational_expression *rel_expr);
+
+struct and_expression {
+	int nodeType;
+	struct dynarr *eq_expr_list;
+};
+
+struct and_expression *and_expression_init(struct equality_expression *eq_expr);
 
 struct relational_expression {
 	int nodeType;

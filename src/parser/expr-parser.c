@@ -173,10 +173,19 @@ static struct equality_expression *parse_equality_expression(struct parser *pars
 
 static struct and_expression *parse_and_expression(struct parser *parser) {
 	struct equality_expression *eq_expr = parse_equality_expression(parser);
-	// struct and_expression *and_expr = and_expression_init( 
+	struct and_expression *and_expr = and_expression_init(eq_expr);
 
-	// TODO
-	panic("parse_and_expression ni");
+	union token tok;
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_AMPERSAND) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		dynarr_add(and_expr->eq_expr_list, parse_equality_expression(parser));
+	}
+	return and_expr;
 }
 
 static struct exclusive_or_expression *parse_exclusive_or_expression(struct parser *parser) {

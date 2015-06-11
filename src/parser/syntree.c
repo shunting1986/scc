@@ -159,3 +159,11 @@ struct equality_expression *equality_expression_init(struct relational_expressio
 	dynarr_add(eq_expr->rel_expr_list, rel_expr);
 	return eq_expr;
 }
+
+struct and_expression *and_expression_init(struct equality_expression *eq_expr) {
+	struct and_expression *and_expr = mallocz(sizeof(*and_expr));
+	and_expr->nodeType = AND_EXPRESSION;
+	and_expr->eq_expr_list = dynarr_init();
+	dynarr_add(and_expr->eq_expr_list, eq_expr);
+	return and_expr;
+}
