@@ -283,7 +283,17 @@ struct unary_expression *degen_cond_to_unary_expr(struct conditional_expression 
 }
 
 static int is_assign_op(int tok_tag) {
-	panic("is_assign_op ni");
+	return tok_tag == TOK_ASSIGN ||
+		tok_tag == TOK_MUL_ASSIGN ||
+		tok_tag == TOK_DIV_ASSIGN ||
+		tok_tag == TOK_MOD_ASSIGN ||
+		tok_tag == TOK_ADD_ASSIGN ||
+		tok_tag == TOK_SUB_ASSIGN ||
+		tok_tag == TOK_LSHIFT_ASSIGN ||
+		tok_tag == TOK_RSHIFT_ASSIGN ||
+		tok_tag == TOK_AND_ASSIGN ||
+		tok_tag == TOK_OR_ASSIGN ||
+		tok_tag == TOK_XOR_ASSIGN;
 }
 
 /*
