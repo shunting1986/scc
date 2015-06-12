@@ -18,7 +18,8 @@ LIB_SRC_LIST := util/file_reader.c \
 	parser/type-parser.c \
 	parser/stmt-parser.c \
 	parser/expr-parser.c \
-	parser/syntree.c 
+	parser/syntree.c \
+	parser/syntree-visitor.c
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))

@@ -6,6 +6,7 @@
 #include <inc/lexer.h>
 #include <inc/util.h>
 #include <inc/dynarr.h>
+#include <inc/syntree-visitor.h>
 
 #define D 0
 
@@ -310,11 +311,6 @@ static struct conditional_expression *parse_conditional_expression(struct parser
 	return cond_expr;
 }
 
-// TODO this can be put in another file
-struct unary_expression *degen_cond_to_unary_expr(struct conditional_expression *cond_expr) {
-	panic("degen_cond_to_unary_expr ni"); // TODO
-}
-
 static int is_assign_op(int tok_tag) {
 	return tok_tag == TOK_ASSIGN ||
 		tok_tag == TOK_MUL_ASSIGN ||
@@ -365,7 +361,7 @@ static struct assignment_expression *parse_assignment_expression(struct parser *
 		}
 
 		// cond_expr will be in invalid state after this, memory will be released
-		unary_expr = degen_cond_to_unary_expr(cond_expr); 
+		unary_expr = degen_cond_to_unary_expr((struct syntreebasenode *) cond_expr); 
 
 		dynarr_add(assign_expr->unary_expr_list, unary_expr);
 		dynarr_add(assign_expr->oplist, (void *) (long) tok.tok_tag);
