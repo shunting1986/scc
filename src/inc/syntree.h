@@ -138,6 +138,7 @@ struct equality_expression {
 };
 
 struct equality_expression *equality_expression_init(struct relational_expression *rel_expr);
+void equality_expression_destroy(struct equality_expression *eq_expr);
 
 struct and_expression {
 	int nodeType;
@@ -145,6 +146,7 @@ struct and_expression {
 };
 
 struct and_expression *and_expression_init(struct equality_expression *eq_expr);
+void and_expression_destroy(struct and_expression *and_expr);
 
 struct exclusive_or_expression {
 	int nodeType;
@@ -152,6 +154,7 @@ struct exclusive_or_expression {
 };
 
 struct exclusive_or_expression *exclusive_or_expression_init(struct and_expression *and_expr);
+void exclusive_or_expression_destroy(struct exclusive_or_expression *xor_expr);
 
 struct inclusive_or_expression {
 	int nodeType;
@@ -159,6 +162,7 @@ struct inclusive_or_expression {
 };
 
 struct inclusive_or_expression *inclusive_or_expression_init(struct exclusive_or_expression *xor_expr);
+void inclusive_or_expression_destroy(struct inclusive_or_expression *or_expr);
 
 struct logical_and_expression {
 	int nodeType;
@@ -166,6 +170,7 @@ struct logical_and_expression {
 };
 
 struct logical_and_expression *logical_and_expression_init(struct inclusive_or_expression *or_expr);
+void logical_and_expression_destroy(struct logical_and_expression *and_expr);
 
 struct logical_or_expression {
 	int nodeType;
@@ -173,6 +178,7 @@ struct logical_or_expression {
 };
 
 struct logical_or_expression *logical_or_expression_init(struct logical_and_expression *and_expr);
+void logical_or_expression_destroy(struct logical_or_expression *lor_expr);
 
 struct conditional_expression {
 	int nodeType;
@@ -181,6 +187,8 @@ struct conditional_expression {
 };
 
 struct conditional_expression *conditional_expression_init(struct logical_or_expression *or_expr);
+// This is a shadow destroy: only destroy the thing allocated in the init method
+void conditional_expression_destroy(struct conditional_expression *cond_expr);
 
 struct relational_expression {
 	int nodeType;
@@ -189,6 +197,7 @@ struct relational_expression {
 };
 
 struct relational_expression *relational_expression_init(struct shift_expression *shift_expr);
+void relational_expression_destroy(struct relational_expression *rel_expr);
 
 struct shift_expression {
 	int nodeType;
@@ -197,6 +206,7 @@ struct shift_expression {
 };
 
 struct shift_expression *shift_expression_init(struct additive_expression *add_expr);
+void shift_expression_destroy(struct shift_expression *shift_expr);
 
 struct additive_expression {
 	int nodeType;
@@ -205,6 +215,7 @@ struct additive_expression {
 };
 
 struct additive_expression *additive_expression_init(struct multiplicative_expression *mul_expr);
+void additive_expression_destroy(struct additive_expression *add_expr);
 
 struct multiplicative_expression {
 	int nodeType;
@@ -213,6 +224,7 @@ struct multiplicative_expression {
 };
 
 struct multiplicative_expression *multiplicative_expression_init(struct cast_expression *cast_expr);
+void multiplicative_expression_destroy(struct multiplicative_expression *mul_expr);
 
 struct primary_expression {
 	int nodeType;
@@ -266,6 +278,7 @@ struct cast_expression {
 };
 
 struct cast_expression *cast_expression_init();
+void cast_expression_destroy(struct cast_expression *cast_expr);
 
 struct assignment_expression {
 	int nodeType;

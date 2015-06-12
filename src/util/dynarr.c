@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #include <inc/dynarr.h>
+#include <inc/util.h>
 
 // only need support append. No need to support deleting
 struct dynarr {
@@ -30,6 +31,13 @@ void dynarr_add(struct dynarr *darr, void *item) {
 		darr->list = realloc(darr->list, darr->capa * sizeof(*darr->list));
 	}
 	darr->list[darr->size++] = item;
+}
+
+void *dynarr_get(struct dynarr *darr, int ind) {
+	if (ind < 0 && ind >= darr->size) {
+		panic("index out of range");
+	}
+	return darr->list[ind];
 }
 
 void dynarr_destroy(struct dynarr *darr) {

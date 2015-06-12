@@ -89,6 +89,10 @@ struct cast_expression *cast_expression_init() {
 	return expr;
 }
 
+void cast_expression_destroy(struct cast_expression *cast_expr) {
+	free(cast_expr);
+}
+
 struct primary_expression *primary_expression_init() {
 	struct primary_expression *expr = mallocz(sizeof(*expr));
 	expr->nodeType = PRIMARY_EXPRESSION;
@@ -126,6 +130,12 @@ struct multiplicative_expression *multiplicative_expression_init(struct cast_exp
 	return multi_expr;
 }
 
+void multiplicative_expression_destroy(struct multiplicative_expression *mul_expr) {
+	dynarr_destroy(mul_expr->cast_expr_list);
+	dynarr_destroy(mul_expr->oplist);
+	free(mul_expr);
+}
+
 struct additive_expression *additive_expression_init(struct multiplicative_expression *mul_expr) {
 	struct additive_expression *add_expr = mallocz(sizeof(*add_expr));
 	add_expr->nodeType = ADDITIVE_EXPRESSION;
@@ -133,6 +143,12 @@ struct additive_expression *additive_expression_init(struct multiplicative_expre
 	add_expr->mul_expr_list = dynarr_init();
 	dynarr_add(add_expr->mul_expr_list, mul_expr);
 	return add_expr;
+}
+
+void additive_expression_destroy(struct additive_expression *add_expr) {
+	dynarr_destroy(add_expr->mul_expr_list);
+	dynarr_destroy(add_expr->oplist);
+	free(add_expr);
 }
 
 struct shift_expression *shift_expression_init(struct additive_expression *add_expr) {
@@ -144,6 +160,12 @@ struct shift_expression *shift_expression_init(struct additive_expression *add_e
 	return shift_expr;
 }
 
+void shift_expression_destroy(struct shift_expression *shift_expr) {
+	dynarr_destroy(shift_expr->add_expr_list);
+	dynarr_destroy(shift_expr->oplist);
+	free(shift_expr);
+}
+
 struct relational_expression *relational_expression_init(struct shift_expression *shift_expr) {
 	struct relational_expression *rel_expr = mallocz(sizeof(*rel_expr));
 	rel_expr->nodeType = RELATIONAL_EXPRESSION;
@@ -151,6 +173,12 @@ struct relational_expression *relational_expression_init(struct shift_expression
 	rel_expr->shift_expr_list = dynarr_init();
 	dynarr_add(rel_expr->shift_expr_list, shift_expr);
 	return rel_expr;
+}
+
+void relational_expression_destroy(struct relational_expression *rel_expr) {
+	dynarr_destroy(rel_expr->shift_expr_list);
+	dynarr_destroy(rel_expr->oplist);
+	free(rel_expr);
 }
 
 struct equality_expression *equality_expression_init(struct relational_expression *rel_expr) {
@@ -162,12 +190,23 @@ struct equality_expression *equality_expression_init(struct relational_expressio
 	return eq_expr;
 }
 
+void equality_expression_destroy(struct equality_expression *eq_expr) {
+	dynarr_destroy(eq_expr->rel_expr_list);
+	dynarr_destroy(eq_expr->oplist);
+	free(eq_expr);
+}
+
 struct and_expression *and_expression_init(struct equality_expression *eq_expr) {
 	struct and_expression *and_expr = mallocz(sizeof(*and_expr));
 	and_expr->nodeType = AND_EXPRESSION;
 	and_expr->eq_expr_list = dynarr_init();
 	dynarr_add(and_expr->eq_expr_list, eq_expr);
 	return and_expr;
+}
+
+void and_expression_destroy(struct and_expression *and_expr) {
+	dynarr_destroy(and_expr->eq_expr_list);
+	free(and_expr);
 }
 
 struct exclusive_or_expression *exclusive_or_expression_init(struct and_expression *and_expr) {
@@ -178,12 +217,22 @@ struct exclusive_or_expression *exclusive_or_expression_init(struct and_expressi
 	return xor_expr;
 }
 
+void exclusive_or_expression_destroy(struct exclusive_or_expression *xor_expr) {
+	dynarr_destroy(xor_expr->and_expr_list);
+	free(xor_expr);
+}
+
 struct inclusive_or_expression *inclusive_or_expression_init(struct exclusive_or_expression *xor_expr) {
 	struct inclusive_or_expression *or_expr = mallocz(sizeof(*or_expr));
 	or_expr->nodeType = INCLUSIVE_OR_EXPRESSION;
 	or_expr->xor_expr_list = dynarr_init();
 	dynarr_add(or_expr->xor_expr_list, xor_expr);
 	return or_expr;
+}
+
+void inclusive_or_expression_destroy(struct inclusive_or_expression *or_expr) {
+	dynarr_destroy(or_expr->xor_expr_list);
+	free(or_expr);
 }
 
 struct logical_and_expression *logical_and_expression_init(struct inclusive_or_expression *or_expr) {
@@ -194,12 +243,22 @@ struct logical_and_expression *logical_and_expression_init(struct inclusive_or_e
 	return logic_and_expr;
 }
 
+void logical_and_expression_destroy(struct logical_and_expression *and_expr) {
+	dynarr_destroy(and_expr->or_expr_list);
+	free(and_expr);
+}
+
 struct logical_or_expression *logical_or_expression_init(struct logical_and_expression *and_expr) {
 	struct logical_or_expression *or_expr = mallocz(sizeof(*or_expr));
 	or_expr->nodeType = LOGICAL_OR_EXPRESSION;
 	or_expr->and_expr_list = dynarr_init();
 	dynarr_add(or_expr->and_expr_list, and_expr);
 	return or_expr;
+}
+
+void logical_or_expression_destroy(struct logical_or_expression *lor_expr) {
+	dynarr_destroy(lor_expr->and_expr_list);
+	free(lor_expr);
 }
 
 struct conditional_expression *conditional_expression_init(struct logical_or_expression *or_expr) {
@@ -209,6 +268,12 @@ struct conditional_expression *conditional_expression_init(struct logical_or_exp
 	cond_expr->inner_expr_list = dynarr_init();
 	dynarr_add(cond_expr->or_expr_list, or_expr);
 	return cond_expr;
+}
+
+void conditional_expression_destroy(struct conditional_expression *cond_expr) {
+	dynarr_destroy(cond_expr->inner_expr_list);
+	dynarr_destroy(cond_expr->or_expr_list);
+	free(cond_expr);
 }
 
 struct assignment_expression *assignment_expression_init() {

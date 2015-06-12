@@ -7,7 +7,10 @@
 extern "C" {
 #endif
 
-struct unary_expression *degen_cond_to_unary_expr(struct syntreebasenode *tnode);
+/*
+ * Degenerate an expression to an unary expression.
+ */
+struct unary_expression *degen_to_unary_expr(struct syntreebasenode *tnode);
 
 #ifdef __cplusplus
 }

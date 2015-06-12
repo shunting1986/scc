@@ -9,6 +9,7 @@ struct dynarr;
 struct dynarr *dynarr_init();
 int dynarr_size(struct dynarr *darr);
 void dynarr_destroy(struct dynarr *darr);
+void *dynarr_get(struct dynarr *darr, int ind);
 
 #ifdef __cplusplus
 }

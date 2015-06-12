@@ -361,7 +361,7 @@ static struct assignment_expression *parse_assignment_expression(struct parser *
 		}
 
 		// cond_expr will be in invalid state after this, memory will be released
-		unary_expr = degen_cond_to_unary_expr((struct syntreebasenode *) cond_expr); 
+		unary_expr = degen_to_unary_expr((struct syntreebasenode *) cond_expr); 
 
 		dynarr_add(assign_expr->unary_expr_list, unary_expr);
 		dynarr_add(assign_expr->oplist, (void *) (long) tok.tok_tag);
