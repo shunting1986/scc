@@ -26,7 +26,7 @@ enum syntree_node_type {
 	DECLARATION_SPECIFIERS,
 	DECLARATION,
 	TRANSLATION_UNIT,
-	EXTERNAL_DECL,
+	EXTERNAL_DECLARATION,
 	JUMP_STATEMENT,
 	EXPRESSION_STATEMENT,
 	EXPRESSION,
@@ -64,7 +64,7 @@ struct translation_unit_node {
 	struct dynarr *external_decl_list;
 };
 
-struct external_decl_node {
+struct external_declaration {
 	int nodeType;
 };
 
@@ -321,7 +321,7 @@ struct expression_statement *expression_statement_init(struct expression *expr);
 union syntreenode {
 	struct syntreebasenode base;
 	struct translation_unit_node translation_unit;
-	struct external_decl_node external_decl;
+	struct external_declaration external_decl;
 };
 
 #ifdef __cplusplus
