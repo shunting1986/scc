@@ -9,7 +9,8 @@ struct cgc_context {
 	int indent;
 };
 
-static void cgc_node(struct cgc_context *ctx, struct syntreebasenode *node);
+static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit);
+static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl);
 
 struct cgc_context *cgc_context_init(FILE *fp, int indent) {
 	struct cgc_context *ctx = mallocz(sizeof(*ctx));
@@ -23,13 +24,15 @@ void cgc_context_destroy(struct cgc_context *ctx) {
 }
 
 void cgc_tree(struct cgc_context *ctx, struct syntree *tree) {
-	cgc_node(ctx, (struct syntreebasenode *) tree->trans_unit);
+	cgc_translation_unit(ctx, tree->trans_unit);
 }
 
-static void cgc_node(struct cgc_context *ctx, struct syntreebasenode *node) {
-	switch (node->nodeType) {
-	default:
-		panic("need implement: %s", node_type_str(node->nodeType));
-	}
+static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit) {
+	DYNARR_FOREACH_BEGIN(trans_unit->external_decl_list, external_declaration, each);
+		cgc_external_declaration(ctx, each);
+	DYNARR_FOREACH_END();
 }
 
+static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl) {
+	panic("ni");
+}
