@@ -21,13 +21,16 @@ void parser_destroy(struct parser *parser) {
 }
 
 struct syntree *parse(struct parser *parser) {
+	struct translation_unit *tu = translation_unit_init();
+	struct external_declaration *external_decl;
 	union token tok;
 	while ((tok = lexer_next_token(parser->lexer)).tok_tag != TOK_EOF) {
-		// lexer put back, should not destroy tok
 		lexer_put_back(parser->lexer, tok);
-		struct external_declaration *external_decl = parse_external_decl(parser);
+		external_decl = parse_external_decl(parser);
+		dynarr_add(tu->external_decl_list, external_decl);
 	}
-	panic("parse ni"); // TODO
+
+	return syntree_init(tu);
 }
 
 static struct declaration_specifiers *parse_decl_specifiers(struct parser *parser) {

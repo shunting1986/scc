@@ -4,11 +4,26 @@
 #include <inc/dynarr.h>
 #include <inc/lexer.h>
 
+// this an abstract representation for the entire syntax tree
+struct syntree {
+	struct translation_unit *trans_unit;
+};
+
+struct syntree *syntree_init(struct translation_unit *trans_unit) {
+	struct syntree *tree = mallocz(sizeof(*tree));
+	tree->trans_unit = trans_unit;
+	return tree;
+}
+
 void syntree_dump(struct syntree *tree) {
 	panic("syntree_dump ni"); // TODO
 }
 
-// TODO add sth like syntree_free
+void syntree_destroy(struct syntree *tree) {
+	panic("ni");
+}
+
+// following are node constructor and destructor definitions
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr) {
 	struct declaration_specifiers *specs = malloc(sizeof(*specs));
@@ -298,3 +313,12 @@ struct external_declaration *external_declaration_init(struct declaration_specif
 	external_decl->decl_specifiers = decl_specifiers;
 	return external_decl;
 }
+
+struct translation_unit *translation_unit_init(void) {
+	struct translation_unit *tu = mallocz(sizeof(*tu));
+	tu->nodeType = TRANSLATION_UNIT;
+	tu->external_decl_list = dynarr_init();
+	return tu;
+}
+
+

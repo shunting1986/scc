@@ -9,6 +9,7 @@ TEST(parser, parser) {
 	struct syntree *tree = parse(parser);
 
 	syntree_dump(tree);
+	syntree_destroy(tree);
 
 	parser_destroy(parser);
 	lexer_destroy(lexer);
