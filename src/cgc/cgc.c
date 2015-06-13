@@ -100,8 +100,24 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 	cgc_indent(ctx); cgc_print(ctx, "}\n");
 }
 
-static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
+static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
 	panic("ni");
+}
+
+static void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt) {
+	cgc_indent(ctx); 
+	cgc_expression(ctx, stmt->expr);
+	cgc_print(ctx, "\n");
+}
+
+static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
+	switch (stmt->nodeType) {
+	case EXPRESSION_STATEMENT:
+		cgc_expression_statement(ctx, (struct expression_statement *) stmt);
+		break;
+	default:
+		panic("unexpected node type %s", node_type_str(stmt->nodeType));
+	}
 }
 
 static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator) {
