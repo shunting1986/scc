@@ -98,6 +98,12 @@ static struct init_declarator *parse_init_declarator_with_la(struct parser *pars
 
 // parse init declarator util meeting a ';'
 static struct init_declarator_list *parse_init_declarator_list(struct parser *parser) {
+	// need check for empty init_declarator_list here
+	union token tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_SEMICOLON) {
+		return init_declarator_list_init(dynarr_init());
+	}
+	lexer_put_back(parser->lexer, tok);
 	return parse_init_declarator_list_with_la(parser, 
 		parse_declarator(parser));
 }
@@ -139,22 +145,43 @@ int initiate_declaration(union token tok) {
 // assume no EOF found; 
 static struct external_declaration *parse_external_decl(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
-	struct declarator *declarator = parse_declarator(parser);
-	
+	struct external_declaration *external_decl = external_declaration_init(decl_specifiers);
+	struct declarator *declarator = NULL;
+
 	// compound statement case
 	struct compound_statement *compound_stmt = NULL;
-	
 	// declaration case
 	struct init_declarator_list *init_declarator_list = NULL;
 
-	union token tok = lexer_next_token(parser->lexer);	
-	if (tok.tok_tag == TOK_LBRACE) {
-		lexer_put_back(parser->lexer, tok);
-		compound_stmt = parse_compound_statement(parser);
+	// check for empty init_declarator_list case, similar to what we do in
+	// parse_init_declarator_list
+	union token tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_SEMICOLON) {
+		init_declarator_list = init_declarator_list_init(dynarr_init());
+
+		// set external decl
+		external_decl->init_declarator_list = init_declarator_list;
 	} else {
-		init_declarator_list = parse_init_declarator_list_with_la(parser, declarator);
+		lexer_put_back(parser->lexer, tok);
+		declarator = parse_declarator(parser);
+
+		tok = lexer_next_token(parser->lexer);	
+		if (tok.tok_tag == TOK_LBRACE) {
+			lexer_put_back(parser->lexer, tok);
+			compound_stmt = parse_compound_statement(parser);
+		
+			// set external decl
+			external_decl->func_def_declarator = declarator;
+			external_decl->compound_stmt = compound_stmt;
+		} else {
+			lexer_put_back(parser->lexer, tok);
+			init_declarator_list = parse_init_declarator_list_with_la(parser, declarator);
+
+			// set external decl
+			external_decl->init_declarator_list = init_declarator_list;
+		}
 	}
 
-	panic("parse_external_decl ni"); 
+	return external_decl;
 }
 

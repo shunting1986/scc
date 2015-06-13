@@ -292,4 +292,9 @@ struct assignment_expression *assignment_expression_init() {
 	return assign_expr;
 }
 
-
+struct external_declaration *external_declaration_init(struct declaration_specifiers *decl_specifiers) {
+	struct external_declaration *external_decl = mallocz(sizeof(*external_decl));
+	external_decl->nodeType = EXTERNAL_DECLARATION;
+	external_decl->decl_specifiers = decl_specifiers;
+	return external_decl;
+}

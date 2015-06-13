@@ -66,7 +66,18 @@ struct translation_unit_node {
 
 struct external_declaration {
 	int nodeType;
+	struct declaration_specifiers *decl_specifiers;
+	
+	// for function declaration
+	struct declarator *func_def_declarator;
+	struct compound_statement *compound_stmt;
+
+	// for declaration
+	struct init_declarator_list *init_declarator_list;
 };
+
+// further information need to be set for the returned external_declaration
+struct external_declaration *external_declaration_init(struct declaration_specifiers *decl_specifiers);
 
 struct initializer {
 	int nodeType;
