@@ -13,6 +13,8 @@ extern "C" {
 struct syntree;
 
 struct syntree *syntree_init(struct translation_unit *trans_unit);
+
+// handy function to dump the syntax tree in C
 void syntree_dump(struct syntree *tree);
 void syntree_destroy(struct syntree *tree);
 
