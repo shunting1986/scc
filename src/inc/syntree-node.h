@@ -93,7 +93,7 @@ struct direct_declarator *direct_declarator_init();
 
 struct declarator {
 	int nodeType;
-	struct direct_declarator *directDeclarator;
+	struct direct_declarator *direct_declarator;
 };
 
 struct declarator *declarator_init();

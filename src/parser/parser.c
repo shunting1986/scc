@@ -75,7 +75,7 @@ static struct direct_declarator *parse_direct_declarator(struct parser *parser) 
 static struct declarator *parse_declarator(struct parser *parser) {
 	struct direct_declarator *direct_declarator = parse_direct_declarator(parser);
 	struct declarator *declarator = declarator_init();
-	declarator->directDeclarator = direct_declarator;
+	declarator->direct_declarator = direct_declarator;
 	return declarator;
 }
 
@@ -104,7 +104,7 @@ static struct init_declarator_list *parse_init_declarator_list(struct parser *pa
 	// need check for empty init_declarator_list here
 	union token tok = lexer_next_token(parser->lexer);
 	if (tok.tok_tag == TOK_SEMICOLON) {
-		return init_declarator_list_init(dynarr_init());
+		return NULL;
 	}
 	lexer_put_back(parser->lexer, tok);
 	return parse_init_declarator_list_with_la(parser, 
@@ -160,10 +160,6 @@ static struct external_declaration *parse_external_decl(struct parser *parser) {
 	// parse_init_declarator_list
 	union token tok = lexer_next_token(parser->lexer);
 	if (tok.tok_tag == TOK_SEMICOLON) {
-		init_declarator_list = init_declarator_list_init(dynarr_init());
-
-		// set external decl
-		external_decl->init_declarator_list = init_declarator_list;
 	} else {
 		lexer_put_back(parser->lexer, tok);
 		declarator = parse_declarator(parser);
