@@ -10,7 +10,10 @@
 extern "C" {
 #endif
 
-struct syntree;
+// this an abstract representation for the entire syntax tree
+struct syntree {
+	struct translation_unit *trans_unit;
+};
 
 struct syntree *syntree_init(struct translation_unit *trans_unit);
 

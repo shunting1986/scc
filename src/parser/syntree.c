@@ -6,11 +6,6 @@
 #include <inc/lexer.h>
 #include <inc/cgc.h>
 
-// this an abstract representation for the entire syntax tree
-struct syntree {
-	struct translation_unit *trans_unit;
-};
-
 struct syntree *syntree_init(struct translation_unit *trans_unit) {
 	struct syntree *tree = mallocz(sizeof(*tree));
 	tree->trans_unit = trans_unit;
@@ -25,6 +20,20 @@ void syntree_dump(struct syntree *tree) {
 
 void syntree_destroy(struct syntree *tree) {
 	panic("ni");
+}
+
+// get string form of the syntax node type
+static const char *node_type_str_table[] = {
+#define DEF(t) [t] = #t,
+#include <parser/node-type.def>
+#undef DEF
+};
+
+const char *node_type_str(unsigned int node_type) {
+	if (node_type >= MAX_NODE_TYPE) {
+		panic("invalid node type %d", node_type);
+	}
+	return node_type_str_table[node_type];
 }
 
 // following are node constructor and destructor definitions
