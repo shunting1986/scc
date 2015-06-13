@@ -46,7 +46,34 @@ static int initiate_jump_statement(union token tok) {
 }
 
 static struct jump_statement *parse_jump_statement(struct parser *parser) {
-	panic("parse_jump_statement ni");
+	union token tok = lexer_next_token(parser->lexer);
+	struct jump_statement *stmt = NULL;
+
+	if (tok.tok_tag == TOK_GOTO) {
+		tok = expect(parser->lexer, TOK_IDENTIFIER);
+		expect(parser->lexer, TOK_SEMICOLON);
+		stmt = jump_statement_init(TOK_GOTO);
+		stmt->goto_label = tok.id.s;
+	} else if (tok.tok_tag == TOK_CONTINUE) {
+		expect(parser->lexer, TOK_SEMICOLON);
+		stmt = jump_statement_init(TOK_CONTINUE);
+	} else if (tok.tok_tag == TOK_BREAK) {
+		expect(parser->lexer, TOK_SEMICOLON);
+		stmt = jump_statement_init(TOK_BREAK);
+	} else if (tok.tok_tag == TOK_RETURN) {
+		struct expression *expr = NULL;
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_SEMICOLON) {
+			lexer_put_back(parser->lexer, tok);
+			expr = parse_expression(parser);
+			expect(parser->lexer, TOK_SEMICOLON);
+		}
+		stmt = jump_statement_init(TOK_RETURN);
+		stmt->ret_expr = expr;
+	} else {
+		panic("invalid jump statement"); 
+	}
+	return stmt;
 }
 
 static int initiate_selection_statement(union token tok) {

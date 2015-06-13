@@ -8,7 +8,7 @@
 #include <inc/dynarr.h>
 #include <inc/syntree-visitor.h>
 
-#define D 0
+#define D 1
 
 static struct assignment_expression *parse_assignment_expression(struct parser *parser);
 static struct cast_expression *parse_cast_expression(struct parser *parser);

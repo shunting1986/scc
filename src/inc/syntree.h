@@ -26,6 +26,7 @@ enum syntree_node_type {
 	DECLARATION,
 	TRANSLATION_UNIT,
 	EXTERNAL_DECL,
+	JUMP_STATEMENT,
 	EXPRESSION_STATEMENT,
 	EXPRESSION,
 	TYPE_SPECIFIER,
@@ -122,6 +123,15 @@ struct type_specifier {
 };
 
 struct type_specifier *type_specifier_init(int tok_tag);
+
+struct jump_statement {
+	int nodeType;
+	int init_tok_tag;
+	char *goto_label;
+	struct expression *ret_expr;
+};
+
+struct jump_statement *jump_statement_init(int init_tok_tag);
 
 struct compound_statement {
 	int nodeType;

@@ -37,6 +37,13 @@ struct declarator *declarator_init() {
 	return declarator;
 }
 
+struct jump_statement *jump_statement_init(int init_tok_tag) {
+	struct jump_statement *stmt = mallocz(sizeof(*stmt));
+	stmt->nodeType = JUMP_STATEMENT;
+	stmt->init_tok_tag = init_tok_tag;
+	return stmt;
+}
+
 struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList) {
 	struct compound_statement *stmt = mallocz(sizeof(*stmt));
 	stmt->nodeType = COMPOUND_STATEMENT;
