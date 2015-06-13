@@ -18,10 +18,14 @@ union token {
 		char *s;
 	} str; // the same as id
 
+#define CONST_VAL_TOK_INTEGER 1
+#define CONST_VAL_TOK_FLOAT 2
 	struct {
 		int tok_tag;
+		int flags;
 		union {
 			int ival;
+			double fval;
 		};
 	} const_val;
 };

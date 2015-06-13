@@ -103,6 +103,7 @@ void cast_expression_destroy(struct cast_expression *cast_expr) {
 struct primary_expression *primary_expression_init() {
 	struct primary_expression *expr = mallocz(sizeof(*expr));
 	expr->nodeType = PRIMARY_EXPRESSION;
+	expr->const_val_tok.tok_tag = TOK_UNDEF;
 	return expr;
 }
 

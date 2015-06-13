@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <inc/token.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -240,6 +241,8 @@ struct primary_expression {
 	int nodeType;
 	char *id;
 	char *str;
+	union token const_val_tok;
+	struct expression *expr;
 };
 
 struct primary_expression *primary_expression_init();

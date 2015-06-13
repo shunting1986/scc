@@ -15,19 +15,24 @@ static struct cast_expression *parse_cast_expression(struct parser *parser);
 
 static struct primary_expression *parse_primary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
-	if (D) {
-		printf("parse_primary_expression token is %s\n", token_tag_str(tok.tok_tag)); 
-	}
 	struct primary_expression *prim_expr = primary_expression_init();
+
 	if (tok.tok_tag == TOK_IDENTIFIER) {
 		prim_expr->id = tok.id.s;
-		return prim_expr;
 	} else if (tok.tok_tag == TOK_STRING_LITERAL) {
 		prim_expr->str = tok.str.s;
-		return prim_expr;
+	} else if (tok.tok_tag == TOK_CONSTANT_VALUE) {
+		prim_expr->const_val_tok = tok;
+	} else if (tok.tok_tag == TOK_LPAREN) {
+		struct expression *expr = parse_expression(parser);
+		expect(parser->lexer, TOK_RPAREN);
+		prim_expr->expr = expr;
+	} else {
+		// we may destroy primary expression first
+		panic("parse_primary_expression ni");
 	}
 
-	panic("parse_primary_expression ni");
+	return prim_expr;
 }
 
 static struct argument_expression_list *parse_argument_expression_list(struct parser *parser) {

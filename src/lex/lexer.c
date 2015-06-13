@@ -47,6 +47,7 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 	}
 	file_reader_put_back(lexer->cstream, ch);
 	ptok->tok_tag = TOK_CONSTANT_VALUE;
+	ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
 	ptok->const_val.ival = val;
 }
 
