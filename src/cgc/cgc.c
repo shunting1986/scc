@@ -25,6 +25,7 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt);
 static void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_list *init_declarator_list);
 static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator);
+static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr);
 
 #define CGC_BINARY_OP_EXPR(ctx, container_expr, subexpr_list, subexpr_type, oplist, single_op) do { \
 	cgc_ ## subexpr_type(ctx, dynarr_get(subexpr_list, 0)); \
@@ -111,12 +112,51 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 	cgc_indent(ctx); cgc_print(ctx, "}\n");
 }
 
-static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
+static void cgc_constant_value(struct cgc_context *ctx, union token tok) {
 	panic("ni");
 }
 
+static void cgc_primary_expression(struct cgc_context *ctx, struct primary_expression *expr) {
+	if (expr->id != NULL) {
+		cgc_print(ctx, "%s", expr->id);
+	} else if (expr->str) {
+		cgc_print(ctx, "\"%s\"", expr->str);
+	} else if (expr->expr) {
+		cgc_expression(ctx, expr->expr);
+	} else if (expr->const_val_tok.tok_tag != TOK_UNDEF) {
+		cgc_constant_value(ctx, expr->const_val_tok);
+	} else {
+		panic("invalid primary expression");
+	}
+}
+
+static void cgc_postfix_expression(struct cgc_context *ctx, struct postfix_expression *expr) {
+	cgc_primary_expression(ctx, expr->prim_expr);
+	DYNARR_FOREACH_BEGIN(expr->suff_list, postfix_expression_suffix, each);
+		panic("handle suffix");
+	DYNARR_FOREACH_END();
+}
+
+static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
+	if (unary_expr->inc_unary != NULL) {
+		cgc_print(ctx, "%s", cgc_get_op_str(TOK_INC));
+		cgc_unary_expression(ctx, unary_expr->inc_unary);
+	} else if (unary_expr->dec_unary != NULL) {
+		cgc_print(ctx, "%s", cgc_get_op_str(TOK_DEC));
+		cgc_unary_expression(ctx, unary_expr->dec_unary);
+	} else if (unary_expr->unary_op != TOK_UNDEF) {
+		cgc_print(ctx, "%s", cgc_get_op_str(unary_expr->unary_op));
+		cgc_cast_expression(ctx, unary_expr->unary_op_cast);
+	} else if (unary_expr->postfix_expr != NULL) {
+		cgc_postfix_expression(ctx, unary_expr->postfix_expr);
+	} else {
+		panic("invalid unary expression");
+	}
+}
+
 static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr) {
-	panic("ni");
+	cgc_unary_expression(ctx, expr->unary_expr);
+	// TODO need handle casting
 }
 
 static void cgc_multiplicative_expression(struct cgc_context *ctx, struct multiplicative_expression *expr) {
@@ -249,7 +289,6 @@ static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator 
 }
 
 static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers) {
-	cgc_indent(ctx);
 	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
 		switch (each->nodeType) {
 		case TYPE_SPECIFIER:
