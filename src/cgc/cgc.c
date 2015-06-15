@@ -12,6 +12,7 @@ struct cgc_context {
 	int step; // the step for indent
 };
 
+static void cgc_expression(struct cgc_context *ctx, struct expression *expr);
 static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit);
 static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl);
 static void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
@@ -100,8 +101,51 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 	cgc_indent(ctx); cgc_print(ctx, "}\n");
 }
 
-static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
+void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
 	panic("ni");
+}
+
+void cgc_logical_or_expression(struct cgc_context *ctx, struct logical_or_expression *expr) {
+	panic("ni");
+}
+
+void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr) {
+	int i;
+	cgc_logical_or_expression(ctx, dynarr_get(cond_expr->or_expr_list, 0));
+
+	// XXX can do better formatting when multiple '?' chained together
+	for (i = 1; i < dynarr_size(cond_expr->or_expr_list); i++) {
+		struct logical_or_expression *or_expr = dynarr_get(cond_expr->or_expr_list, i);
+		struct expression *expr = dynarr_get(cond_expr->inner_expr_list, i - 1);
+		cgc_print(ctx, " ? ");
+		cgc_expression(ctx, expr);
+		cgc_print(ctx, " : ");
+		cgc_logical_or_expression(ctx, or_expr);
+	}
+}
+
+static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment_expression *expr) {
+	int i;
+	for (i = 0; i < dynarr_size(expr->unary_expr_list); i++) {
+		struct unary_expression *unary_expr = dynarr_get(expr->unary_expr_list, i);
+		int optok = (int)(long) dynarr_get(expr->oplist, i);
+		cgc_unary_expression(ctx, unary_expr);
+		cgc_print(ctx, " ");
+		cgc_get_op_str(optok);
+		cgc_print(ctx, " ");
+	}
+	cgc_conditional_expression(ctx, expr->cond_expr);
+}
+
+static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
+	int first = 1;
+	DYNARR_FOREACH_BEGIN(expr->darr, assignment_expression, each);
+		if (!first) {
+			cgc_print(ctx, ", ");
+		}
+		first = 0;
+		cgc_assignment_expression(ctx, each);
+	DYNARR_FOREACH_END();
 }
 
 static void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt) {
