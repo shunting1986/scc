@@ -41,6 +41,8 @@ TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 
 PROG_NAME := scc
 
+rebuild-$(PROG_NAME): clean $(PROG_NAME)
+
 $(PROG_NAME): $(LIB_SCC) obj/main.o
 	gcc $(CFLAGS) -o $@ obj/main.o $(LIB_SCC)
 

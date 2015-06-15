@@ -334,4 +334,9 @@ struct translation_unit *translation_unit_init(void) {
 	return tu;
 }
 
-
+struct type_qualifier_list *type_qualifier_list_init(void) {
+	struct type_qualifier_list *nd = mallocz(sizeof(*nd));
+	nd->nodeType = TYPE_QUALIFIER_LIST;
+	nd->darr = dynarr_init();
+	return nd;
+}

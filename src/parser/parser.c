@@ -71,10 +71,43 @@ static struct direct_declarator *parse_direct_declarator(struct parser *parser) 
 	return dd;
 }
 
-// TODO: handle pointer here
+static int initiate_type_qualifier(union token tok) {
+	return tok.tok_tag == TOK_CONST || tok.tok_tag == TOK_VOLATILE;
+}
+
+static struct dynarr *parse_pointer(struct parser *parser) {
+	union token tok;
+	struct type_qualifier_list *qual_list = NULL;
+	struct dynarr *ptr_list = dynarr_init();
+	while (1) {
+		// get '*'
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_STAR) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		// get the following type qualifier list	
+		qual_list = type_qualifier_list_init();
+		while (1) {
+			tok = lexer_next_token(parser->lexer);
+			if (!initiate_type_qualifier(tok)) {
+				lexer_put_back(parser->lexer, tok);
+				break;
+			}
+
+			dynarr_add(qual_list->darr, (void *) (long) tok.tok_tag);
+		}
+		dynarr_add(ptr_list, qual_list);
+	}
+	return ptr_list;
+}
+
 static struct declarator *parse_declarator(struct parser *parser) {
+	struct dynarr *ptr_list = parse_pointer(parser);
 	struct direct_declarator *direct_declarator = parse_direct_declarator(parser);
 	struct declarator *declarator = declarator_init();
+	declarator->ptr_list = ptr_list;
 	declarator->direct_declarator = direct_declarator;
 	return declarator;
 }

@@ -3,18 +3,17 @@
 
 int
 main(int argc, char **argv) {
-	/*
 	if (argc != 2) {
 		panic("Usage: %s [file to compile]");
 	} 
-	 */
-	struct file_reader *fr = file_reader_init("sample-progs/sample.c");
+	struct file_reader *fr = file_reader_init(argv[1]);
 	struct lexer *lexer = lexer_init(fr);
 	struct parser *parser = parser_init(lexer);
 
 	struct syntree *tree = parse(parser);
 
 	syntree_dump(tree);
+	syntree_destroy(tree);
 
 	parser_destroy(parser);
 	lexer_destroy(lexer);

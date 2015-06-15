@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 int check_keyword_token(char *s);
+const char *keyword_str(int tok_tag);
 
 #ifdef __cplusplus
 }

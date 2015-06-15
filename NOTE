@@ -1,20 +1,7 @@
-exprssion
-- assignment_expression
-
-??? should we use a queue or stack for the put back ???
-
-- parse declaration
-  + parse declaration specifiers
-	+ parse declarators
-	+ parse initializer
-
-* after succeed to do parsing, dump/format the syntree as C source code
-=====================
+== HERE: enhance the parsing for declarator
 
 - NOTE: the only external resource I refer is the grammar of C language
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
 - TODO: let the make file support dependency on header file
-
-- HERE: be able to do lexicial analyzer first..
 
 NOTE: we can try to compile mongoose/memcached with my compiler :)

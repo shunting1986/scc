@@ -316,7 +316,19 @@ static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt)
 	}
 }
 
+static void cgc_pointer(struct cgc_context *ctx, struct dynarr *ptr_list) {
+	DYNARR_FOREACH_BEGIN(ptr_list, type_qualifier_list, each);
+		cgc_print(ctx, "*");
+		int j;
+		for (j = 0; j < dynarr_size(each->darr); j++) {
+			int qual_tok = (int) (long) dynarr_get(each->darr, j);
+			cgc_print(ctx, "%s ", keyword_str(qual_tok));
+		}
+	DYNARR_FOREACH_END();
+}
+
 static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator) {
+	cgc_pointer(ctx, declarator->ptr_list);
 	cgc_direct_declarator(ctx, declarator->direct_declarator);
 }
 

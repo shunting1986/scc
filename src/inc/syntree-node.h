@@ -91,8 +91,19 @@ struct direct_declarator {
 
 struct direct_declarator *direct_declarator_init();
 
+struct type_qualifier_list {
+	int nodeType;
+	struct dynarr *darr; // each element is a type_qualifier (int)
+};
+
+struct type_qualifier_list *type_qualifier_list_init(void);
+
 struct declarator {
 	int nodeType;
+
+	// ptr_list will not be NULL; each element if exist will not be null and its type
+	// is type_qualifier_list
+	struct dynarr *ptr_list;
 	struct direct_declarator *direct_declarator;
 };
 
