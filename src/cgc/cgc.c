@@ -26,6 +26,7 @@ static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt)
 static void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_list *init_declarator_list);
 static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator);
 static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr);
+static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment_expression *expr);
 
 #define CGC_BINARY_OP_EXPR(ctx, container_expr, subexpr_list, subexpr_type, oplist, single_op) do { \
 	cgc_ ## subexpr_type(ctx, dynarr_get(subexpr_list, 0)); \
@@ -113,7 +114,14 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 }
 
 static void cgc_constant_value(struct cgc_context *ctx, union token tok) {
-	panic("ni");
+	int flags = tok.const_val.flags;
+	if (flags & CONST_VAL_TOK_INTEGER) {
+		cgc_print(ctx, "%d", tok.const_val.ival);
+	} else if (flags & CONST_VAL_TOK_FLOAT) {
+		cgc_print(ctx, "%f", tok.const_val.fval);
+	} else {
+		panic("invalid flag");
+	}
 }
 
 static void cgc_primary_expression(struct cgc_context *ctx, struct primary_expression *expr) {
@@ -130,10 +138,44 @@ static void cgc_primary_expression(struct cgc_context *ctx, struct primary_expre
 	}
 }
 
+static void cgc_argument_expression_list(struct cgc_context *ctx, struct argument_expression_list *arg_list) {
+	struct dynarr *assign_expr_list = arg_list->list;
+	int first = 1;
+	DYNARR_FOREACH_BEGIN(assign_expr_list, assignment_expression, each);
+		if (!first) {
+			cgc_print(ctx, ", ");
+		}
+		first = 0;
+		cgc_assignment_expression(ctx, each);
+	DYNARR_FOREACH_END();
+}
+
+static void cgc_postfix_expression_suffix(struct cgc_context *ctx, struct postfix_expression_suffix *suff) {
+	if (suff->ind != NULL) {
+		cgc_print(ctx, "[");
+		cgc_expression(ctx, suff->ind);
+		cgc_print(ctx, "]");
+	} else if (suff->arg_list != NULL) {
+		cgc_print(ctx, "(");
+		cgc_argument_expression_list(ctx, suff->arg_list);
+		cgc_print(ctx, ")");
+	} else if (suff->dot_id) {
+		cgc_print(ctx, ".%s", suff->dot_id);
+	} else if (suff->ptr_id) {
+		cgc_print(ctx, "->%s", suff->ptr_id);
+	} else if (suff->is_inc) {
+		cgc_print(ctx, "%s", cgc_get_op_str(TOK_INC));
+	} else if (suff->is_dec) {
+		cgc_print(ctx, "%s", cgc_get_op_str(TOK_DEC));
+	} else {
+		panic("invalid suffix");
+	}
+}
+
 static void cgc_postfix_expression(struct cgc_context *ctx, struct postfix_expression *expr) {
 	cgc_primary_expression(ctx, expr->prim_expr);
 	DYNARR_FOREACH_BEGIN(expr->suff_list, postfix_expression_suffix, each);
-		panic("handle suffix");
+		cgc_postfix_expression_suffix(ctx, each);
 	DYNARR_FOREACH_END();
 }
 
@@ -220,9 +262,7 @@ static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment
 		struct unary_expression *unary_expr = dynarr_get(expr->unary_expr_list, i);
 		int optok = (int)(long) dynarr_get(expr->oplist, i);
 		cgc_unary_expression(ctx, unary_expr);
-		cgc_print(ctx, " ");
-		cgc_get_op_str(optok);
-		cgc_print(ctx, " ");
+		cgc_print(ctx, " %s ", cgc_get_op_str(optok));
 	}
 	cgc_conditional_expression(ctx, expr->cond_expr);
 }
@@ -240,14 +280,36 @@ static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
 
 static void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt) {
 	cgc_indent(ctx); 
-	cgc_expression(ctx, stmt->expr);
-	cgc_print(ctx, "\n");
+	if (stmt->expr != NULL)
+		cgc_expression(ctx, stmt->expr);
+	cgc_print(ctx, ";\n");
+}
+
+static void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *stmt) {
+	cgc_indent(ctx);
+	if (stmt->init_tok_tag == TOK_GOTO) {
+		cgc_print(ctx, "goto %s", stmt->goto_label);
+	} else if (stmt->init_tok_tag == TOK_CONTINUE) {
+		cgc_print(ctx, "continue");
+	} else if (stmt->init_tok_tag == TOK_BREAK) {
+		cgc_print(ctx, "break");
+	} else if (stmt->init_tok_tag == TOK_RETURN) {
+		cgc_print(ctx, "return");
+		if (stmt->ret_expr != NULL) {
+			cgc_print(ctx, " ");
+			cgc_expression(ctx, stmt->ret_expr);
+		}
+	}
+	cgc_print(ctx, ";\n");
 }
 
 static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
 		cgc_expression_statement(ctx, (struct expression_statement *) stmt);
+		break;
+	case JUMP_STATEMENT:
+		cgc_jump_statement(ctx, (struct jump_statement *) stmt);
 		break;
 	default:
 		panic("unexpected node type %s", node_type_str(stmt->nodeType));
