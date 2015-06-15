@@ -26,6 +26,16 @@ static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt)
 static void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_list *init_declarator_list);
 static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator);
 
+#define CGC_BINARY_OP_EXPR(ctx, container_expr, subexpr_list, subexpr_type, oplist, single_op) do { \
+	cgc_ ## subexpr_type(ctx, dynarr_get(subexpr_list, 0)); \
+	int i; \
+	for (i = 1; i < dynarr_size(subexpr_list); i++) { \
+		int tok_op = oplist != NULL ? (int) (long) dynarr_get(oplist, i - 1) : single_op; \
+		cgc_print(ctx, " %s ", cgc_get_op_str(tok_op)); \
+		cgc_ ## subexpr_type(ctx, dynarr_get(subexpr_list, i)); \
+	} \
+} while (0)
+
 // this method will take care of the indent
 static void cgc_printi(struct cgc_context *ctx, const char *fmt, ...) {
 	va_list va;
@@ -101,15 +111,55 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 	cgc_indent(ctx); cgc_print(ctx, "}\n");
 }
 
-void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
+static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
 	panic("ni");
 }
 
-void cgc_logical_or_expression(struct cgc_context *ctx, struct logical_or_expression *expr) {
+static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr) {
 	panic("ni");
 }
 
-void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr) {
+static void cgc_multiplicative_expression(struct cgc_context *ctx, struct multiplicative_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->cast_expr_list, cast_expression, expr->oplist, TOK_UNDEF);
+}
+
+static void cgc_additive_expression(struct cgc_context *ctx, struct additive_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->mul_expr_list, multiplicative_expression, expr->oplist, TOK_UNDEF);
+}
+
+static void cgc_shift_expression(struct cgc_context *ctx, struct shift_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->add_expr_list, additive_expression, expr->oplist, TOK_UNDEF);
+}
+
+static void cgc_relational_expression(struct cgc_context *ctx, struct relational_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->shift_expr_list, shift_expression, expr->oplist, TOK_UNDEF);
+}
+
+static void cgc_equality_expression(struct cgc_context *ctx, struct equality_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->rel_expr_list, relational_expression, expr->oplist, TOK_UNDEF);
+}
+
+static void cgc_and_expression(struct cgc_context *ctx, struct and_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->eq_expr_list, equality_expression, NULL, TOK_AMPERSAND);
+}
+
+static void cgc_exclusive_or_expression(struct cgc_context *ctx, struct exclusive_or_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->and_expr_list, and_expression, NULL, TOK_XOR);
+}
+
+static void cgc_inclusive_or_expression(struct cgc_context *ctx, struct inclusive_or_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->xor_expr_list, exclusive_or_expression, NULL, TOK_VERT_BAR);
+}
+
+static void cgc_logical_and_expression(struct cgc_context *ctx, struct logical_and_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->or_expr_list, inclusive_or_expression, NULL, TOK_LOGIC_AND);
+}
+
+static void cgc_logical_or_expression(struct cgc_context *ctx, struct logical_or_expression *expr) {
+	CGC_BINARY_OP_EXPR(ctx, expr, expr->and_expr_list, logical_and_expression, NULL, TOK_LOGIC_OR);
+}
+
+static void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr) {
 	int i;
 	cgc_logical_or_expression(ctx, dynarr_get(cond_expr->or_expr_list, 0));
 
