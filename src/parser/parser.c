@@ -33,7 +33,7 @@ struct syntree *parse(struct parser *parser) {
 	return syntree_init(tu);
 }
 
-static struct declaration_specifiers *parse_decl_specifiers(struct parser *parser) {
+static struct declaration_specifiers *parse_declaration_specifiers(struct parser *parser) {
 	union token tok;
 	void *nd;
 	struct dynarr *darr = dynarr_init();
@@ -55,8 +55,51 @@ static struct declaration_specifiers *parse_decl_specifiers(struct parser *parse
 	return declaration_specifiers_init(darr);
 }
 
+static int initiate_pointer(union token tok) {
+}
+
+static int initiate_declarator(union token tok) {
+	return tok.tok_tag == TOK_STAR || tok.tok_tag == TOK_IDENTIFIER || tok.tok_tag == TOK_LPAREN;
+}
+
+// TODO support abstract_declarator
+static struct parameter_declaration *parse_parameter_declaration(struct parser *parser) {
+	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
+
+	union token tok = lexer_next_token(parser->lexer);
+	struct declarator *declarator = NULL;
+	if (initiate_declarator(tok)) {
+		lexer_put_back(parser->lexer, tok);
+		declarator = parse_declarator(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+	}
+	return parameter_declaration_init(decl_specifiers, declarator);
+}
+
 static struct parameter_type_list *parse_parameter_type_list(struct parser *parser) {
-	panic("ni");
+	struct parameter_type_list *param_type_list = parameter_type_list_init();
+	struct parameter_declaration *decl = parse_parameter_declaration(parser);
+	dynarr_add(param_type_list->param_decl_list, decl);
+	union token tok;
+
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag != TOK_COMMA) {
+			lexer_put_back(parser->lexer, tok);
+			break;
+		}
+
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag == TOK_ELLIPSIS) {
+			param_type_list->has_ellipsis = 1;
+			break;
+		}
+		lexer_put_back(parser->lexer, tok);
+		decl = parse_parameter_declaration(parser);
+		dynarr_add(param_type_list->param_decl_list, decl);
+	}
+	return param_type_list;
 }
 
 static struct direct_declarator *parse_direct_declarator(struct parser *parser) {
@@ -200,7 +243,7 @@ static struct init_declarator_list *parse_init_declarator_list_with_la(struct pa
 }
 
 struct declaration *parse_declaration(struct parser *parser) {
-	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
+	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
 	return declaration_init(decl_specifiers, init_declarator_list);
 }
@@ -214,7 +257,7 @@ int initiate_declaration(union token tok) {
 
 // assume no EOF found; 
 static struct external_declaration *parse_external_decl(struct parser *parser) {
-	struct declaration_specifiers *decl_specifiers = parse_decl_specifiers(parser);
+	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
 	struct external_declaration *external_decl = external_declaration_init(decl_specifiers);
 	struct declarator *declarator = NULL;
 

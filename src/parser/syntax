@@ -60,6 +60,13 @@ declarator
   : direct_declarator
 	| pointer direct_declarator;
 
+pointer
+	: '*'
+	| '*' type_qualifier_list
+	| '*' pointer
+	| '*' type_qualifier_list pointer
+	;
+
 direct_declarator
   : IDENTIFIER
 	| '(' declarator ')'
@@ -67,6 +74,22 @@ direct_declarator
 	| direct_declarator '[' ']'
 	| direct_declarator '(' parameter_type_list ')'
 	| direct_declarator '(' ')'
+	;
+
+parameter_type_list
+	: parameter_list 
+	| parameter_list ',' ELLIPSIS
+	;
+
+parameter_list
+	: parameter_declaration
+	| parameter_list ',' parameter_declaration
+	;
+
+parameter_declaration:
+	: declaration_specifiers declarator
+	| declaration_specifiers abstract_declarator
+	| declaration_sepcifiers
 	;
 
 type_name

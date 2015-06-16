@@ -86,6 +86,22 @@ struct declaration_specifiers {
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr);
 
+struct parameter_declaration {
+	int nodeType;
+	struct declaration_specifiers *decl_specifiers;
+	struct declarator *declarator;
+};
+
+struct parameter_declaration *parameter_declaration_init(struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
+
+struct parameter_type_list {
+	int nodeType;
+	int has_ellipsis;
+	struct dynarr *param_decl_list; // not empty
+};
+
+struct parameter_type_list *parameter_type_list_init(void);
+
 struct direct_declarator_suffix {
 	int empty_bracket;
 	int empty_paren;
@@ -93,8 +109,12 @@ struct direct_declarator_suffix {
 	struct parameter_type_list *param_type_list;
 };
 
+/* 
+ * TODO handle abstract declarator here
+ */
 struct direct_declarator {
 	int nodeType;
+
 	char *id;
 	struct declarator *declarator;
 

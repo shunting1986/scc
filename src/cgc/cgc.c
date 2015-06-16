@@ -12,6 +12,8 @@ struct cgc_context {
 	int step; // the step for indent
 };
 
+#define cgc_constant_expression cgc_conditional_expression
+
 static void cgc_expression(struct cgc_context *ctx, struct expression *expr);
 static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit);
 static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl);
@@ -332,10 +334,56 @@ static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarato
 	cgc_direct_declarator(ctx, declarator->direct_declarator);
 }
 
+static void cgc_parameter_declaration(struct cgc_context *ctx, struct parameter_declaration *decl) {
+	cgc_declaration_specifiers(ctx, decl->decl_specifiers);	
+	if (decl->declarator) {
+		cgc_print(ctx, " ");
+		cgc_declarator(ctx, decl->declarator);
+	}
+}
+
+static void cgc_parameter_type_list(struct cgc_context *ctx, struct parameter_type_list *list) {
+	int first = 1;
+	DYNARR_FOREACH_BEGIN(list->param_decl_list, parameter_declaration, each);
+		if (!first) {
+			cgc_print(ctx, ", ");
+		}
+		first = 0;
+		cgc_parameter_declaration(ctx, each);
+	DYNARR_FOREACH_END();
+	if (list->has_ellipsis) {
+		cgc_print(ctx, ", ...");
+	}
+}
+
 static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declarator *direct_declarator) {
-	assert(direct_declarator->id != NULL);
-	cgc_print(ctx, "%s", direct_declarator->id);
-	// TODO
+	if (direct_declarator->id != NULL) {
+		cgc_print(ctx, "%s", direct_declarator->id);
+	} else if (direct_declarator->declarator != NULL) {
+		cgc_print(ctx, "(");
+		cgc_declarator(ctx, direct_declarator->declarator);
+		cgc_print(ctx, ")");
+	} else {
+		panic("abstract declarator not supported yet");
+	}
+
+	DYNARR_FOREACH_BEGIN(direct_declarator->suff_list, direct_declarator_suffix, suff);
+		if (suff->empty_bracket) {
+			cgc_print(ctx, "[]");
+		} else if (suff->empty_paren) {
+			cgc_print(ctx, "()");
+		} else if (suff->const_expr) {
+			cgc_print(ctx, "[");
+			cgc_constant_expression(ctx, suff->const_expr);
+			cgc_print(ctx, "]");
+		} else if (suff->param_type_list) {
+			cgc_print(ctx, "(");
+			cgc_parameter_type_list(ctx, suff->param_type_list);
+			cgc_print(ctx, ")");
+		} else {
+			panic("invalid declaraotr suffix");
+		}
+	DYNARR_FOREACH_END();
 }
 
 static void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {

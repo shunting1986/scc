@@ -341,3 +341,18 @@ struct type_qualifier_list *type_qualifier_list_init(void) {
 	nd->darr = dynarr_init();
 	return nd;
 }
+
+struct parameter_type_list *parameter_type_list_init(void) {
+	struct parameter_type_list *nd = mallocz(sizeof(*nd));
+	nd->nodeType = PARAMETER_TYPE_LIST;
+	nd->param_decl_list = dynarr_init();
+	return nd;
+}
+
+struct parameter_declaration *parameter_declaration_init(struct declaration_specifiers *decl_specifiers, struct declarator *declarator) {
+	struct parameter_declaration *decl = mallocz(sizeof(*decl));
+	decl->nodeType = PARAMETER_DECLARATION;
+	decl->decl_specifiers = decl_specifiers;
+	decl->declarator = declarator;
+	return decl;
+}

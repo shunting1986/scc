@@ -147,6 +147,7 @@ repeat:
 		goto repeat;
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '?': case '~':
+	case '[': case ']':
 		tok.tok_tag = ch;
 		break;
 	case '+':

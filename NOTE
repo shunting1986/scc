@@ -1,5 +1,3 @@
-== HERE: enhance the parsing for declarator
-== make sure the sample-prog is correctly dumpped
 == translate sample-prog to assembly code
 
 - NOTE: the only external resource I refer is the grammar of C language
@@ -7,3 +5,5 @@
 - TODO: let the make file support dependency on header file
 
 NOTE: we can try to compile mongoose/memcached with my compiler :)
+
+need distinguish declarator and abstract_declarator <== parse these 2 at the same time
