@@ -23,6 +23,8 @@ struct additive_expression;
 struct multiplicative_expression;
 struct cast_expression;
 
+#define constant_expression conditional_expression
+
 struct syntreebasenode {
 	int nodeType;
 };
@@ -84,9 +86,19 @@ struct declaration_specifiers {
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr);
 
+struct direct_declarator_suffix {
+	int empty_bracket;
+	int empty_paren;
+	struct constant_expression *const_expr;
+	struct parameter_type_list *param_type_list;
+};
+
 struct direct_declarator {
 	int nodeType;
 	char *id;
+	struct declarator *declarator;
+
+	struct dynarr *suff_list;
 };
 
 struct direct_declarator *direct_declarator_init();

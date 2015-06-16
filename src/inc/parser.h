@@ -17,12 +17,19 @@ void parser_destroy(struct parser *parser);
 
 // parse methods
 struct syntree *parse(struct parser *parser);
+
+// stmt
 struct syntreebasenode *parse_statement(struct parser *parser);
 struct compound_statement *parse_compound_statement(struct parser *parser);
 
+// decl
 int initiate_declaration(union token tok);
 struct declaration *parse_declaration(struct parser *parser);
+
+// expr
 struct expression *parse_expression(struct parser *parser);
+struct conditional_expression *parse_conditional_expression(struct parser *parser);
+#define parse_constant_expression parse_conditional_expression
 
 #ifdef __cplusplus
 }

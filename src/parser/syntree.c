@@ -56,6 +56,7 @@ struct type_specifier *type_specifier_init(int tok_tag) {
 struct direct_declarator *direct_declarator_init() {
 	struct direct_declarator *dd = malloc(sizeof(*dd));
 	dd->nodeType = DIRECT_DECLARATOR;
+	dd->suff_list = dynarr_init();
 	return dd;
 }
 

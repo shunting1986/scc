@@ -55,18 +55,52 @@ static struct declaration_specifiers *parse_decl_specifiers(struct parser *parse
 	return declaration_specifiers_init(darr);
 }
 
-// TODO parse trailing '[' or '('
-// TODO parse '(' declarator ')'
-static struct direct_declarator *parse_direct_declarator(struct parser *parser) {
-	union token tok = expect(parser->lexer, TOK_IDENTIFIER);
-	struct direct_declarator *dd = direct_declarator_init();
-	dd->id = tok.id.s;
+static struct parameter_type_list *parse_parameter_type_list(struct parser *parser) {
+	panic("ni");
+}
 
-	tok = lexer_next_token(parser->lexer);
-	if (tok.tok_tag == TOK_LPAREN) {
+static struct direct_declarator *parse_direct_declarator(struct parser *parser) {
+	struct direct_declarator *dd = direct_declarator_init();
+	union token tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_IDENTIFIER) {
+		dd->id = tok.id.s;	
+	} else if (tok.tok_tag == TOK_LPAREN) {
+		dd->declarator = parse_declarator(parser);
 		expect(parser->lexer, TOK_RPAREN);
 	} else {
-		lexer_put_back(parser->lexer, tok);
+		panic("unexpected token %s\n", token_tag_str(tok.tok_tag));
+	}
+	
+	while (1) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag == TOK_LBRACKET) {
+			tok = lexer_next_token(parser->lexer);
+			struct direct_declarator_suffix *suff = mallocz(sizeof(*suff));
+			if (tok.tok_tag == TOK_RBRACKET) {
+				suff->empty_bracket = 1;
+			} else {
+				lexer_put_back(parser->lexer, tok);
+				struct constant_expression *expr = parse_constant_expression(parser);
+				expect(parser->lexer, TOK_RBRACKET);
+				suff->const_expr = expr;
+			}
+			dynarr_add(dd->suff_list, suff);
+		} else if (tok.tok_tag == TOK_LPAREN) {
+			tok = lexer_next_token(parser->lexer);
+			struct direct_declarator_suffix *suff = mallocz(sizeof(*suff));
+			if (tok.tok_tag == TOK_RPAREN) {
+				suff->empty_paren = 1;
+			} else {
+				lexer_put_back(parser->lexer, tok);
+				struct parameter_type_list *param_type_list = parse_parameter_type_list(parser);
+				expect(parser->lexer, TOK_RPAREN);
+				suff->param_type_list = param_type_list;
+			}
+			dynarr_add(dd->suff_list, suff);
+		} else {
+			lexer_put_back(parser->lexer, tok);	
+			break;
+		}
 	}
 	return dd;
 }

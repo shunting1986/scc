@@ -41,6 +41,9 @@ TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 
 PROG_NAME := scc
 
+handy: rebuild-$(PROG_NAME)
+	./scc sample-progs/decl.c
+
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
 $(PROG_NAME): $(LIB_SCC) obj/main.o

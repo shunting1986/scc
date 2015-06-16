@@ -295,7 +295,7 @@ static struct logical_or_expression *parse_logical_or_expression(struct parser *
 	return or_expr;
 }
 
-static struct conditional_expression *parse_conditional_expression(struct parser *parser) {
+struct conditional_expression *parse_conditional_expression(struct parser *parser) {
 	struct logical_or_expression *or_expr = parse_logical_or_expression(parser);
 	struct conditional_expression *cond_expr = conditional_expression_init(or_expr);
 	union token tok;
