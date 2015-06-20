@@ -21,6 +21,7 @@ static void cgc_function_definition(struct cgc_context *ctx, struct declaration_
 static void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers);
 static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier);
+static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual);
 static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator);
 static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declarator *direct_declarator);
 static void cgc_compound_statement(struct cgc_context *ctx, struct compound_statement *compound_stmt);
@@ -412,13 +413,21 @@ static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator 
 }
 
 static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers) {
+	int first = 1;
 	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
+		if (!first) {
+			cgc_print(ctx, " ");
+		}
+		first = 0;
 		switch (each->nodeType) {
 		case TYPE_SPECIFIER:
 			cgc_type_specifier(ctx, (struct type_specifier *) each);
 			break;
+		case TYPE_QUALIFIER:
+			cgc_type_qualifier(ctx, (struct type_qualifier *) each);
+			break;
 		default:
-			panic("ni");
+			panic("ni %d");
 		}
 	DYNARR_FOREACH_END();
 }
@@ -427,6 +436,19 @@ static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *t
 	switch (type_specifier->tok_tag) {
 	case TOK_INT:
 		cgc_print(ctx, "int");
+		break;
+	case TOK_CHAR:
+		cgc_print(ctx, "char");
+		break;
+	default:
+		panic("ni %s", token_tag_str(type_specifier->tok_tag));
+	}
+}
+
+static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual) {
+	switch (qual->tok_tag) {
+	case TOK_CONST:
+		cgc_print(ctx, "const");
 		break;
 	default:
 		panic("ni");
