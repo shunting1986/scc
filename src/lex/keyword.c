@@ -13,6 +13,8 @@ int check_keyword_token(char *s) {
 		return TOK_RETURN;
 	} else if (strcmp(s, "const") == 0) {
 		return TOK_CONST;
+	} else if (strcmp(s, "char") == 0) {
+		return TOK_CHAR;
 	} else {
 		return TOK_UNDEF;
 	}

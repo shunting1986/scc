@@ -238,6 +238,20 @@ repeat:
 	case '"':
 		parse_string_literal(lexer, &tok);
 		break;
+	case '.':
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '.') {
+			ch = file_reader_next_char(lexer->cstream);
+			if (ch == '.') {
+				tok.tok_tag = TOK_ELLIPSIS;
+			} else {
+				panic("invalid '..'");
+			}
+		} else {
+			// TODO handle the .23 case
+			panic("invalid '.'");
+		}
+		break;
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}
