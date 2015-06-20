@@ -9,6 +9,7 @@ static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator);
 static struct declarator *parse_declarator(struct parser *parser);
+static int initiate_type_qualifier(union token tok);
 
 struct parser *parser_init(struct lexer *lexer) {
 	struct parser *parser = malloc(sizeof(*parser));
@@ -33,16 +34,57 @@ struct syntree *parse(struct parser *parser) {
 	return syntree_init(tu);
 }
 
+// TODO handle TYPE_NAME here
+static int initiate_type_specifier(union token tok) {
+	static int type_tag_list[] = {
+		TOK_VOID, TOK_CHAR, TOK_SHORT, TOK_INT, TOK_LONG, TOK_FLOAT,
+		TOK_DOUBLE, TOK_SIGNED, TOK_UNSIGNED, TOK_STRUCT, TOK_UNION,
+		TOK_ENUM,
+		TOK_UNDEF, // the last one
+	};
+	int i;
+	for (i = 0; type_tag_list[i] != TOK_UNDEF; i++) {
+		if (type_tag_list[i] == tok.tok_tag) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+static int initiate_storage_class_specifier(union token tok) {
+	return tok.tok_tag == TOK_TYPEDEF
+		|| tok.tok_tag == TOK_EXTERN
+		|| tok.tok_tag == TOK_STATIC
+		|| tok.tok_tag == TOK_AUTO
+		|| tok.tok_tag == TOK_REGISTER;
+}
+
+/* TODO handle TYPE_NAME
+ * We already know that a type_specifier is following
+ */
+static struct type_specifier *parse_type_specifier(struct parser *parser) {
+	union token tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_STRUCT || tok.tok_tag == TOK_UNION || tok.tok_tag == TOK_ENUM) {
+		panic("struct, union, enum not supported yet");
+	} else {
+		return type_specifier_init(tok.tok_tag);
+	}
+}
+
 static struct declaration_specifiers *parse_declaration_specifiers(struct parser *parser) {
 	union token tok;
 	void *nd;
 	struct dynarr *darr = dynarr_init();
 
-	while (1) { // TODO handle more cases
+	while (1) { 
 		tok = lexer_next_token(parser->lexer);
-		if (tok.tok_tag == TOK_INT) {
-			nd = type_specifier_init(tok.tok_tag);
-			token_destroy(tok);
+		if (initiate_type_specifier(tok)) {
+			lexer_put_back(parser->lexer, tok);
+			nd = parse_type_specifier(parser);
+		} else if (initiate_type_qualifier(tok)) {
+			nd = type_qualifier_init(tok.tok_tag);
+		} else if (initiate_storage_class_specifier(tok)) {
+			nd = storage_class_specifier_init(tok.tok_tag);
 		} else {
 			lexer_put_back(parser->lexer, tok);
 			break;
@@ -53,9 +95,6 @@ static struct declaration_specifiers *parse_declaration_specifiers(struct parser
 	// the list should not be empty
 	assert(dynarr_size(darr) > 0);
 	return declaration_specifiers_init(darr);
-}
-
-static int initiate_pointer(union token tok) {
 }
 
 static int initiate_declarator(union token tok) {
@@ -173,7 +212,7 @@ static struct dynarr *parse_pointer(struct parser *parser) {
 				break;
 			}
 
-			dynarr_add(qual_list->darr, (void *) (long) tok.tok_tag);
+			dynarr_add(qual_list->darr, type_qualifier_init(tok.tok_tag));
 		}
 		dynarr_add(ptr_list, qual_list);
 	}

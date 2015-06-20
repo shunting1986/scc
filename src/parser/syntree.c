@@ -356,3 +356,19 @@ struct parameter_declaration *parameter_declaration_init(struct declaration_spec
 	decl->declarator = declarator;
 	return decl;
 }
+
+struct type_qualifier *type_qualifier_init(int tok_tag) {
+	struct type_qualifier *qual = mallocz(sizeof(*qual));
+	qual->nodeType = TYPE_QUALIFIER;
+	qual->tok_tag = tok_tag;
+	return qual;
+}
+
+struct storage_class_specifier *storage_class_specifier_init(int tok_tag) {
+	struct storage_class_specifier *sc = mallocz(sizeof(*sc));
+	sc->nodeType = STORAGE_CLASS_SPECIFIER;
+	sc->tok_tag = tok_tag;
+	return sc;
+}
+
+

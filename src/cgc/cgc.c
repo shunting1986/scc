@@ -323,7 +323,8 @@ static void cgc_pointer(struct cgc_context *ctx, struct dynarr *ptr_list) {
 		cgc_print(ctx, "*");
 		int j;
 		for (j = 0; j < dynarr_size(each->darr); j++) {
-			int qual_tok = (int) (long) dynarr_get(each->darr, j);
+			struct type_qualifier *qual = dynarr_get(each->darr, j);
+			int qual_tok = qual->tok_tag;
 			cgc_print(ctx, "%s ", keyword_str(qual_tok));
 		}
 	DYNARR_FOREACH_END();

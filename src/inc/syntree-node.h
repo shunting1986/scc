@@ -141,6 +141,20 @@ struct declarator {
 
 struct declarator *declarator_init();
 
+struct type_qualifier {
+	int nodeType;
+	int tok_tag;
+};
+
+struct type_qualifier *type_qualifier_init(int tok_tag);
+
+struct storage_class_specifier {
+	int nodeType;
+	int tok_tag;
+};
+
+struct storage_class_specifier *storage_class_specifier_init(int tok_tag);
+
 struct type_specifier {
 	int nodeType;
 	int tok_tag; // specify type

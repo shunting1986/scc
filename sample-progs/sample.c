@@ -1,3 +1,6 @@
+int scanf(const char *fmt, ...);
+int printf(const char *fmt, ...);
+
 int
 main() {
 	int a, b;

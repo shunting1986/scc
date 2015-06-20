@@ -1,3 +1,5 @@
+=== another enhance for dumping sample.c back to C
+
 == translate sample-prog to assembly code
 
 - NOTE: the only external resource I refer is the grammar of C language
