@@ -1,6 +1,8 @@
 #ifndef _INC_SYNTREE_NODE_H
 #define _INC_SYNTREE_NODE_H
 
+#include <inc/token.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
