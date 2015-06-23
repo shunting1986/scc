@@ -28,6 +28,24 @@ void cgasm_tree(struct syntree *tree) {
 	cgasm_context_destroy(ctx);
 }
 
-static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit) {
+static void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {	
 	panic("ni");
+}
+
+static void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
+	panic("ni");
+}
+
+static void cgasm_external_declaration(struct cgasm_context *ctx, struct external_declaration *external_decl) {
+	if (external_decl->func_def_declarator != NULL) {
+		cgasm_function_definition(ctx, external_decl->decl_specifiers, external_decl->func_def_declarator, external_decl->compound_stmt);
+	} else {
+		cgasm_declaration(ctx, external_decl->decl_specifiers, external_decl->init_declarator_list);		
+	}
+}
+
+static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit) {
+	DYNARR_FOREACH_BEGIN(trans_unit->external_decl_list, external_declaration, each);
+		cgasm_external_declaration(ctx, each);
+	DYNARR_FOREACH_END();
 }
