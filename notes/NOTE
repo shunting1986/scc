@@ -1,3 +1,5 @@
+TODO: make the compiler support both 32 bit and 64 bit asm?
+
 === another enhance for dumping sample.c back to C
 
 == translate sample-prog to assembly code
