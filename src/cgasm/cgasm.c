@@ -50,6 +50,13 @@ static int is_func_decl_init_declarator_list(struct init_declarator_list *init_d
 	return init_declarator->initializer == NULL && is_func_decl_declarator(init_declarator->declarator);
 }
 
+/* 
+ * NOTE: the caller should create the symtab before calling this method
+ */
+void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt) {
+	panic("ni"); // TODO
+}
+
 static void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
 	// function declaration
 	if (is_func_decl_init_declarator_list(init_declarator_list)) {
