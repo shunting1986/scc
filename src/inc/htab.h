@@ -8,6 +8,9 @@ extern "C" {
 struct hashtab;
 
 struct hashtab *htab_init();
+void htab_destroy(struct hashtab *tab);
+void *htab_query(struct hashtab *htab, const char *key);
+void htab_insert(struct hashtab *htab, const char *key, void *val);
 
 #ifdef __cplusplus
 }
