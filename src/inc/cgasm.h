@@ -17,6 +17,7 @@ struct cgasm_func_context;
 struct cgasm_context {
 	FILE *fp;
 	struct cgasm_func_context *func_ctx;
+	struct symtab *top_stab; // the top stab
 };
 
 void cgasm_tree(struct syntree *tree);

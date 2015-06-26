@@ -4,12 +4,14 @@
 #include <inc/util.h>
 #include <inc/syntree.h>
 #include <inc/syntree-node.h>
+#include <inc/symtab.h>
 
 static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit);
 
 static struct cgasm_context *cgasm_context_init(FILE *fp) {
 	struct cgasm_context *ctx = mallocz(sizeof(*ctx));
 	ctx->fp = fp;
+	ctx->top_stab = symtab_init(NULL);
 	return ctx;
 }
 

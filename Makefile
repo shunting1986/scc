@@ -11,6 +11,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	util/cbuf.c \
 	util/dynarr.c \
 	util/malloc.c \
+	util/htab.c \
 	lex/lexer.c \
 	lex/keyword.c \
 	lex/token.c \
@@ -24,7 +25,8 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgc/cgc_opstr.c \
 	cgasm/cgasm.c \
 	cgasm/cgasm-func.c \
-	cgasm/cgasm-emit.c
+	cgasm/cgasm-emit.c \
+	symtab/symtab.c 
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))
