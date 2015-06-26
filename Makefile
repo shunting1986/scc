@@ -20,6 +20,8 @@ LIB_SRC_LIST := util/file_reader.c \
 	parser/stmt-parser.c \
 	parser/expr-parser.c \
 	parser/syntree.c \
+	parser/syntree-node.c \
+	parser/syntree-check.c \
 	parser/syntree-visitor.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
