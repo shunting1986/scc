@@ -1,13 +1,19 @@
+#include <stdarg.h>
+
 #include <inc/cgasm.h>
 #include <inc/util.h>
 #include <inc/syntree.h>
 #include <inc/syntree-node.h>
 
-struct cgasm_context {
-	FILE *fp;
-};
-
 static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit);
+
+static void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...) {
+	va_list va;
+	va_start(va, fmt);
+	vfprintf(ctx->fp, fmt, va);
+	fprintf(ctx->fp, "\n");
+	va_end(va);
+}
 
 static struct cgasm_context *cgasm_context_init(FILE *fp) {
 	struct cgasm_context *ctx = mallocz(sizeof(*ctx));
@@ -29,7 +35,15 @@ void cgasm_tree(struct syntree *tree) {
 }
 
 static void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {	
+	char *fname = func_def_declarator->direct_declarator->id;
+	cgasm_println(ctx, ".global %s", fname);
+	cgasm_println(ctx, "%s:", fname);
+	cgasm_enter_function(ctx);
+
+	// middle
 	panic("ni");
+
+	cgasm_leave_function(ctx);
 }
 
 static int is_func_decl_direct_declarator_suffix(struct direct_declarator_suffix *suff) {

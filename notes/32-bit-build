@@ -1,9 +1,0 @@
-	$ gcc -m32 manual-32bit.s 
-	/usr/bin/ld: skipping incompatible /usr/lib/gcc/x86_64-linux-gnu/4.8/libgcc.a when searching for -lgcc
-	/usr/bin/ld: cannot find -lgcc
-	/usr/bin/ld: skipping incompatible /usr/lib/gcc/x86_64-linux-gnu/4.8/libgcc_s.so when searching for -lgcc_s
-	/usr/bin/ld: cannot find -lgcc_s
-	collect2: error: ld returned 1 exit status
-	
-
-

@@ -22,7 +22,8 @@ LIB_SRC_LIST := util/file_reader.c \
 	parser/syntree-visitor.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
-	cgasm/cgasm.c
+	cgasm/cgasm.c \
+	cgasm/cgasm-func.c
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
 LIB_SRC_LIST := $(wildcard $(LIB_SRC_LIST))
