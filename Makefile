@@ -37,7 +37,8 @@ LIB_SCC := libscc.a
 TEST_SRC_LIST := main.cc \
 	test-file-reader.cc \
 	test-cbuf.cc \
-	test-parser.cc
+	test-htab.cc \
+	test-parser.cc 
 
 	# XXX ignore the cases temporarily to make the output less
 	# test-lexer.cc \

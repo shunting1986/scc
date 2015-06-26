@@ -7,7 +7,7 @@
 
 void 
 // _panic(const char *fname, int line, char *fmt, ...) {
-_panic(const char *fname, int line, const char *funcname, char *fmt, ...) {
+_panic(const char *fname, int line, const char *funcname, const char *fmt, ...) {
 	va_list va;
 	printf("%s:%d:%s ", fname, line, funcname);
 	va_start(va, fmt);
