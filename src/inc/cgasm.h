@@ -2,6 +2,9 @@
 #define _INC_CGASM_H
 
 #include <stdio.h>
+#include <stdarg.h>
+#include <inc/syntree.h>
+#include <inc/syntree-node.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +20,10 @@ struct cgasm_context {
 };
 
 void cgasm_tree(struct syntree *tree);
+void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
+
+// cgasm-emit.c
+void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 
 #ifdef __cplusplus
 }
