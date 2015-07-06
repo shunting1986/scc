@@ -5,30 +5,38 @@
 extern "C" {
 #endif
 
+#define SYMBOL_MAX_LEN 128
+
 struct symtab {
 	struct symtab *enclosing;
 	struct hashtab *htab;
 };
 
+enum {
+	SYMBOL_GLOBAL_VAR,
+	SYMBOL_LOCAL_VAR,
+	SYMBOL_PARAM,
+};
+
 struct symbol {
 	int type;
-	char *name;
+	char name[SYMBOL_MAX_LEN];
 };
 
 struct global_var_symbol {
 	int type;
-	char *name;
+	char name[SYMBOL_MAX_LEN];
 };
 
 struct local_var_symbol {
 	int type;
-	char *name;
+	char name[SYMBOL_MAX_LEN];
 	int var_ind;
 };
 
 struct param_symbol {
 	int type;
-	char *name;
+	char name[SYMBOL_MAX_LEN];
 	int param_ind;
 };
 
