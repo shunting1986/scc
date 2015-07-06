@@ -53,7 +53,10 @@ static void cgasm_declaration(struct cgasm_context *ctx, struct declaration_spec
 		return; // XXX ignore function declaration right now
 	}
 
-	panic("ni");
+	struct dynarr *idlist = extract_id_list_from_init_declarator_list(init_declarator_list);
+	DYNARR_FOREACH_PLAIN_BEGIN(idlist, char *, each);
+		cgasm_add_symbol(ctx, each);
+	DYNARR_FOREACH_END();
 }
 
 static void cgasm_external_declaration(struct cgasm_context *ctx, struct external_declaration *external_decl) {

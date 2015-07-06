@@ -11,6 +11,13 @@ int dynarr_size(struct dynarr *darr);
 void dynarr_destroy(struct dynarr *darr);
 void *dynarr_get(struct dynarr *darr, int ind);
 
+/* NO append struct to the type */
+#define DYNARR_FOREACH_PLAIN_BEGIN(darr, type, each) do { \
+	int _i; \
+	type each; \
+	for (_i = 0; _i < dynarr_size(darr); _i++) { \
+		each = dynarr_get(darr, _i)
+
 #define DYNARR_FOREACH_BEGIN(darr, type, each) do { \
 	int _i; \
 	struct type *each; \

@@ -23,6 +23,7 @@ void syntree_destroy(struct syntree *tree);
 
 // syntree-check.c
 int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarator_list);
+struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_list *init_declarator_list);
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,9 @@ void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_spe
 // cgasm-emit.c
 void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 
+// cgasm-symbol.c
+void cgasm_add_symbol(struct cgasm_context *ctx, char *id);
+
 #ifdef __cplusplus
 }
 #endif

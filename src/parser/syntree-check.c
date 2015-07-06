@@ -26,4 +26,9 @@ int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarat
 	return init_declarator->initializer == NULL && is_func_decl_declarator(init_declarator->declarator);
 }
 
-
+/*
+ * Retrieve the identifier list from init_declarator_list
+ */
+struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_list *init_declarator_list) {
+	panic("ni");
+}
