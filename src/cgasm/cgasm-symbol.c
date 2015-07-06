@@ -2,5 +2,5 @@
 #include <inc/util.h>
 
 void cgasm_add_symbol(struct cgasm_context *ctx, char *id) {
-	panic("ni");
+	panic("ni %s", id);
 }

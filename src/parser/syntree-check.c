@@ -30,5 +30,14 @@ int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarat
  * Retrieve the identifier list from init_declarator_list
  */
 struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_list *init_declarator_list) {
-	panic("ni");
+	struct dynarr *darr = dynarr_init();
+	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
+		// XXX does care about initializer here
+		struct declarator *declarator = each->declarator;
+		char *id = declarator->direct_declarator->id;
+		if (id != NULL) {
+			dynarr_add(darr, id);
+		}
+	DYNARR_FOREACH_END();
+	return darr;
 }
