@@ -29,6 +29,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgasm/cgasm-func.c \
 	cgasm/cgasm-emit.c \
 	cgasm/cgasm-symbol.c \
+	cgasm/cgasm-expr.c \
 	symtab/symtab.c 
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))

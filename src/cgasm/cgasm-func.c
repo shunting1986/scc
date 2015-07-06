@@ -23,6 +23,7 @@ void cgasm_enter_function(struct cgasm_context *ctx) {
 }
 
 void cgasm_leave_function(struct cgasm_context *ctx) {
+	// TODO: need push all and pop all
 	panic("ni");
 	assert(ctx->func_ctx != NULL);
 	free(ctx->func_ctx);

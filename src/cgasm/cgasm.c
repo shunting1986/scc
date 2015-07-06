@@ -29,8 +29,20 @@ void cgasm_tree(struct syntree *tree) {
 	cgasm_context_destroy(ctx);
 }
 
-static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *statement) {
-	panic("ni");
+static void cgasm_expression_statement(struct cgasm_context *ctx, struct expression_statement *stmt) {
+	if (stmt->expr == NULL) {
+		return;
+	}
+	(void) cgasm_expression(ctx, stmt->expr);
+}
+
+static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt) {
+	switch (stmt->nodeType) {
+	case EXPRESSION_STATEMENT:
+		cgasm_expression_statement(ctx, (struct expression_statement *) stmt);
+	default:
+		panic("unexpected node type %s\n", node_type_str(stmt->nodeType));
+	}
 }
 
 /* 

@@ -35,6 +35,27 @@ void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id);
 void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, int ind);
 
+// cgasm-expr.c
+struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
+
+// cgasm-expr-val.c
+struct temp_var {
+	int ind; // use (anonymous) local variable as temporary variable right now
+};
+
+enum {
+	EXPR_VAL_TEMP,
+	EXPR_VAL_SYMBOL,
+};
+
+struct expr_val {
+	int type;
+	union {
+		struct symbol *sym;
+		struct temp_var temp_var;
+	};
+};
+
 #ifdef __cplusplus
 }
 #endif
