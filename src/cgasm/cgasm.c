@@ -55,7 +55,7 @@ static void cgasm_declaration(struct cgasm_context *ctx, struct declaration_spec
 
 	struct dynarr *idlist = extract_id_list_from_init_declarator_list(init_declarator_list);
 	DYNARR_FOREACH_PLAIN_BEGIN(idlist, char *, each);
-		cgasm_add_symbol(ctx, each);
+		cgasm_add_decl_sym(ctx, each);
 	DYNARR_FOREACH_END();
 }
 

@@ -2,11 +2,6 @@
 #include <inc/util.h>
 #include <inc/symtab.h>
 
-struct cgasm_func_context {
-	int nparam_word; // number of 32bit words for parameter
-	int nlocal_word; // number of 32bit words for local variables
-};
-
 static struct cgasm_func_context *func_context_init() {
 	struct cgasm_func_context *ctx = (struct cgasm_func_context *) mallocz(sizeof(*ctx));
 	return ctx;
