@@ -4,8 +4,35 @@
 #include <inc/syntree-node.h>
 #include <inc/dynarr.h>
 
-static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr) {
+static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	panic("ni");
+}
+
+/**
+ * XXX this method only handle several special cases right now.
+ */
+static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struct postfix_expression *expr) {
+	struct postfix_expression_suffix *suff;
+	char *id;
+	// function call
+	if ((id = expr->prim_expr->id) != NULL && dynarr_size(expr->suff_list) == 1 && (suff = dynarr_get(expr->suff_list, 0))->arg_list != NULL) {
+		return cgasm_function_call(ctx, id, suff->arg_list);
+	}
+	panic("ni");
+}
+
+static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct unary_expression *expr) {
+	if (expr->postfix_expr != NULL) {
+		return cgasm_postfix_expression(ctx, expr->postfix_expr);
+	} else {
+		panic("ni");
+	}
+}
+
+static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr) {
+	struct expr_val val = cgasm_unary_expression(ctx, expr->unary_expr);
+	// TODO handle cast
+	return val;
 }
 
 /*
