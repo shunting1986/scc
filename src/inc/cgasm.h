@@ -46,6 +46,8 @@ struct temp_var {
 enum {
 	EXPR_VAL_TEMP,
 	EXPR_VAL_SYMBOL,
+	EXPR_VAL_VOID,
+	EXPR_VAL_REGISTER, //
 };
 
 struct expr_val {
