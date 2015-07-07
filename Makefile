@@ -3,7 +3,7 @@ GTEST_ROOT=/media/shunting/disk/compiler/3rdParty/gtest-1.7.0
 GTEST_CFLAGS=-isystem $(GTEST_ROOT)/include -g
 GTEST_LDFLAGS=$(GTEST_ROOT)/make/gtest-all.o -lpthread
 
-CFLAGS += -Isrc $(MCFLAGS)
+CFLAGS += -Isrc -g $(MCFLAGS)
 
 # NOTE: should not add quote around each path
 LIB_SRC_LIST := util/file_reader.c \
@@ -55,7 +55,7 @@ TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 PROG_NAME := scc
 
 handy: rebuild-$(PROG_NAME)
-	./scc sample-progs/decl.c
+	./scc sample-progs/sample.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

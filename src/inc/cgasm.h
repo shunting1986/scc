@@ -45,6 +45,7 @@ struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *e
 // str-literals.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);
 struct expr_val cgasm_register_str_literal(struct cgasm_context *ctx, char *str);
+char *get_str_literal_label(int ind, char *buf);
 
 // handle-op.c
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand);

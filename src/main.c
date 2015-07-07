@@ -1,5 +1,6 @@
 #include <inc/util.h>
 #include <inc/parser.h>
+#include <inc/cgasm.h>
 
 int
 main(int argc, char **argv) {
@@ -12,7 +13,8 @@ main(int argc, char **argv) {
 
 	struct syntree *tree = parse(parser);
 
-	syntree_dump(tree);
+	// syntree_dump(tree);
+	cgasm_tree(tree);
 	syntree_destroy(tree);
 
 	parser_destroy(parser);

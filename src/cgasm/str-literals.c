@@ -1,4 +1,15 @@
 #include <inc/cgasm.h>
+#include <inc/util.h>
+
+#define LABEL_FMT "STRING_LITERAL_%d"
+
+char *get_str_literal_label(int ind, char *buf) {
+	if (buf == NULL) {
+		buf = mallocz(256); // NEED FREE BY CALLER
+	}
+	sprintf(buf, LABEL_FMT, ind);
+	return buf;
+}
 
 void cgasm_destroy_str_literals(struct cgasm_context *ctx) {
 	dynarr_destroy(ctx->str_literals); // NOTE: the storage for string is released
