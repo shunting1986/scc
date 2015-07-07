@@ -1,6 +1,8 @@
 #include <inc/util.h>
 #include <inc/cgasm.h>
 
+#define DEBUG 1
+
 static void cgasm_vprintln(struct cgasm_context *ctx, const char *fmt, va_list va);
 static void cgasm_func_vprintln(struct cgasm_func_context *ctx, const char *fmt, va_list va);
 
@@ -23,6 +25,11 @@ static void cgasm_vprintln(struct cgasm_context *ctx, const char *fmt, va_list v
 }
 
 static void cgasm_func_vprintln(struct cgasm_func_context *ctx, const char *fmt, va_list va) {
+	if (DEBUG) {
+		printf("[DEBUG] ");
+		vprintf(fmt, va);
+		printf("\n");
+	}
 	panic("ni");
 }
 

@@ -10,11 +10,24 @@ static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct c
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
 	struct expr_val *pval;
+	int i;
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = malloc(sizeof(*pval)); // TODO remember to free
 		*pval = cgasm_assignment_expression(ctx, each);
 		dynarr_add(argu_val_list, pval);
 	DYNARR_FOREACH_END();
+
+	// push arguments in reverse order
+	for (i = dynarr_size(argu_val_list) - 1; i >= 0; i--) {
+		cgasm_push_val(ctx, *(struct expr_val *) dynarr_get(argu_val_list, i));
+	}
+
+	// emit call 
+	cgasm_println(ctx, "call %s", funcname);
+
+	// POP
+
+	// CLEANUP
 
 out:
 	dynarr_destroy(argu_val_list);

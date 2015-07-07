@@ -1,6 +1,37 @@
 #include <inc/cgasm.h>
 #include <inc/util.h>
 #include <inc/lexer.h>
+#include <inc/symtab.h>
+
+/**
+ * handle unary op, binary op, push op etc.
+ */
+
+static void cgasm_push_local_var_addr(struct cgasm_context *ctx, struct local_var_symbol *sym) {
+	int offset = sym->var_ind * 4 + 4;
+	cgasm_println(ctx, "leal %%eax, -%d(%%esp)", offset);
+	cgasm_println(ctx, "pushl %%eax");
+}
+
+static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
+	switch (sym->type) {
+	case SYMBOL_LOCAL_VAR:
+		cgasm_push_local_var_addr(ctx, (struct local_var_symbol *) sym);
+		break;
+	default:
+		panic("ni %d", sym->type);
+	}
+}
+
+void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
+	switch (val.type) {
+	case EXPR_VAL_SYMBOL_ADDR:
+		cgasm_push_sym_addr(ctx, val.sym);
+		break;
+	default:
+		panic("ni %d", val.type);
+	}
+}
 
 struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_val operand) {
 	if (operand.type != EXPR_VAL_SYMBOL) {
