@@ -36,6 +36,7 @@ void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 // cgasm-symbol.c
 void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id);
 void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, int ind);
+struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
@@ -72,6 +73,7 @@ struct expr_val {
 };
 
 struct expr_val str_literal_expr_val(int ind);
+struct expr_val symbol_expr_val(struct symbol *sym);
 
 #ifdef __cplusplus
 }

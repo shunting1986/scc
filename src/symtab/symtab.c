@@ -21,6 +21,11 @@ struct symbol *symtab_lookup_norec(struct symtab *stab, const char *id) {
 	return htab_query(stab->htab, id);
 }
 
+struct symbol *symtab_lookup(struct symtab *stab, const char *id) {
+	// TODO
+	panic("ni");
+}
+
 void symtab_add(struct symtab *stab, struct symbol *sym) {
 	htab_insert(stab->htab, sym->name, sym);
 }

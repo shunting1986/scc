@@ -25,6 +25,7 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
 	if (expr->str != NULL) {
 		return cgasm_register_str_literal(ctx, expr->str);
 	} else if (expr->id != NULL) {
+		return symbol_expr_val(cgasm_lookup_sym(ctx, expr->id));
 		panic("ni %s", expr->id);
 	} else {
 		panic("ni");

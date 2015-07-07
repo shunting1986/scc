@@ -47,6 +47,7 @@ struct symbol *symtab_new_param(char *name, int ind);
 struct symbol *symtab_new_local_var(char *name, int ind);
 struct symbol *symtab_new_global_var(char *name);
 void symtab_add(struct symtab *stab, struct symbol *sym);
+struct symbol *symtab_lookup(struct symtab *stab, const char *id);
 
 #ifdef __cplusplus
 }

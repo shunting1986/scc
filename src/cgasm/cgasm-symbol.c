@@ -8,6 +8,14 @@ static void cgasm_check_sym_redef(struct cgasm_context *ctx, char *id) {
 	}
 }
 
+struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id) {
+	struct symbol *sym = symtab_lookup(ctx->top_stab, id);
+	if (sym == NULL) {
+		panic("symbol undefined: %s", id);
+	}
+	return sym;
+}
+
 void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
 	cgasm_check_sym_redef(ctx, id);
