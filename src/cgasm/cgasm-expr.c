@@ -5,6 +5,7 @@
 #include <inc/dynarr.h>
 
 static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
+static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr);
 
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
@@ -23,6 +24,8 @@ out:
 static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struct primary_expression *expr) {
 	if (expr->str != NULL) {
 		return cgasm_register_str_literal(ctx, expr->str);
+	} else if (expr->id != NULL) {
+		panic("ni %s", expr->id);
 	} else {
 		panic("ni");
 	}
@@ -49,6 +52,9 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct unary_expression *expr) {
 	if (expr->postfix_expr != NULL) {
 		return cgasm_postfix_expression(ctx, expr->postfix_expr);
+	} else if (expr->unary_op_cast != NULL) {
+		struct expr_val val = cgasm_cast_expression(ctx, expr->unary_op_cast);
+		return cgasm_handle_unary_op(ctx, expr->unary_op, val);
 	} else {
 		panic("ni");
 	}

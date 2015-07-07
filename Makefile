@@ -32,6 +32,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgasm/cgasm-expr.c \
 	cgasm/cgasm-expr-val.c \
 	cgasm/str-literals.c \
+	cgasm/handle-op.c \
 	symtab/symtab.c 
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
