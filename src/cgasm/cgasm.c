@@ -13,10 +13,12 @@ static struct cgasm_context *cgasm_context_init(FILE *fp) {
 	struct cgasm_context *ctx = mallocz(sizeof(*ctx));
 	ctx->fp = fp;
 	ctx->top_stab = symtab_init(NULL);
+	ctx->str_literals = dynarr_init();
 	return ctx;
 }
 
 static void cgasm_context_destroy(struct cgasm_context *ctx) {
+	cgasm_destroy_str_literals(ctx);
 	free(ctx);
 }
 

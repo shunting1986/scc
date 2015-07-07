@@ -4,8 +4,28 @@
 #include <inc/syntree-node.h>
 #include <inc/dynarr.h>
 
+static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
+
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
-	panic("ni");
+	struct dynarr *argu_val_list = dynarr_init();	
+	struct expr_val *pval;
+	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
+		pval = malloc(sizeof(*pval)); // TODO remember to free
+		*pval = cgasm_assignment_expression(ctx, each);
+		dynarr_add(argu_val_list, pval);
+	DYNARR_FOREACH_END();
+
+out:
+	dynarr_destroy(argu_val_list);
+	panic("ni"); // TODO
+}
+
+static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struct primary_expression *expr) {
+	if (expr->str != NULL) {
+		return cgasm_register_str_literal(ctx, expr->str);
+	} else {
+		panic("ni");
+	}
 }
 
 /**
@@ -17,6 +37,11 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 	// function call
 	if ((id = expr->prim_expr->id) != NULL && dynarr_size(expr->suff_list) == 1 && (suff = dynarr_get(expr->suff_list, 0))->arg_list != NULL) {
 		return cgasm_function_call(ctx, id, suff->arg_list);
+	}
+
+	// primary expression
+	if (dynarr_size(expr->suff_list) == 0) {
+		return cgasm_primary_expression(ctx, expr->prim_expr);
 	}
 	panic("ni");
 }

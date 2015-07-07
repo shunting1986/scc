@@ -18,6 +18,8 @@ struct cgasm_context {
 	FILE *fp;
 	struct cgasm_func_context *func_ctx;
 	struct symtab *top_stab; // the top stab
+
+	struct dynarr *str_literals;
 };
 
 struct cgasm_func_context {
@@ -38,9 +40,15 @@ void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, int ind);
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
 
+// str-literals.c
+void cgasm_destroy_str_literals(struct cgasm_context *ctx);
+struct expr_val cgasm_register_str_literal(struct cgasm_context *ctx, char *str);
+
 // cgasm-expr-val.c
+
 struct temp_var {
 	int ind; // use (anonymous) local variable as temporary variable right now
+		// may optimize to use register in future
 };
 
 enum {
@@ -48,6 +56,7 @@ enum {
 	EXPR_VAL_SYMBOL,
 	EXPR_VAL_VOID,
 	EXPR_VAL_REGISTER, //
+	EXPR_VAL_STR_LITERAL,
 };
 
 struct expr_val {
@@ -55,8 +64,11 @@ struct expr_val {
 	union {
 		struct symbol *sym;
 		struct temp_var temp_var;
+		int ind; // for string literal
 	};
 };
+
+struct expr_val str_literal_expr_val(int ind);
 
 #ifdef __cplusplus
 }
