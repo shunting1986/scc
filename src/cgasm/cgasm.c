@@ -42,6 +42,7 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
 		cgasm_expression_statement(ctx, (struct expression_statement *) stmt);
+		break;
 	default:
 		panic("unexpected node type %s\n", node_type_str(stmt->nodeType));
 	}
