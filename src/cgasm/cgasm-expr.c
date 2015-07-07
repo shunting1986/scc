@@ -12,7 +12,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 	struct expr_val *pval;
 	int i;
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
-		pval = malloc(sizeof(*pval)); // TODO remember to free
+		pval = malloc(sizeof(*pval));
 		*pval = cgasm_assignment_expression(ctx, each);
 		dynarr_add(argu_val_list, pval);
 	DYNARR_FOREACH_END();
@@ -25,13 +25,16 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 	// emit call 
 	cgasm_println(ctx, "call %s", funcname);
 
-	// POP
+	// pop
+	cgasm_println(ctx, "addl %%esp, %d", dynarr_size(argu_val_list) * 4); // XXX assume each argument takes 4 bytes right now
 
-	// CLEANUP
+	// cleanup
+	DYNARR_FOREACH_BEGIN(argu_val_list, expr_val, each);
+		free(each);
+	DYNARR_FOREACH_END();
 
 out:
 	dynarr_destroy(argu_val_list);
-	panic("ni"); // TODO
 }
 
 static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struct primary_expression *expr) {
