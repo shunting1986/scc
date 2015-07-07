@@ -91,13 +91,15 @@ static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct c
 	int i; \
 	accum = cgasm_ ## subexpr_type(ctx, dynarr_get(subexpr_list, 0)); \
 	for (i = 1; i < dynarr_size(subexpr_list); i++) { \
-		panic("ni"); \
+		struct expr_val extra = cgasm_ ## subexpr_type(ctx, dynarr_get(subexpr_list, i)); \
+		int op = oplist == NULL ? single_op : (int) (long) dynarr_get(oplist, i - 1); \
+		accum = cgasm_handle_binary_op(ctx, op, accum, extra); \
 	} \
 	accum; \
 })
 
 static struct expr_val cgasm_multiplicative_expression(struct cgasm_context *ctx, struct multiplicative_expression *expr) {
-	return CGASM_BINARY_OP_EXPR(ctx, expr->cast_expr_list, cast_expression, expr-oplist, TOK_UNDEF);
+	return CGASM_BINARY_OP_EXPR(ctx, expr->cast_expr_list, cast_expression, expr->oplist, TOK_UNDEF);
 }
 
 static struct expr_val cgasm_additive_expression(struct cgasm_context *ctx, struct additive_expression *expr) {
@@ -129,7 +131,7 @@ static struct expr_val cgasm_inclusive_or_expression(struct cgasm_context *ctx, 
 }
 
 static struct expr_val cgasm_logical_and_expression(struct cgasm_context *ctx, struct logical_and_expression *expr) {
-	return CGASM_BINARY_OP_EXPR(ctx, expr->or_expr_list, inclusive_or_expression, NULL, TOK_LOGICAL_AND);
+	return CGASM_BINARY_OP_EXPR(ctx, expr->or_expr_list, inclusive_or_expression, NULL, TOK_LOGIC_AND);
 }
 
 static struct expr_val cgasm_logical_or_expression(struct cgasm_context *ctx, struct logical_or_expression *expr) {

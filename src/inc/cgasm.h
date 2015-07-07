@@ -50,34 +50,10 @@ char *get_str_literal_label(int ind, char *buf);
 // handle-op.c
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand);
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val);
+struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs);
 
 // cgasm-expr-val.c
-
-struct temp_var {
-	int ind; // use (anonymous) local variable as temporary variable right now
-		// may optimize to use register in future
-};
-
-enum {
-	EXPR_VAL_TEMP,
-	EXPR_VAL_SYMBOL,
-	EXPR_VAL_SYMBOL_ADDR,
-	EXPR_VAL_VOID,
-	EXPR_VAL_REGISTER, //
-	EXPR_VAL_STR_LITERAL,
-};
-
-struct expr_val {
-	int type;
-	union {
-		struct symbol *sym;
-		struct temp_var temp_var;
-		int ind; // for string literal
-	};
-};
-
-struct expr_val str_literal_expr_val(int ind);
-struct expr_val symbol_expr_val(struct symbol *sym);
+#include <inc/cgasm-expr-val.h>
 
 #ifdef __cplusplus
 }

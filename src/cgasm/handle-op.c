@@ -58,3 +58,24 @@ struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, st
 		panic("ni %s", token_tag_str(tok_tag));
 	}
 }
+
+struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
+	int lhs_reg = REG_EAX;
+	int rhs_reg = REG_ECX;
+	load_val_to_reg(lhs, lhs_reg);
+	load_val_to_reg(rhs, rhs_reg);
+	struct expr_val res;
+
+	switch (tok_tag) {
+	case TOK_ADD:
+		panic("add");
+	default:
+		panic("ni %s", token_tag_str(tok_tag));
+	}
+
+	res = cgasm_alloc_temp_var(ctx);
+	store_reg_to_mem(lhs_reg, res);
+	return res;
+}
+
+
