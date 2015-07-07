@@ -1,13 +1,16 @@
 #include <inc/cgasm.h>
 #include <inc/util.h>
 #include <inc/symtab.h>
+#include <inc/cbuf.h>
 
 static struct cgasm_func_context *func_context_init() {
 	struct cgasm_func_context *ctx = (struct cgasm_func_context *) mallocz(sizeof(*ctx));
+	ctx->code_buf = cbuf_init();
 	return ctx;
 }
 
 static void func_context_destroy(struct cgasm_func_context *ctx) {
+	cbuf_destroy(ctx->code_buf);	
 	free(ctx);
 }
 
@@ -26,6 +29,7 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 	// TODO: need push all and pop all
 	panic("ni");
 	assert(ctx->func_ctx != NULL);
+	func_context_destroy(ctx->func_ctx);
 	free(ctx->func_ctx);
 	ctx->func_ctx = NULL;
 

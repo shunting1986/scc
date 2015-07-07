@@ -24,13 +24,16 @@ static void cgasm_vprintln(struct cgasm_context *ctx, const char *fmt, va_list v
 	}
 }
 
+char line[512];
 static void cgasm_func_vprintln(struct cgasm_func_context *ctx, const char *fmt, va_list va) {
 	if (DEBUG) {
 		printf("[DEBUG] ");
 		vprintf(fmt, va);
 		printf("\n");
 	}
-	panic("ni");
+	vsnprintf(line, sizeof(line), fmt, va);
+	cbuf_add_str(ctx->code_buf, line);
+	cbuf_add(ctx->code_buf, '\n');
 }
 
 

@@ -9,6 +9,7 @@ struct cbuf;
 
 struct cbuf *cbuf_init();
 void cbuf_add(struct cbuf *buf, char ch);
+void cbuf_add_str(struct cbuf *buf, char *s);
 char *cbuf_transfer(struct cbuf *buf);
 char *cbuf_gets(struct cbuf *buf);
 void cbuf_destroy(struct cbuf *buf);

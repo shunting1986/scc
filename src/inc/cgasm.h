@@ -25,6 +25,7 @@ struct cgasm_context {
 struct cgasm_func_context {
 	int nparam_word; // number of 32bit words for parameter
 	int nlocal_word; // number of 32bit words for local variables
+	struct cbuf *code_buf;
 };
 
 void cgasm_tree(struct syntree *tree);

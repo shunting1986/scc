@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 #include <inc/cbuf.h>
 
@@ -16,16 +17,31 @@ struct cbuf *cbuf_init() {
 	return buf;
 }
 
+static void ensure_space(struct cbuf *buf, int newsize) {
+	while (buf->capa < newsize + 1) { // leave one byte for '\0'
+		buf->buf = realloc(buf->buf, buf->capa * 2);
+		buf->capa <<= 1;
+	}
+}
+
+void cbuf_add_str(struct cbuf *buf, char *s) {
+	assert(buf->buf != NULL);
+	assert(buf->capa > 0);
+	assert(buf->size < buf->capa);
+
+	int len = strlen(s);
+	ensure_space(buf, buf->size + len);
+	strcpy(buf->buf + buf->size, s);
+	buf->size += len;
+}
+
 // assume internal buffer is not null
 void cbuf_add(struct cbuf *buf, char ch) {
 	assert(buf->buf != NULL);
 	assert(buf->capa > 0);
 	assert(buf->size < buf->capa);
 
-	if (buf->size + 1 == buf->capa) {
-		buf->buf = realloc(buf->buf, buf->capa * 2);
-		buf->capa <<= 1;
-	}
+	ensure_space(buf, buf->size + 1);
 	buf->buf[buf->size++] = ch;
 }
 
