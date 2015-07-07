@@ -22,8 +22,14 @@ struct symbol *symtab_lookup_norec(struct symtab *stab, const char *id) {
 }
 
 struct symbol *symtab_lookup(struct symtab *stab, const char *id) {
-	// TODO
-	panic("ni");
+	void *ret;
+	while (stab) {
+		if ((ret = htab_query(stab->htab, id)) != NULL) {
+			return ret;
+		}
+		stab = stab->enclosing;
+	}
+	return NULL;
 }
 
 void symtab_add(struct symtab *stab, struct symbol *sym) {
