@@ -125,6 +125,13 @@ static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
 	}
 }
 
+static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
+	// load the register first
+	int reg = REG_EAX;
+	cgasm_load_sym_to_reg(ctx, sym, reg);
+	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
+}
+
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL_ADDR:
@@ -132,6 +139,9 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		break;
 	case EXPR_VAL_STR_LITERAL:
 		cgasm_push_str_literal(ctx, val.ind);
+		break;
+	case EXPR_VAL_SYMBOL:
+		cgasm_push_sym(ctx, val.sym);
 		break;
 	default:
 		panic("ni %d", val.type);
