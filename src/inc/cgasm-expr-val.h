@@ -14,6 +14,7 @@ enum {
 	REG_EDI,
 	REG_ESP,
 	REG_EDP,
+	REG_NUM,
 };
 
 struct temp_var {
@@ -42,8 +43,7 @@ struct expr_val {
 struct expr_val str_literal_expr_val(int ind);
 struct expr_val symbol_expr_val(struct symbol *sym);
 struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx);
-void load_val_to_reg(struct expr_val val, int reg);
-void store_reg_to_mem(int reg, struct expr_val mem);
+const char *get_reg_str_code(unsigned int reg);
 
 #ifdef __cplusplus
 }
