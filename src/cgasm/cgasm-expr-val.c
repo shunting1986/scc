@@ -27,7 +27,10 @@ struct expr_val str_literal_expr_val(int ind) {
 }
 
 struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx) {
-	panic("ni");
+	struct expr_val ret;
+	ret.type = EXPR_VAL_TEMP;
+	ret.temp_var.ind = ctx->func_ctx->nlocal_word++;
+	return ret;
 }
 
 

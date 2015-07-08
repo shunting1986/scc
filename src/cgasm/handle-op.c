@@ -11,14 +11,18 @@
 /* util               */
 /**********************/
 static int get_local_var_offset(struct local_var_symbol *sym) {
-	return sym->var_ind * 4 + 4;
+	return -(sym->var_ind * 4 + 4);
+}
+
+static int get_temp_var_offset(struct temp_var temp) {
+	return -(temp.ind * 4 + 4);
 }
 
 /**********************/
 /* load               */
 /**********************/
 static void cgasm_load_local_var_to_reg(struct cgasm_context *ctx, struct local_var_symbol *sym, int reg) {
-	cgasm_println(ctx, "movl %%%s -%d(%%esp)", get_reg_str_code(reg), get_local_var_offset(sym));
+	cgasm_println(ctx, "movl %%%s %d(%%esp)", get_reg_str_code(reg), get_local_var_offset(sym));
 }
 
 static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
@@ -45,8 +49,18 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 /***********************/
 /* store               */
 /***********************/
+static void cgasm_store_reg_to_temp_var(struct cgasm_context *ctx, int reg, struct temp_var temp) {
+	cgasm_println(ctx, "movl %d(%%esp), %%%s", get_temp_var_offset(temp), get_reg_str_code(reg));
+}
+
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem) {
-	panic("ni");
+	switch (mem.type) {
+	case EXPR_VAL_TEMP:
+		cgasm_store_reg_to_temp_var(ctx, reg, mem.temp_var);
+		break;
+	default:
+		panic("ni %d", mem.type);
+	}
 }
 
 /***********************/
@@ -59,7 +73,7 @@ static void cgasm_push_str_literal(struct cgasm_context *ctx, int ind) {
 }
 
 static void cgasm_push_local_var_addr(struct cgasm_context *ctx, struct local_var_symbol *sym) {
-	cgasm_println(ctx, "leal %%eax, -%d(%%esp)", get_local_var_offset(sym));
+	cgasm_println(ctx, "leal %%eax, %d(%%esp)", get_local_var_offset(sym));
 	cgasm_println(ctx, "pushl %%eax");
 }
 
