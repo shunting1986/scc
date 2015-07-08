@@ -26,7 +26,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 	cgasm_println(ctx, "call %s", funcname);
 
 	// pop
-	cgasm_println(ctx, "addl %%esp, %d", dynarr_size(argu_val_list) * 4); // XXX assume each argument takes 4 bytes right now
+	cgasm_println(ctx, "addl $%d, %%esp", dynarr_size(argu_val_list) * 4); // XXX assume each argument takes 4 bytes right now
 
 	// cleanup
 	DYNARR_FOREACH_BEGIN(argu_val_list, expr_val, each);

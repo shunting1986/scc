@@ -21,3 +21,15 @@ struct expr_val cgasm_register_str_literal(struct cgasm_context *ctx, char *str)
 	dynarr_add(ctx->str_literals, str);
 	return str_literal_expr_val(ind);
 }
+
+void cgasm_dump_string_literals(struct cgasm_context *ctx) {
+	char buf[256];
+	int i;
+	for (i = 0; i < dynarr_size(ctx->str_literals); i++) {
+		char *s = dynarr_get(ctx->str_literals, i);
+
+		// dump one string literal
+		cgasm_println_noind(ctx, "%s:", get_str_literal_label(i, buf));
+		cgasm_println(ctx, ".string \"%s\"", s);
+	}
+}

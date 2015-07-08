@@ -44,14 +44,14 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 	ctx->func_ctx = NULL; // this avoids buffer the asm code 
 
 	cgasm_println(ctx, "pushl %%ebp");
-	cgasm_println(ctx, "movl %%ebp, %%esp");
+	cgasm_println(ctx, "movl %%esp, %%ebp");
 	for (i = 0; i < ctx->nstate_reg; i++) {
 		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(ctx->state_reg[i]));
 	}
-	cgasm_println(ctx, "subl %%esp, $%d", func_ctx->nlocal_word * 4);
+	cgasm_println(ctx, "subl $%d, %%esp", func_ctx->nlocal_word * 4);
 	cgasm_dump_buffered_code(ctx, func_ctx);
 
-	panic("ni"); // TODO
+	cgasm_dump_string_literals(ctx);
 	 
 	// destroy func context
 	func_context_destroy(func_ctx);
