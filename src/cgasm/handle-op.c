@@ -70,6 +70,15 @@ static void cgasm_load_temp_to_reg(struct cgasm_context *ctx, struct temp_var te
 	cgasm_println(ctx, "movl %%%s, %d(%%esp)", get_reg_str_code(reg), get_temp_var_offset(temp));
 }
 
+static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token const_val, int reg) {
+	int flags = const_val.const_val.flags;
+	if (flags & CONST_VAL_TOK_INTEGER) {
+		cgasm_println(ctx, "movl %%%s, $%d", get_reg_str_code(reg), const_val.const_val.ival);
+	} else {
+		panic("ni");
+	}
+}
+
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
@@ -77,6 +86,9 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 		break;
 	case EXPR_VAL_TEMP:
 		cgasm_load_temp_to_reg(ctx, val.temp_var, reg);
+		break;
+	case EXPR_VAL_CONST_VAL:
+		cgasm_load_const_val_to_reg(ctx, val.const_val, reg);
 		break;
 	default:
 		panic("ni %d", val.type);
