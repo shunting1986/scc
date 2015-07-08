@@ -13,6 +13,12 @@ static struct cgasm_context *cgasm_context_init(FILE *fp) {
 	ctx->fp = fp;
 	ctx->top_stab = symtab_init(NULL);
 	ctx->str_literals = dynarr_init();
+
+	ctx->state_reg[0] = REG_ESI;
+	ctx->state_reg[1] = REG_EDI;
+	ctx->state_reg[2] = REG_EBX;
+	ctx->nstate_reg = 3;
+
 	return ctx;
 }
 

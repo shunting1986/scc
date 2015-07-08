@@ -20,6 +20,9 @@ struct cgasm_context {
 	struct symtab *top_stab; // the top stab
 
 	struct dynarr *str_literals;
+
+	int nstate_reg;
+	int state_reg[8];
 };
 
 struct cgasm_func_context {

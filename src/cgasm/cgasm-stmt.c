@@ -7,7 +7,7 @@ static void cgasm_return_statement(struct cgasm_context *ctx, struct expression 
 		struct expr_val val = cgasm_expression(ctx, expr);
 		cgasm_load_val_to_reg(ctx, val, REG_EAX);
 	}
-	cgasm_handle_ret();
+	cgasm_handle_ret(ctx);
 }
 
 static void cgasm_jump_statement(struct cgasm_context *ctx, struct jump_statement *stmt) {
