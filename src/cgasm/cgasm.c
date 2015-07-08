@@ -7,7 +7,6 @@
 #include <inc/symtab.h>
 
 static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit);
-static void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 
 static struct cgasm_context *cgasm_context_init(FILE *fp) {
 	struct cgasm_context *ctx = mallocz(sizeof(*ctx));
@@ -31,38 +30,7 @@ void cgasm_tree(struct syntree *tree) {
 	cgasm_context_destroy(ctx);
 }
 
-static void cgasm_expression_statement(struct cgasm_context *ctx, struct expression_statement *stmt) {
-	if (stmt->expr == NULL) {
-		return;
-	}
-	(void) cgasm_expression(ctx, stmt->expr);
-}
-
-static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt) {
-	switch (stmt->nodeType) {
-	case EXPRESSION_STATEMENT:
-		cgasm_expression_statement(ctx, (struct expression_statement *) stmt);
-		break;
-	default:
-		panic("unexpected node type %s\n", node_type_str(stmt->nodeType));
-	}
-}
-
-/* 
- * NOTE: the caller should create the symtab before calling this method and destroy it
- * afterwards
- */
-void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt) {
-	DYNARR_FOREACH_BEGIN(compound_stmt->declList, declaration, each);
-		cgasm_declaration(ctx, each->decl_specifiers, each->init_declarator_list);
-	DYNARR_FOREACH_END();
-	
-	DYNARR_FOREACH_BEGIN(compound_stmt->stmtList, syntreebasenode, each);
-		cgasm_statement(ctx, each);
-	DYNARR_FOREACH_END();
-}
-
-static void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
+void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
 	// function declaration
 	if (is_func_decl_init_declarator_list(init_declarator_list)) {
 		return; // XXX ignore function declaration right now

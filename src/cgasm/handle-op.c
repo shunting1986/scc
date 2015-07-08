@@ -209,4 +209,9 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	return lhs;
 }
 
-
+/********************************/
+/* return op                    */
+void cgasm_handle_ret(struct cgasm_context *ctx) {
+	panic("ni");
+	cgasm_println(ctx, "ret");
+}
