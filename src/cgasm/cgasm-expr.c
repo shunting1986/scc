@@ -42,7 +42,8 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
 		return cgasm_register_str_literal(ctx, expr->str);
 	} else if (expr->id != NULL) {
 		return symbol_expr_val(cgasm_lookup_sym(ctx, expr->id));
-		panic("ni %s", expr->id);
+	} else if (expr->const_val_tok.tok_tag != TOK_UNDEF) {
+		return const_expr_val(expr->const_val_tok);
 	} else {
 		panic("ni");
 	}
@@ -167,7 +168,10 @@ static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, st
 }
 
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr) {
+	struct expr_val ret;
 	DYNARR_FOREACH_BEGIN(expr->darr, assignment_expression, each);	
-		cgasm_assignment_expression(ctx, each);
+		ret = cgasm_assignment_expression(ctx, each); // the last one win
 	DYNARR_FOREACH_END();
+
+	return ret;
 }

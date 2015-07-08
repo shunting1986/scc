@@ -33,4 +33,10 @@ struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx) {
 	return ret;
 }
 
+struct expr_val const_expr_val(union token tok) {
+	struct expr_val ret;
+	ret.type = EXPR_VAL_CONST_VAL;
+	ret.const_val = tok;
+	return ret;
+}
 
