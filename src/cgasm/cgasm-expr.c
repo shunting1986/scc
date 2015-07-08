@@ -157,10 +157,13 @@ static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, s
 
 static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr) {
 	struct expr_val val = cgasm_conditional_expression(ctx, expr->cond_expr);
-	if (dynarr_size(expr->unary_expr_list) == 0) {
-		return val;
+	int i;
+	for (i = dynarr_size(expr->unary_expr_list) - 1; i >= 0; i--) {
+		struct expr_val un = cgasm_unary_expression(ctx, dynarr_get(expr->unary_expr_list, i));
+		int op = (int) (long) dynarr_get(expr->oplist, i);
+		val = cgasm_handle_assign_op(ctx, un, val, op);
 	}
-	panic("ni");
+	return val;
 }
 
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr) {

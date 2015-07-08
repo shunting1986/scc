@@ -18,11 +18,42 @@ static int get_temp_var_offset(struct temp_var temp) {
 	return -(temp.ind * 4 + 4);
 }
 
+static void get_lval_local_var_asm_code(struct local_var_symbol *sym, char *buf) {
+	assert(buf != NULL);
+	sprintf(buf, "%d(%%esp)", get_local_var_offset(sym));
+}
+
+static void get_lval_sym_asm_code(struct symbol *sym, char *buf) {
+	assert(buf != NULL);
+	switch (sym->type) {
+	case SYMBOL_LOCAL_VAR:
+		get_lval_local_var_asm_code((struct local_var_symbol *) sym, buf);
+		break;
+	default:
+		panic("ni %d", sym->type);
+		break;
+	}
+}
+
+static char *get_lval_asm_code(struct expr_val val, char *buf) {
+	if (buf == NULL) {
+		buf = malloc(128); // caller should free it
+	}
+	switch (val.type) {
+	case EXPR_VAL_SYMBOL:
+		get_lval_sym_asm_code(val.sym, buf);
+		break;
+	default:
+		panic("ni %d", val.type);
+	}
+	return buf;
+}
+
 /**********************/
 /* load               */
 /**********************/
 static void cgasm_load_local_var_to_reg(struct cgasm_context *ctx, struct local_var_symbol *sym, int reg) {
-	cgasm_println(ctx, "movl %%%s %d(%%esp)", get_reg_str_code(reg), get_local_var_offset(sym));
+	cgasm_println(ctx, "movl %%%s, %d(%%esp)", get_reg_str_code(reg), get_local_var_offset(sym));
 }
 
 static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
@@ -35,10 +66,17 @@ static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym,
 	}
 }
 
+static void cgasm_load_temp_to_reg(struct cgasm_context *ctx, struct temp_var temp, int reg) {
+	cgasm_println(ctx, "movl %%%s, %d(%%esp)", get_reg_str_code(reg), get_temp_var_offset(temp));
+}
+
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_load_sym_to_reg(ctx, val.sym, reg);
+		break;
+	case EXPR_VAL_TEMP:
+		cgasm_load_temp_to_reg(ctx, val.temp_var, reg);
 		break;
 	default:
 		panic("ni %d", val.type);
@@ -132,7 +170,7 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 
 	switch (tok_tag) {
 	case TOK_ADD:
-		cgasm_println(ctx, "addl %%%s %%%s", get_reg_str_code(lhs_reg), get_reg_str_code(rhs_reg));
+		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(lhs_reg), get_reg_str_code(rhs_reg));
 		break;
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
@@ -141,6 +179,24 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	res = cgasm_alloc_temp_var(ctx);
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res);
 	return res;
+}
+
+/*******************************/
+/* assignment                  */
+/*******************************/
+struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
+	int rhs_reg = REG_EAX;
+	char buf[128];
+	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
+
+	switch (op) {
+	case TOK_ASSIGN:
+		cgasm_println(ctx, "movl %s, %s", get_lval_asm_code(lhs, buf), get_reg_str_code(rhs_reg));
+		break;
+	default:
+		panic("ni %s", token_tag_str(op));
+	}
+	return lhs;
 }
 
 
