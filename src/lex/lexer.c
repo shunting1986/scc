@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include <inc/lexer.h>
 #include <inc/cbuf.h>
 #include <inc/util.h>
+#include <inc/keyword.h>
 
 struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = mallocz(sizeof(*lexer));

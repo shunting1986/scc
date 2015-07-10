@@ -36,7 +36,8 @@ static unsigned long elf_hash(const unsigned char *name) {
 	unsigned long h = 0, g;
 	while (*name) {
 		h = (h << 4) + *name++;
-		if (g = h & 0xf0000000) 
+		g = h & 0xf0000000;
+		if (g) 
 			h ^= g >> 24;
 		h &= ~g;
 	}
@@ -66,7 +67,7 @@ void htab_destroy(struct hashtab *tab) {
 }
 
 void *htab_query(struct hashtab *htab, const char *key) {
-	struct hashtab_item *head = htab->buckets[hash_fn(key) % htab->nbucket];
+	struct hashtab_item *head = htab->buckets[hash_fn((unsigned char *) key) % htab->nbucket];
 	for (; head != NULL; head = head->next) {
 		if (strcmp(key, head->key) == 0) {
 			return head->val;
@@ -80,7 +81,7 @@ void *htab_query(struct hashtab *htab, const char *key) {
  * duplciated and val will be used directly
  */
 void htab_insert(struct hashtab *htab, const char *key, void *val) {
-	int bind = hash_fn(key) % htab->nbucket;
+	int bind = hash_fn((unsigned char *) key) % htab->nbucket;
 	struct hashtab_item *item = alloc_item(key, val);
 	item->next = htab->buckets[bind];
 	htab->buckets[bind] = item;

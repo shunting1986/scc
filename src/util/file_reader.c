@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <stdio.h>
+#include <unistd.h>
 
 struct file_reader {
 	char *path;

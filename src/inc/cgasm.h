@@ -37,6 +37,9 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 // cgasm-func.c
 void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
 
+// cgasm-stmt.c
+void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt);
+
 // cgasm-emit.c
 void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 void cgasm_println_noind(struct cgasm_context *ctx, const char *fmt, ...);
@@ -62,6 +65,7 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op);
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem);
+void cgasm_handle_ret(struct cgasm_context *ctx);
 
 // cgasm-expr-val.c
 #include <inc/cgasm-expr-val.h>

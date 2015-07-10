@@ -5,6 +5,7 @@
 #include <inc/cgc.h>
 #include <inc/syntree.h>
 #include <inc/util.h>
+#include <inc/keyword.h>
 
 struct cgc_context {
 	FILE *fp;
@@ -40,15 +41,6 @@ static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment
 		cgc_ ## subexpr_type(ctx, dynarr_get(subexpr_list, i)); \
 	} \
 } while (0)
-
-// this method will take care of the indent
-static void cgc_printi(struct cgc_context *ctx, const char *fmt, ...) {
-	va_list va;
-	fprintf(ctx->fp, "%*s", ctx->indent, "");
-	va_start(va, fmt);
-	vfprintf(ctx->fp, fmt, va);
-	va_end(va);
-}
 
 // this method does not add indent
 static void cgc_print(struct cgc_context *ctx, const char *fmt, ...) {

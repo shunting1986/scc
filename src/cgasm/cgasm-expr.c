@@ -33,8 +33,8 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 		free(each);
 	DYNARR_FOREACH_END();
 
-out:
 	dynarr_destroy(argu_val_list);
+	panic("ni");
 }
 
 static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struct primary_expression *expr) {

@@ -1,5 +1,6 @@
 #include <inc/util.h>
 #include <inc/cgasm.h>
+#include <inc/cbuf.h>
 
 // #define DEBUG 1
 #define DEBUG 0

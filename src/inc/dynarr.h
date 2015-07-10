@@ -10,6 +10,7 @@ struct dynarr *dynarr_init();
 int dynarr_size(struct dynarr *darr);
 void dynarr_destroy(struct dynarr *darr);
 void *dynarr_get(struct dynarr *darr, int ind);
+void dynarr_add(struct dynarr *darr, void *item);
 
 /* NO append struct to the type */
 #define DYNARR_FOREACH_PLAIN_BEGIN(darr, type, each) do { \

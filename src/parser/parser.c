@@ -4,6 +4,7 @@
 #include <inc/parser.h>
 #include <inc/dynarr.h>
 #include <inc/util.h>
+#include <inc/dynarr.h>
 
 static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
