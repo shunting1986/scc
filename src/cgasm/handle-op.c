@@ -233,4 +233,9 @@ void cgasm_handle_ret(struct cgasm_context *ctx) {
 	cgasm_println(ctx, "ret");
 }
 
-
+/*******************************/
+/* check truth                 */
+/*******************************/
+void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val) {
+	panic("ni");
+}

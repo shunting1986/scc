@@ -31,7 +31,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgasm/cgasm-symbol.c \
 	cgasm/cgasm-expr.c \
 	cgasm/cgasm-expr-val.c \
-	cgasm/str-literals.c \
+	cgasm/asm-label.c \
 	cgasm/handle-op.c \
 	cgasm/cgasm-stmt.c \
 	symtab/symtab.c 

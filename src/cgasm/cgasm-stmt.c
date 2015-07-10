@@ -2,6 +2,9 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
+
+static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt);
+
 static void cgasm_return_statement(struct cgasm_context *ctx, struct expression *expr) {
 	if (expr != NULL) {
 		struct expr_val val = cgasm_expression(ctx, expr);
@@ -28,7 +31,17 @@ static void cgasm_expression_statement(struct cgasm_context *ctx, struct express
 }
 
 static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
-	panic("ni");
+	int entry_label = cgasm_new_label_no(ctx);
+	int exit_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	struct expr_val cond_expr_val = cgasm_expression(ctx, expr);
+	cgasm_emit_jump_label(ctx, entry_label);
+	cgasm_test_expr(ctx, cond_expr_val);
+	cgasm_println(ctx, "jz %s", get_jump_label_str(exit_label, buf));
+	cgasm_statement(ctx, stmt);
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(entry_label, buf));
+	cgasm_emit_jump_label(ctx, exit_label);
 }
 
 static void cgasm_iteration_statement(struct cgasm_context *ctx, struct iteration_statement *stmt) {

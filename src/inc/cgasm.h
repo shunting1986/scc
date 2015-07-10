@@ -54,11 +54,14 @@ struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
 
-// str-literals.c
+// asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);
 struct expr_val cgasm_register_str_literal(struct cgasm_context *ctx, char *str);
 char *get_str_literal_label(int ind, char *buf);
 void cgasm_dump_string_literals(struct cgasm_context *ctx);
+int cgasm_new_label_no(struct cgasm_context *ctx);
+void cgasm_emit_jump_label(struct cgasm_context *ctx, int no);
+char *get_jump_label_str(int no, char *buf);
 
 // handle-op.c
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand);
@@ -68,6 +71,7 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem);
 void cgasm_handle_ret(struct cgasm_context *ctx);
+void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val);
 
 // cgasm-expr-val.c
 #include <inc/cgasm-expr-val.h>

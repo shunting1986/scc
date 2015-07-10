@@ -1,6 +1,9 @@
 #include <inc/cgasm.h>
 #include <inc/util.h>
 
+/**********************/
+/* string literal     */
+/**********************/
 #define LABEL_FMT "STRING_LITERAL_%d"
 
 char *get_str_literal_label(int ind, char *buf) {
@@ -33,3 +36,19 @@ void cgasm_dump_string_literals(struct cgasm_context *ctx) {
 		cgasm_println(ctx, ".string \"%s\"", s);
 	}
 }
+
+/**********************/
+/* jump label         */
+/**********************/
+int cgasm_new_label_no(struct cgasm_context *ctx) {
+	panic("ni");
+}
+
+void cgasm_emit_jump_label(struct cgasm_context *ctx, int no) {
+	panic("ni");
+}
+
+char *get_jump_label_str(int no, char *buf) {
+	panic("ni");
+}
+
