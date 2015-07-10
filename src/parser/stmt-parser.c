@@ -36,8 +36,30 @@ static int initiate_iteration_statement(union token tok) {
 	return tok.tok_tag == TOK_WHILE || tok.tok_tag == TOK_FOR || tok.tok_tag == TOK_DO;
 }
 
+static struct iteration_statement *parse_while_statement(struct parser *parser) {
+	panic("ni");
+}
+
+static struct iteration_statement *parse_do_while_statement(struct parser *parser) {
+	panic("ni");
+}
+
+static struct iteration_statement *parse_for_statement(struct parser *parser) {
+	panic("ni");
+}
+
 static struct iteration_statement *parse_iteration_statement(struct parser *parser) {
-	panic("parse_iteration_statement ni");
+	union token tok = lexer_next_token(parser->lexer);
+	switch (tok.tok_tag) {
+	case TOK_WHILE: 
+		return parse_while_statement(parser);
+	case TOK_DO:
+		return parse_do_while_statement(parser);
+	case TOK_FOR:
+		return parse_for_statement(parser);
+	default:
+		panic("ni %s", token_tag_str(tok.tok_tag));
+	}
 }
 
 static int initiate_jump_statement(union token tok) {

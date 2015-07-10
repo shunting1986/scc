@@ -55,6 +55,8 @@ TEST_SRC_LIST := $(patsubst %,test/%,$(TEST_SRC_LIST))
 
 PROG_NAME := scc
 
+all: handy
+
 handy: rebuild-$(PROG_NAME)
 	./scc integration-test/sum/main.c
 
