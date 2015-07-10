@@ -41,7 +41,7 @@ void cgasm_dump_string_literals(struct cgasm_context *ctx) {
 /* jump label         */
 /**********************/
 int cgasm_new_label_no(struct cgasm_context *ctx) {
-	panic("ni");
+	return ctx->nasm_label++;
 }
 
 void cgasm_emit_jump_label(struct cgasm_context *ctx, int no) {

@@ -182,6 +182,10 @@ repeat:
 		ch = file_reader_next_char(lexer->cstream);
 		if (ch == '=') {
 			tok.tok_tag = TOK_DIV_ASSIGN;
+		} else if (ch == '/') {
+			// one line comment
+			discard_line(lexer);
+			goto repeat;
 		} else {
 			file_reader_put_back(lexer->cstream, ch);
 			tok.tok_tag = TOK_DIV;

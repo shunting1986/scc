@@ -29,7 +29,7 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 		prim_expr->expr = expr;
 	} else {
 		// we may destroy primary expression first
-		panic("parse_primary_expression ni");
+		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
 
 	return prim_expr;
