@@ -6,7 +6,7 @@ TEST(file_reader, file_reader) {
 	char buf[256];
 	int n = 0;
 	int r;
-	while (n < sizeof(buf) - 1 && (r = file_reader_next_char(fr)) != EOF) {
+	while ((unsigned) n < sizeof(buf) - 1 && (r = file_reader_next_char(fr)) != EOF) {
 		buf[n++] = (char) r;
 	}
 	buf[n] = '\0';

@@ -40,3 +40,8 @@ struct expr_val const_expr_val(union token tok) {
 	return ret;
 }
 
+struct expr_val void_expr_val() {
+	struct expr_val ret;
+	ret.type = EXPR_VAL_VOID;
+	return ret;
+}
