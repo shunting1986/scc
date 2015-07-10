@@ -5,6 +5,8 @@
 #include <inc/util.h>
 #include <inc/dynarr.h>
 
+static struct expression_statement *parse_expression_statement(struct parser *parser);
+
 static int initiate_compound_statement(union token tok) {
 	return tok.tok_tag == TOK_LBRACE;
 }
@@ -56,7 +58,30 @@ static struct iteration_statement *parse_do_while_statement(struct parser *parse
 }
 
 static struct iteration_statement *parse_for_statement(struct parser *parser) {
-	panic("ni");
+	struct expression_statement *expr_stmt1, *expr_stmt2;
+	struct expression *expr = NULL;
+	struct statement *stmt;
+	struct iteration_statement *iter_stmt = iteration_statement_init(ITER_TYPE_FOR);
+	union token tok;
+
+	expect(parser->lexer, TOK_LPAREN);
+	expr_stmt1 = parse_expression_statement(parser);
+	expr_stmt2 = parse_expression_statement(parser);
+
+	tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag != TOK_RPAREN) {
+		lexer_put_back(parser->lexer, tok);
+		expr = parse_expression(parser);
+		expect(parser->lexer, TOK_RPAREN);
+	}
+	stmt = parse_statement(parser);
+
+	iter_stmt->for_stmt.expr_stmt_1 = expr_stmt1;
+	iter_stmt->for_stmt.expr_stmt_2 = expr_stmt2;
+	iter_stmt->for_stmt.expr = expr;
+	iter_stmt->for_stmt.stmt = stmt;
+
+	return iter_stmt;
 }
 
 static struct iteration_statement *parse_iteration_statement(struct parser *parser) {

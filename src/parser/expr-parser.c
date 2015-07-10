@@ -66,6 +66,10 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 			struct postfix_expression_suffix *suf = mallocz(sizeof(*suf));
 			suf->arg_list = arg_expr_list;
 			dynarr_add(post_expr->suff_list, suf);
+		} else if (tok.tok_tag == TOK_INC) {
+			struct postfix_expression_suffix *suff = mallocz(sizeof(*suff));
+			suff->is_inc = 1;
+			dynarr_add(post_expr->suff_list, suff);
 		} else { // TODO need handle more cases
 			lexer_put_back(parser->lexer, tok);
 			break;
