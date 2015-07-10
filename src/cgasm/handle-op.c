@@ -269,3 +269,19 @@ void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val) {
 	// XXX don't need this yet
 	panic("ni");
 }
+
+/*******************************/
+/* inc/dec                     */
+/*******************************/
+struct expr_val cgasm_handle_post_inc(struct cgasm_context *ctx, struct expr_val val) {
+	int reg = REG_EAX;
+	struct expr_val temp_var = cgasm_alloc_temp_var(ctx);
+
+	cgasm_load_val_to_reg(ctx, val, reg);
+	cgasm_store_reg_to_mem(ctx, reg, temp_var);
+	cgasm_println(ctx, "incl %%%s", get_reg_str_code(reg));
+	cgasm_store_reg_to_mem(ctx, reg, val);
+	return temp_var;
+}
+
+

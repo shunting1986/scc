@@ -68,6 +68,15 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 	if (dynarr_size(expr->suff_list) == 0) {
 		return cgasm_primary_expression(ctx, expr->prim_expr);
 	}
+
+	// post ++
+	if (dynarr_size(expr->suff_list) == 1) {
+		struct postfix_expression_suffix *suff = dynarr_get(expr->suff_list, 0);
+		if (suff->is_inc) {
+			struct expr_val val = cgasm_primary_expression(ctx, expr->prim_expr);
+			return cgasm_handle_post_inc(ctx, val);
+		}
+	}
 	panic("ni");
 }
 
