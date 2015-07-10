@@ -1,10 +1,8 @@
-HERE: handle function definition
+KEYLIST
+  TODO: handle switch, if, for, while, recursion, array, struct, pointer
+  TODO: support preprocessor
 
 TODO: make the compiler support both 32 bit and 64 bit asm?
-
-=== another enhance for dumping sample.c back to C
-
-== translate sample-prog to assembly code
 
 - NOTE: the only external resource I refer is the grammar of C language
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
@@ -16,3 +14,7 @@ need distinguish declarator and abstract_declarator <== parse these 2 at the sam
 
 Compiler optimization
 1. copy duplication
+
+========== DONE
+- translate sample.c back to C
+- translate sample.c to asm (32 bit)

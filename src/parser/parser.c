@@ -92,7 +92,6 @@ static struct declaration_specifiers *parse_declaration_specifiers(struct parser
 		dynarr_add(darr, nd);
 	}
 
-	// the list should not be empty
 	assert(dynarr_size(darr) > 0);
 	return declaration_specifiers_init(darr);
 }

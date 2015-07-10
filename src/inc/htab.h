@@ -5,7 +5,13 @@
 extern "C" {
 #endif
 
-struct hashtab;
+struct hashtab {
+	struct hashtab_item **buckets; // we use a ptr rather than a static array so that
+		// in future we can do hash table expansion
+	int nbucket;
+	int nofreekey;
+	int nofreeval;
+};
 
 struct hashtab *htab_init();
 void htab_destroy(struct hashtab *tab);

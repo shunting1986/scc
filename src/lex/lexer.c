@@ -98,6 +98,12 @@ static int handle_tricase(struct lexer *lexer, int folone, int compone, int folt
 	}
 }
 
+static void discard_line(struct lexer *lexer) {
+	char ch;
+	while ((ch = file_reader_next_char(lexer->cstream)) != '\n') {
+	}
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	int ch;
 	union token tok;
@@ -252,6 +258,9 @@ repeat:
 			panic("invalid '.'");
 		}
 		break;
+	case '#':
+		discard_line(lexer); // ignore preprocess right now
+		goto repeat;
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}

@@ -15,12 +15,6 @@ struct hashtab_item {
 	struct hashtab_item *next;
 };
 
-struct hashtab {
-	struct hashtab_item **buckets; // we use a ptr rather than a static array so that
-		// in future we can do hash table expansion
-	int nbucket;
-};
-
 static struct hashtab_item *alloc_item(const char *key, void *val) {
 	struct hashtab_item *item = mallocz(sizeof(*item));
 	item->key = strdup(key);
@@ -28,9 +22,13 @@ static struct hashtab_item *alloc_item(const char *key, void *val) {
 	return item;
 }
 
-static void destroy_item(struct hashtab_item *item) {
-	free((void *) item->key);
-	free(item->val);
+static void destroy_item(struct hashtab *tab, struct hashtab_item *item) {
+	if (!tab->nofreekey) {
+		free((void *) item->key);
+	}
+	if (!tab->nofreeval) {
+		free(item->val);
+	}
 	free(item);
 }
 
@@ -60,7 +58,7 @@ void htab_destroy(struct hashtab *tab) {
 		struct hashtab_item *cur, *next;
 		for (cur = tab->buckets[i]; cur != NULL; cur = next) {
 			next = cur->next;
-			destroy_item(cur);
+			destroy_item(tab, cur);
 		}
 	}
 	free(tab->buckets);
