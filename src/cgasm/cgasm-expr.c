@@ -37,7 +37,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 
 	// TODO current simple implementation is always return a temp holding eax
 	retval = cgasm_alloc_temp_var(ctx);
-	cgasm_store_reg_to_temp_var(ctx, REG_EAX, retval.temp_var);
+	cgasm_store_reg_to_mem(ctx, REG_EAX, retval);
 	return retval;
 }
 

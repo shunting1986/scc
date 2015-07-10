@@ -35,7 +35,13 @@ static void cgasm_get_lval_sym_asm_code(struct cgasm_context *ctx, struct symbol
 	}
 }
 
-// this funtion will report error if val is not an lval
+static void cgasm_get_lval_temp_asm_code(struct cgasm_context *ctx, struct temp_var temp, char *buf) {
+	assert(buf != NULL);
+	sprintf(buf, "%d(%%ebp)", cgasm_get_temp_var_offset(ctx, temp));
+}
+
+// this funtion will report error if val is not an lval.
+// we also use this method to get the asm code for temp var
 static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf) {
 	if (buf == NULL) {
 		buf = malloc(128); // caller should free it
@@ -43,6 +49,9 @@ static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val 
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_get_lval_sym_asm_code(ctx, val.sym, buf);
+		break;
+	case EXPR_VAL_TEMP:
+		cgasm_get_lval_temp_asm_code(ctx, val.temp_var, buf);
 		break;
 	default:
 		panic("ni %d", val.type);
@@ -100,18 +109,11 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 /***********************/
 /* store               */
 /***********************/
-void cgasm_store_reg_to_temp_var(struct cgasm_context *ctx, int reg, struct temp_var temp) {
-	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg), cgasm_get_temp_var_offset(ctx, temp));
-}
-
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem) {
-	switch (mem.type) {
-	case EXPR_VAL_TEMP:
-		cgasm_store_reg_to_temp_var(ctx, reg, mem.temp_var);
-		break;
-	default:
-		panic("ni %d", mem.type);
-	}
+	char buf[128];
+
+	cgasm_get_lval_asm_code(ctx, mem, buf);
+	cgasm_println(ctx, "movl %%%s, %s", get_reg_str_code(reg), buf);
 }
 
 /***********************/
