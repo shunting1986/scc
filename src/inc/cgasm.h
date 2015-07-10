@@ -23,6 +23,8 @@ struct cgasm_context {
 
 	int nstate_reg;
 	int state_reg[8];
+
+	int nasm_label;
 };
 
 struct cgasm_func_context {

@@ -27,6 +27,20 @@ static void cgasm_expression_statement(struct cgasm_context *ctx, struct express
 	(void) cgasm_expression(ctx, stmt->expr);
 }
 
+static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
+	panic("ni");
+}
+
+static void cgasm_iteration_statement(struct cgasm_context *ctx, struct iteration_statement *stmt) {
+	switch (stmt->iterType) {
+	case ITER_TYPE_WHILE:
+		cgasm_while_statement(ctx, stmt->while_stmt.expr, stmt->while_stmt.stmt);
+		break;
+	default:
+		panic("ni %d", stmt->iterType);
+	}
+}
+
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
@@ -34,6 +48,9 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
 		break;
 	case JUMP_STATEMENT:
 		cgasm_jump_statement(ctx, (struct jump_statement *) stmt);
+		break;
+	case ITERATION_STATEMENT:
+		cgasm_iteration_statement(ctx, (struct iteration_statement *) stmt);
 		break;
 	default:
 		panic("unexpected node type %s\n", node_type_str(stmt->nodeType));
