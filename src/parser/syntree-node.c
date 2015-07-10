@@ -355,4 +355,10 @@ struct storage_class_specifier *storage_class_specifier_init(int tok_tag) {
 	return sc;
 }
 
+struct iteration_statement *iteration_statement_init(int iterType) {
+	struct iteration_statement *stmt = mallocz(sizeof(*stmt));
+	stmt->nodeType = ITERATION_STATEMENT;
+	stmt->iterType = iterType;
+	return stmt;
+}
 

@@ -357,6 +357,39 @@ struct expression_statement {
 
 struct expression_statement *expression_statement_init(struct expression *expr);
 
+enum {
+	ITER_TYPE_WHILE,
+	ITER_TYPE_DO_WHILE,
+	ITER_TYPE_FOR,
+};
+
+#define statement syntreebasenode
+
+struct iteration_statement {
+	int nodeType;
+	int iterType;
+	union {
+		struct {
+			struct expression *expr;
+			struct statement *stmt;
+		} while_stmt;
+
+		struct {
+			struct statement *stmt;
+			struct expression *expr;
+		} do_while_stmt;
+
+		struct {
+			struct expression_statement *expr_stmt_1;
+			struct expression_statement *expr_stmt_2;
+			struct expression *expr;
+			struct statement *stmt;
+		} for_stmt;
+	};
+};
+
+struct iteration_statement *iteration_statement_init(int iterType);
+
 #ifdef __cplusplus
 }
 #endif
