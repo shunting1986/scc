@@ -37,7 +37,18 @@ static int initiate_iteration_statement(union token tok) {
 }
 
 static struct iteration_statement *parse_while_statement(struct parser *parser) {
-	panic("ni");
+	struct expression *expr;
+	struct statement *stmt;
+	struct iteration_statement *iter_stmt = iteration_statement_init(ITER_TYPE_WHILE);
+
+	expect(parser->lexer, TOK_LPAREN);
+	expr = parse_expression(parser);
+	expect(parser->lexer, TOK_RPAREN);
+	stmt = parse_statement(parser);
+
+	iter_stmt->while_stmt.expr = expr;
+	iter_stmt->while_stmt.stmt = stmt;
+	return iter_stmt;
 }
 
 static struct iteration_statement *parse_do_while_statement(struct parser *parser) {
