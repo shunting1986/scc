@@ -23,11 +23,14 @@ static void cgasm_jump_statement(struct cgasm_context *ctx, struct jump_statemen
 	}
 }
 
-static void cgasm_expression_statement(struct cgasm_context *ctx, struct expression_statement *stmt) {
+/* 
+ * when expression_statement is used in for statement, we will need the expression part
+ */
+static struct expr_val cgasm_expression_statement(struct cgasm_context *ctx, struct expression_statement *stmt) {
 	if (stmt->expr == NULL) {
-		return;
+		return void_expr_val();
 	}
-	(void) cgasm_expression(ctx, stmt->expr);
+	return cgasm_expression(ctx, stmt->expr);
 }
 
 static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse) {
@@ -80,13 +83,31 @@ static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *
 	int entry_label = cgasm_new_label_no(ctx);
 	int exit_label = cgasm_new_label_no(ctx);
 	char buf[128];
+	struct expr_val cond_expr_val;
 
-	struct expr_val cond_expr_val = cgasm_expression(ctx, expr);
 	cgasm_emit_jump_label(ctx, entry_label);
-
+	cond_expr_val = cgasm_expression(ctx, expr);
 	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
 
 	cgasm_statement(ctx, stmt);
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(entry_label, buf));
+	cgasm_emit_jump_label(ctx, exit_label);
+}
+
+static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_statement *expr_stmt1, struct expression_statement *expr_stmt2, struct expression *expr, struct statement *stmt) {
+	int entry_label = cgasm_new_label_no(ctx);
+	int exit_label = cgasm_new_label_no(ctx);
+	struct expr_val cond_expr_val;
+	char buf[128];
+	
+	cgasm_expression_statement(ctx, expr_stmt1);
+	cgasm_emit_jump_label(ctx, entry_label);
+	cond_expr_val = cgasm_expression_statement(ctx, expr_stmt2);
+	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
+	cgasm_statement(ctx, stmt);
+	if (expr) {
+		cgasm_expression(ctx, expr);
+	}
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(entry_label, buf));
 	cgasm_emit_jump_label(ctx, exit_label);
 }
@@ -95,6 +116,9 @@ static void cgasm_iteration_statement(struct cgasm_context *ctx, struct iteratio
 	switch (stmt->iterType) {
 	case ITER_TYPE_WHILE:
 		cgasm_while_statement(ctx, stmt->while_stmt.expr, stmt->while_stmt.stmt);
+		break;
+	case ITER_TYPE_FOR:
+		cgasm_for_statement(ctx, stmt->for_stmt.expr_stmt_1, stmt->for_stmt.expr_stmt_2, stmt->for_stmt.expr, stmt->for_stmt.stmt);
 		break;
 	default:
 		panic("ni %d", stmt->iterType);
