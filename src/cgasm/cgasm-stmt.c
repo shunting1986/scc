@@ -112,6 +112,11 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
 	case ITERATION_STATEMENT:
 		cgasm_iteration_statement(ctx, (struct iteration_statement *) stmt);
 		break;
+	case COMPOUND_STATEMENT:
+		cgasm_push_symtab(ctx);
+		cgasm_compound_statement(ctx, (struct compound_statement *) stmt);
+		cgasm_pop_symtab(ctx);
+		break;
 	default:
 		panic("unexpected node type %s\n", node_type_str(stmt->nodeType));
 	}

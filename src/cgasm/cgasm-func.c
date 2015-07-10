@@ -34,7 +34,7 @@ void cgasm_enter_function(struct cgasm_context *ctx, char *fname) {
  	cgasm_println_noind(ctx, "%s:", fname);
 
 	ctx->func_ctx = func_context_init();
-	ctx->top_stab = symtab_init(ctx->top_stab);
+	cgasm_push_symtab(ctx);
 }
 
 void cgasm_leave_function(struct cgasm_context *ctx) {
@@ -56,12 +56,7 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 	// destroy func context
 	func_context_destroy(func_ctx);
 
-	{
-		// pop the top symtab
-		struct symtab *old_stab = ctx->top_stab;
-		ctx->top_stab = old_stab->enclosing;
-		symtab_destroy(old_stab);
-	}
+	cgasm_pop_symtab(ctx);
 }
 
 static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_list) {

@@ -2,6 +2,18 @@
 #include <inc/util.h>
 #include <inc/symtab.h>
 
+void cgasm_push_symtab(struct cgasm_context *ctx) {
+	ctx->top_stab = symtab_init(ctx->top_stab);
+}
+
+void cgasm_pop_symtab(struct cgasm_context *ctx) {
+	// pop the top symtab
+	struct symtab *old_stab = ctx->top_stab;
+	assert(old_stab != NULL);
+	ctx->top_stab = old_stab->enclosing;
+	symtab_destroy(old_stab);
+}
+
 static void cgasm_check_sym_redef(struct cgasm_context *ctx, char *id) {
 	if (symtab_lookup_norec(ctx->top_stab, id) != NULL) {
 		panic("symbol redefinition: %s", id);
