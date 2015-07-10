@@ -99,7 +99,7 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 /***********************/
 /* store               */
 /***********************/
-static void cgasm_store_reg_to_temp_var(struct cgasm_context *ctx, int reg, struct temp_var temp) {
+void cgasm_store_reg_to_temp_var(struct cgasm_context *ctx, int reg, struct temp_var temp) {
 	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg), cgasm_get_temp_var_offset(ctx, temp));
 }
 
@@ -171,10 +171,22 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 	return operand;
 }
 
+struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val operand) {
+	// special case for constant
+	if (operand.type == EXPR_VAL_CONST_VAL) {
+		assert(operand.const_val.const_val.flags & CONST_VAL_TOK_INTEGER);
+		operand.const_val.const_val.ival = -operand.const_val.const_val.ival;
+		return operand;
+	}
+	panic("ni");
+}
+
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {
 	switch (tok_tag) {
 	case TOK_AMPERSAND:
 		return cgasm_handle_ampersand(ctx, operand);
+	case TOK_SUB:
+		return cgasm_handle_negate(ctx, operand);
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
 	}

@@ -9,7 +9,7 @@ static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct c
 
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
-	struct expr_val *pval;
+	struct expr_val *pval, retval;
 	int i;
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = malloc(sizeof(*pval));
@@ -35,8 +35,10 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 
 	dynarr_destroy(argu_val_list);
 
-	// TODO right now we only return void
-	return void_expr_val();
+	// TODO current simple implementation is always return a temp holding eax
+	retval = cgasm_alloc_temp_var(ctx);
+	cgasm_store_reg_to_temp_var(ctx, REG_EAX, retval.temp_var);
+	return retval;
 }
 
 static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struct primary_expression *expr) {

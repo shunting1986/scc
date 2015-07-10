@@ -177,6 +177,7 @@ repeat:
 		break;
 	case '!':
 		tok.tok_tag = handle_bicase(lexer, '=', TOK_NE, TOK_EXCLAMATION);
+		break;
 	case '/':
 		// XXX not support comments yet
 		ch = file_reader_next_char(lexer->cstream);

@@ -33,6 +33,9 @@ struct cgasm_func_context {
 	struct cbuf *code_buf;
 };
 
+// cgasm-expr-val.c
+#include <inc/cgasm-expr-val.h>
+
 void cgasm_tree(struct syntree *tree);
 void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 
@@ -70,11 +73,9 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op);
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem);
+void cgasm_store_reg_to_temp_var(struct cgasm_context *ctx, int reg, struct temp_var temp);
 void cgasm_handle_ret(struct cgasm_context *ctx);
 void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val);
-
-// cgasm-expr-val.c
-#include <inc/cgasm-expr-val.h>
 
 #ifdef __cplusplus
 }
