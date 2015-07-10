@@ -30,6 +30,52 @@ static void cgasm_expression_statement(struct cgasm_context *ctx, struct express
 	(void) cgasm_expression(ctx, stmt->expr);
 }
 
+static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse) {
+	int op = ccexpr->op;
+	int lhs_reg = REG_EAX;
+	int rhs_reg = REG_ECX;
+	char buf[128];
+	struct expr_val lhs = ccexpr->lhs;
+	struct expr_val rhs = ccexpr->rhs;
+
+	// handle reverse
+	if (reverse) {
+		switch (op) {
+		case TOK_NE:
+			op = TOK_EQ;
+			break;
+		default:
+			panic("ni %s", token_tag_str(op));
+		}
+	}
+
+	cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
+	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
+	switch (op) {
+	case TOK_EQ:
+		cgasm_println(ctx, "cmpl %s, %s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "jz %s", get_jump_label_str(goto_label, buf));
+		break;
+	default:
+		panic("ni %s", token_tag_str(op));
+	}
+	free(ccexpr); // free condcode after evaluation
+}
+
+
+static void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse) {
+	char buf[128];
+	(void) buf;
+
+	switch (condval.type) {
+	case EXPR_VAL_CC:
+		cgasm_goto_ifcond_cc(ctx, condval.cc, goto_label, inverse);
+		break;
+	default:
+		panic("ni %d", condval.type);
+	}
+}
+
 static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
 	int entry_label = cgasm_new_label_no(ctx);
 	int exit_label = cgasm_new_label_no(ctx);
@@ -37,8 +83,9 @@ static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *
 
 	struct expr_val cond_expr_val = cgasm_expression(ctx, expr);
 	cgasm_emit_jump_label(ctx, entry_label);
-	cgasm_test_expr(ctx, cond_expr_val); // TODO need revise
-	cgasm_println(ctx, "jz %s", get_jump_label_str(exit_label, buf));
+
+	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
+
 	cgasm_statement(ctx, stmt);
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(entry_label, buf));
 	cgasm_emit_jump_label(ctx, exit_label);

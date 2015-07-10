@@ -4,13 +4,13 @@
 /**********************/
 /* string literal     */
 /**********************/
-#define LABEL_FMT "STRING_LITERAL_%d"
+#define STRING_LITERAL_FMT "STRING_LITERAL_%d"
 
 char *get_str_literal_label(int ind, char *buf) {
 	if (buf == NULL) {
 		buf = mallocz(256); // NEED FREE BY CALLER
 	}
-	sprintf(buf, LABEL_FMT, ind);
+	sprintf(buf, STRING_LITERAL_FMT, ind);
 	return buf;
 }
 
@@ -40,15 +40,22 @@ void cgasm_dump_string_literals(struct cgasm_context *ctx) {
 /**********************/
 /* jump label         */
 /**********************/
+
+#define ASM_LABEL_FMT ".L%d"
+
 int cgasm_new_label_no(struct cgasm_context *ctx) {
 	return ctx->nasm_label++;
 }
 
 void cgasm_emit_jump_label(struct cgasm_context *ctx, int no) {
-	panic("ni");
+	cgasm_println_noind(ctx, ASM_LABEL_FMT ":", no);
 }
 
 char *get_jump_label_str(int no, char *buf) {
-	panic("ni");
+	if (buf == NULL) {
+		buf = mallocz(128); // NEED FREE BY CALLER	
+	}
+	sprintf(buf, ASM_LABEL_FMT, no);
+	return buf;
 }
 

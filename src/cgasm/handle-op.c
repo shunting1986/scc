@@ -262,5 +262,6 @@ void cgasm_handle_ret(struct cgasm_context *ctx) {
 /* check truth                 */
 /*******************************/
 void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val) {
+	// XXX don't need this yet
 	panic("ni");
 }
