@@ -35,6 +35,7 @@ static void cgasm_get_lval_sym_asm_code(struct cgasm_context *ctx, struct symbol
 	}
 }
 
+// this funtion will report error if val is not an lval
 static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf) {
 	if (buf == NULL) {
 		buf = malloc(128); // caller should free it
@@ -239,6 +240,9 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	switch (op) {
 	case TOK_ASSIGN:
 		cgasm_println(ctx, "movl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		break;
+	case TOK_ADD_ASSIGN:
+		cgasm_println(ctx, "addl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
 		break;
 	default:
 		panic("ni %s", token_tag_str(op));
