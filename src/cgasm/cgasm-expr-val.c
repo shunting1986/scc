@@ -45,3 +45,17 @@ struct expr_val void_expr_val() {
 	ret.type = EXPR_VAL_VOID;
 	return ret;
 }
+
+struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs) {
+	struct expr_val ret;
+	struct condcode *cc = mallocz(sizeof(*cc));
+	ret.type = EXPR_VAL_CC;
+	ret.cc = cc;
+	
+	cc->op = op;
+	cc->lhs = lhs;
+	cc->rhs = rhs;
+	return ret;
+}
+
+

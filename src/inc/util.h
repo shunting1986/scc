@@ -21,6 +21,9 @@ void _panic(const char *fname, int line, const char *funcname, const char *fmt, 
 
 void *mallocz(size_t sz);
 
+#define true 1
+#define false 0
+
 #ifdef __cplusplus
 }
 #endif

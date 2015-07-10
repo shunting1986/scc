@@ -3,7 +3,7 @@ GTEST_ROOT=/media/shunting/disk/compiler/3rdParty/gtest-1.7.0
 GTEST_CFLAGS=-isystem $(GTEST_ROOT)/include -g
 GTEST_LDFLAGS=$(GTEST_ROOT)/make/gtest-all.o -lpthread
 
-CFLAGS += -Isrc -g $(MCFLAGS) -Wall -Werror
+CFLAGS += -Isrc -g $(MCFLAGS) -Wall -Werror -DDEBUG
 
 # NOTE: should not add quote around each path
 LIB_SRC_LIST := util/file_reader.c \

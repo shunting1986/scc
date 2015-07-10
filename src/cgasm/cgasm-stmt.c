@@ -37,7 +37,7 @@ static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *
 
 	struct expr_val cond_expr_val = cgasm_expression(ctx, expr);
 	cgasm_emit_jump_label(ctx, entry_label);
-	cgasm_test_expr(ctx, cond_expr_val);
+	cgasm_test_expr(ctx, cond_expr_val); // TODO need revise
 	cgasm_println(ctx, "jz %s", get_jump_label_str(exit_label, buf));
 	cgasm_statement(ctx, stmt);
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(entry_label, buf));

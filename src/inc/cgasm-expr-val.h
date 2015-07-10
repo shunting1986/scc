@@ -30,7 +30,10 @@ enum {
 	EXPR_VAL_REGISTER, //
 	EXPR_VAL_STR_LITERAL,
 	EXPR_VAL_CONST_VAL,
+	EXPR_VAL_CC, // conditional code, should delay the processing
 };
+
+struct condcode;
 
 struct expr_val {
 	int type;
@@ -39,7 +42,13 @@ struct expr_val {
 		struct temp_var temp_var;
 		int ind; // for string literal
 		union token const_val;
+		struct condcode *cc;
 	};
+};
+
+struct condcode {
+	int op; // TOK_NE, ...
+	struct expr_val lhs, rhs;
 };
 
 struct expr_val str_literal_expr_val(int ind);
@@ -47,6 +56,7 @@ struct expr_val symbol_expr_val(struct symbol *sym);
 struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx);
 struct expr_val const_expr_val(union token tok);
 struct expr_val void_expr_val();
+struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs);
 const char *get_reg_str_code(unsigned int reg);
 
 #ifdef __cplusplus

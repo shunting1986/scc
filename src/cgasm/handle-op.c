@@ -198,20 +198,33 @@ struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, st
 struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	int lhs_reg = REG_EAX;
 	int rhs_reg = REG_ECX;
-	cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
-	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 	struct expr_val res;
+#define LOAD_TO_REG() do { \
+	cgasm_load_val_to_reg(ctx, lhs, lhs_reg); \
+	cgasm_load_val_to_reg(ctx, rhs, rhs_reg); \
+} while (true)
+
+// note: the result is stored in the rhs register 
+#define STORE_TO_TEMP() do { \
+	res = cgasm_alloc_temp_var(ctx); \
+	cgasm_store_reg_to_mem(ctx, rhs_reg, res); \
+} while (true)
 
 	switch (tok_tag) {
 	case TOK_ADD:
+		LOAD_TO_REG();
 		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(lhs_reg), get_reg_str_code(rhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_NE:
+		res = condcode_expr(tok_tag, lhs, rhs);
 		break;
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
 	}
 
-	res = cgasm_alloc_temp_var(ctx);
-	cgasm_store_reg_to_mem(ctx, rhs_reg, res); // note: the result is stored in the rhs register
+#undef LOAD_TO_REG
+#undef STORE_TO_TEMP
 	return res;
 }
 
