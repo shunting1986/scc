@@ -59,11 +59,11 @@ static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *cce
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 	switch (op) {
 	case TOK_EQ:
-		cgasm_println(ctx, "cmpl %s, %s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		cgasm_println(ctx, "jz %s", get_jump_label_str(goto_label, buf));
 		break;
 	case TOK_GT:
-		cgasm_println(ctx, "cmpl %s, %s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		cgasm_println(ctx, "jg %s", get_jump_label_str(goto_label, buf));
 		break;
 	default:
