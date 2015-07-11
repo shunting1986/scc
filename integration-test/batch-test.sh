@@ -1,7 +1,6 @@
 #!/bin/bash
 
 TEST_ROOT="integration-test"
-TEST_DIR_LIST=`ls $TEST_ROOT` # will filter non-dir later
 WS_ROOT="temp"
 CC="./scc"
 
@@ -66,6 +65,13 @@ runonetest() {
 		i=$(expr $i + 1)
 	done
 }
+
+if [ $# -gt 0 ]
+then
+	TEST_DIR_LIST=$*
+else
+	TEST_DIR_LIST=`ls $TEST_ROOT` # will filter non-dir later
+fi
 
 for test_dir in $TEST_DIR_LIST
 do

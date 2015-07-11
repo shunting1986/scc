@@ -88,4 +88,4 @@ clean:
 	rm -f scc
 
 btest:
-	@integration-test/batch-test.sh
+	@integration-test/batch-test.sh $(TLIST)
