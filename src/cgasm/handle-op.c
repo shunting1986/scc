@@ -205,13 +205,13 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 #define LOAD_TO_REG() do { \
 	cgasm_load_val_to_reg(ctx, lhs, lhs_reg); \
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg); \
-} while (true)
+} while (0)
 
 // note: the result is stored in the rhs register 
 #define STORE_TO_TEMP() do { \
 	res = cgasm_alloc_temp_var(ctx); \
 	cgasm_store_reg_to_mem(ctx, rhs_reg, res); \
-} while (true)
+} while (0)
 
 	switch (tok_tag) {
 	case TOK_ADD:

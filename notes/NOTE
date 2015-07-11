@@ -1,5 +1,7 @@
+TODO setup an integration test framework..
+
 KEYLIST
-  TODO: handle switch, if, for, while, recursion, array def & use, struct def & dot, ptr, general pointer, break, continue, && || short cut
+  TODO: handle switch, if, recursion, array def & use, struct def & dot, ptr, general pointer, break, continue, && || short cut
   TODO: support preprocessor
 
 TODO: make the compiler support both 32 bit and 64 bit asm?
@@ -18,3 +20,4 @@ Compiler optimization
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
+- support for, while
