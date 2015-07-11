@@ -47,7 +47,7 @@ struct expr_val {
 };
 
 struct condcode {
-	int op; // TOK_NE, TOK_LE, ...
+	int op; // TOK_NE, TOK_LE, TOK_GT, TOK_LT ...
 	struct expr_val lhs, rhs;
 };
 

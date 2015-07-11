@@ -50,6 +50,12 @@ static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *cce
 		case TOK_LE:
 			op = TOK_GT;
 			break;
+		case TOK_GT:
+			op = TOK_LE;
+			break;
+		case TOK_LT:
+			op = TOK_GE;
+			break;
 		default:
 			panic("ni %s", token_tag_str(op));
 		}
@@ -65,6 +71,14 @@ static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *cce
 	case TOK_GT:
 		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		cgasm_println(ctx, "jg %s", get_jump_label_str(goto_label, buf));
+		break;
+	case TOK_LE:
+		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "jle %s", get_jump_label_str(goto_label, buf));
+		break;
+	case TOK_GE:
+		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "jge %s", get_jump_label_str(goto_label, buf));
 		break;
 	default:
 		panic("ni %s", token_tag_str(op));
@@ -143,7 +157,18 @@ static void cgasm_if_statement(struct cgasm_context *ctx, struct expression *con
  * handle the if statement with else
  */
 static void cgasm_ifelse_statement(struct cgasm_context *ctx, struct expression *cond, struct statement *truestmt, struct statement *falsestmt) {
-	panic("ni");
+	int else_label = cgasm_new_label_no(ctx);
+	int exit_label = cgasm_new_label_no(ctx);
+	char buf[128];
+	struct expr_val cond_expr_val;
+
+	cond_expr_val = cgasm_expression(ctx, cond);
+	cgasm_goto_ifcond(ctx, cond_expr_val, else_label, true);
+	cgasm_statement(ctx, truestmt);
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(exit_label, buf));
+	cgasm_emit_jump_label(ctx, else_label);
+	cgasm_statement(ctx, falsestmt);
+	cgasm_emit_jump_label(ctx, exit_label);
 }
 
 static void cgasm_switch_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
