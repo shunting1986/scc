@@ -11,7 +11,7 @@ int fact(int n) {
 int
 main() {
 	int n;
-	while (scanf("%d", &n) != EOF) {
+	while (scanf("%d", &n) != -1) {
 		printf("%d\n", fact(n));
 	}
 	return 0;

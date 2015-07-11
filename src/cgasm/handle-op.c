@@ -158,6 +158,12 @@ static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
 
+static void cgasm_push_temp(struct cgasm_context *ctx, struct temp_var temp) {
+	int reg = REG_EAX;
+	cgasm_load_temp_to_reg(ctx, temp, reg);
+	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
+}
+
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL_ADDR:
@@ -168,6 +174,9 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		break;
 	case EXPR_VAL_SYMBOL:
 		cgasm_push_sym(ctx, val.sym);
+		break;
+	case EXPR_VAL_TEMP:
+		cgasm_push_temp(ctx, val.temp_var);
 		break;
 	default:
 		panic("ni %d", val.type);
@@ -218,16 +227,21 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg); \
 } while (0)
 
-// note: the result is stored in the rhs register 
+// note: the result is stored in the lhs register 
 #define STORE_TO_TEMP() do { \
 	res = cgasm_alloc_temp_var(ctx); \
-	cgasm_store_reg_to_mem(ctx, rhs_reg, res); \
+	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
 
 	switch (tok_tag) {
-	case TOK_ADD:
+	case TOK_ADD: 
 		LOAD_TO_REG();
-		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(lhs_reg), get_reg_str_code(rhs_reg));
+		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_SUB:
+		LOAD_TO_REG();
+		cgasm_println(ctx, "subl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		STORE_TO_TEMP();
 		break;
 	case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:
