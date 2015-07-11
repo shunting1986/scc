@@ -250,6 +250,7 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		STORE_TO_TEMP();
 		break;
 	case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:
+	case TOK_LOGIC_AND:
 		res = condcode_expr(tok_tag, lhs, rhs);
 		break;
 	default:

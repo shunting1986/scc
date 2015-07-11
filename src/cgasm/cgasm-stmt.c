@@ -33,6 +33,26 @@ static struct expr_val cgasm_expression_statement(struct cgasm_context *ctx, str
 	return cgasm_expression(ctx, stmt->expr);
 }
 
+static void cgasm_goto_ifcond_logic_and(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int goto_label, int itemreverse) {
+	panic("ni");
+}
+
+static void cgasm_goto_ifcond_logic_or(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int goto_label, int itemreverse) {
+	panic("ni");
+}
+
+static void cgasm_goto_ifcond_logic(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs, int goto_label, int reverse) {
+	assert(op == TOK_LOGIC_AND || op == TOK_LOGIC_OR);
+	int finalop = reverse ? TOK_LOGIC_AND + TOK_LOGIC_OR - op : op;
+	int itemreverse = reverse;
+
+	if (finalop == TOK_LOGIC_AND) {
+		cgasm_goto_ifcond_logic_and(ctx, lhs, rhs, goto_label, itemreverse);
+	} else {
+		cgasm_goto_ifcond_logic_or(ctx, lhs, rhs, goto_label, itemreverse);
+	}
+}
+
 static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse) {
 	int op = ccexpr->op;
 	int lhs_reg = REG_EAX;
@@ -40,6 +60,13 @@ static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *cce
 	char buf[128];
 	struct expr_val lhs = ccexpr->lhs;
 	struct expr_val rhs = ccexpr->rhs;
+	free(ccexpr); // free condcode after evaluation
+	ccexpr = NULL;
+
+	if (op == TOK_LOGIC_AND || op == TOK_LOGIC_OR) {
+		cgasm_goto_ifcond_logic(ctx, op, lhs, rhs, goto_label, reverse);
+		return;
+	}
 
 	// handle reverse
 	if (reverse) {
@@ -90,7 +117,6 @@ static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *cce
 	default:
 		panic("ni %s", token_tag_str(op));
 	}
-	free(ccexpr); // free condcode after evaluation
 }
 
 
