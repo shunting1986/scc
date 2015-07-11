@@ -10,6 +10,10 @@
 /**********************/
 /* util               */
 /**********************/
+static int cgasm_get_param_offset(struct cgasm_context *ctx /* unused */, struct param_symbol *sym) {
+	return sym->param_ind * 4 + 8;
+}
+
 static int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbol *sym) {
 	return -((sym->var_ind + ctx->nstate_reg) * 4 + 4);
 }
@@ -66,10 +70,17 @@ static void cgasm_load_local_var_to_reg(struct cgasm_context *ctx, struct local_
 	cgasm_println(ctx, "movl %d(%%ebp), %%%s", cgasm_get_local_var_offset(ctx, sym), get_reg_str_code(reg));
 }
 
+static void cgasm_load_param_to_reg(struct cgasm_context *ctx, struct param_symbol *sym, int reg) {
+	cgasm_println(ctx, "movl %d(%%ebp), %%%s", cgasm_get_param_offset(ctx, sym), get_reg_str_code(reg));
+}
+
 static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
 		cgasm_load_local_var_to_reg(ctx, (struct local_var_symbol *) sym, reg);
+		break;
+	case SYMBOL_PARAM:
+		cgasm_load_param_to_reg(ctx, (struct param_symbol *) sym, reg);
 		break;
 	default:
 		panic("ni %d %s", sym->type, sym->name);
