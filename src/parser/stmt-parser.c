@@ -138,8 +138,44 @@ static int initiate_selection_statement(union token tok) {
 	return tok.tok_tag == TOK_IF || tok.tok_tag == TOK_SWITCH;
 }
 
+static struct selection_statement *parse_switch_statement(struct parser *parser) {
+	panic("ni");
+}
+
+static struct selection_statement *parse_if_statement(struct parser *parser) {
+	struct expression *expr;
+	struct statement *truestmt, *falsestmt = NULL;
+	union token tok;
+	struct selection_statement *selstmt = selection_statement_init(SEL_TYPE_IF);
+
+	expect(parser->lexer, TOK_LPAREN);
+	expr = parse_expression(parser);
+	expect(parser->lexer, TOK_RPAREN);
+	truestmt = parse_statement(parser);
+
+	tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag == TOK_ELSE) {
+		falsestmt = parse_statement(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+	}
+
+	selstmt->if_stmt.expr = expr;
+	selstmt->if_stmt.truestmt = truestmt;
+	selstmt->if_stmt.falsestmt = falsestmt;
+	return selstmt;
+}
+
 static struct selection_statement *parse_selection_statement(struct parser *parser) {
-	panic("parse_selection_statement ni");
+	union token tok = lexer_next_token(parser->lexer);
+	switch (tok.tok_tag) {
+	case TOK_IF:
+		return parse_if_statement(parser);
+	case TOK_SWITCH:
+		return parse_switch_statement(parser);
+	default:
+		panic("invalid selection statement");
+	}
 }
 
 static int initiate_labeled_statement(union token tok, union token tok2) {

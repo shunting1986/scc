@@ -1,5 +1,5 @@
 KEYLIST
-  TODO: handle recursion, if, switch, array def & use, struct def & dot, ptr & general pointer, break, continue, && || short cut
+  TODO: handle if, recursion, switch, array def & use, struct def & dot, ptr & general pointer, break, continue, && || short cut
   TODO: support preprocessor
 
 TODO: make the compiler support both 32 bit and 64 bit asm?

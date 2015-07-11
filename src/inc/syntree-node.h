@@ -26,6 +26,7 @@ struct multiplicative_expression;
 struct cast_expression;
 
 #define constant_expression conditional_expression
+#define statement syntreebasenode
 
 struct syntreebasenode {
 	int nodeType;
@@ -358,12 +359,34 @@ struct expression_statement {
 struct expression_statement *expression_statement_init(struct expression *expr);
 
 enum {
+	SEL_TYPE_IF,
+	SEL_TYPE_SWITCH,
+};
+
+struct selection_statement {
+	int nodeType;
+	int selType;
+	union {
+		struct {
+			struct expression *expr;
+			struct statement *truestmt;
+			struct statement *falsestmt;
+		} if_stmt;
+		
+		struct {
+			struct expression *expr;
+			struct statement *stmt;
+		} switch_stmt;
+	};
+};
+
+struct selection_statement *selection_statement_init(int selType);
+
+enum {
 	ITER_TYPE_WHILE,
 	ITER_TYPE_DO_WHILE,
 	ITER_TYPE_FOR,
 };
-
-#define statement syntreebasenode
 
 struct iteration_statement {
 	int nodeType;

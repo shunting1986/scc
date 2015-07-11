@@ -12,6 +12,8 @@ static const char *keyword_str_list[] = {
 	[TOK_CHAR] = "char",
 	[TOK_WHILE] = "while",
 	[TOK_FOR] = "for",
+	[TOK_IF] = "if",
+	[TOK_ELSE] = "else",
 	[TOK_TOTAL_NUM] = NULL,
 };
 

@@ -362,3 +362,11 @@ struct iteration_statement *iteration_statement_init(int iterType) {
 	return stmt;
 }
 
+struct selection_statement *selection_statement_init(int selType) {
+	struct selection_statement *stmt = mallocz(sizeof(*stmt));
+	stmt->nodeType = SELECTION_STATEMENT;
+	stmt->selType = selType;
+	return stmt;
+}
+
+
