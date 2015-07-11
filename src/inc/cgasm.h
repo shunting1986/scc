@@ -44,6 +44,7 @@ void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_spe
 
 // cgasm-stmt.c
 void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt);
+void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse);
 
 // cgasm-emit.c
 void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);

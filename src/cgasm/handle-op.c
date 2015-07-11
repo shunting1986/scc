@@ -100,6 +100,30 @@ static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token c
 	}
 }
 
+/* 
+ * TODO current solution is translate the logic as
+ *
+ * if (expr) {
+ *   reg = 1;
+ * } else {
+ *   reg = 0;
+ * }
+ *
+ * Check conditional code directly by setcc instruction should be more efficient
+ */
+static void cgasm_load_cc_to_reg(struct cgasm_context *ctx, struct condcode *cc, int reg) {
+	int set1_label = cgasm_new_label_no(ctx);
+	int out_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_goto_ifcond_cc(ctx, cc, set1_label, 0);
+	cgasm_println(ctx, "movl $0, %%%s", get_reg_str_code(reg));
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
+	cgasm_emit_jump_label(ctx, set1_label);
+	cgasm_println(ctx, "movl $1, %%%s", get_reg_str_code(reg));
+	cgasm_emit_jump_label(ctx, out_label);
+}
+
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
@@ -110,6 +134,9 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 		break;
 	case EXPR_VAL_CONST_VAL:
 		cgasm_load_const_val_to_reg(ctx, val.const_val, reg);
+		break;
+	case EXPR_VAL_CC:
+		cgasm_load_cc_to_reg(ctx, val.cc, reg);
 		break;
 	default:
 		panic("ni %d", val.type);

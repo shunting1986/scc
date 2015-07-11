@@ -53,7 +53,7 @@ static void cgasm_goto_ifcond_logic(struct cgasm_context *ctx, int op, struct ex
 	}
 }
 
-static void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse) {
+void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse) {
 	int op = ccexpr->op;
 	int lhs_reg = REG_EAX;
 	int rhs_reg = REG_ECX;
