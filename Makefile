@@ -58,7 +58,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/syntax_if/main.c
+	./scc integration-test/fact/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

@@ -1,5 +1,5 @@
 KEYLIST
-  TODO: handle recursion, && || short cut, array def & use, switch, struct def & dot, ptr & general pointer, break, continue
+  TODO: handle recursive function call, && || short cut, array def & use, switch, struct def & dot, ptr & general pointer, break, continue
 	TODO: n-queen
 	TODO: typedef
 	TODO: type conversion?

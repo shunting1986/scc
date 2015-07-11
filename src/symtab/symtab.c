@@ -37,7 +37,11 @@ void symtab_add(struct symtab *stab, struct symbol *sym) {
 }
 
 struct symbol *symtab_new_param(char *name, int ind) {
-	panic("ni");
+	struct param_symbol *sym = mallocz(sizeof(*sym));
+	sym->type = SYMBOL_PARAM;
+	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
+	sym->param_ind = ind;
+	return (struct symbol *) sym;
 }
 
 struct symbol *symtab_new_local_var(char *name, int ind) {

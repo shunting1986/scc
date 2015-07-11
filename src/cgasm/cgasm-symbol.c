@@ -41,11 +41,14 @@ void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id) {
 }
 
 // ind start from 0
-void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, int ind) {
+void cgasm_add_param_sym(struct cgasm_context *ctx, char *id) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
+	int ind;
 	assert(func_ctx != NULL);
-	assert(ind < func_ctx->nparam_word);
+	// assert(ind < func_ctx->nparam_word);
 	assert(ctx->top_stab->enclosing != NULL);
+	cgasm_check_sym_redef(ctx, id);
+	ind = func_ctx->nparam_word++;
 	symtab_add(ctx->top_stab, symtab_new_param(id, ind));
 }
 

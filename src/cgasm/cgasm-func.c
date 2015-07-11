@@ -2,6 +2,7 @@
 #include <inc/util.h>
 #include <inc/symtab.h>
 #include <inc/cbuf.h>
+#include <inc/dynarr.h>
 
 static struct cgasm_func_context *func_context_init() {
 	struct cgasm_func_context *ctx = (struct cgasm_func_context *) mallocz(sizeof(*ctx));
@@ -59,11 +60,27 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 	cgasm_pop_symtab(ctx);
 }
 
+static void register_parameter(struct cgasm_context *ctx, struct parameter_declaration *decl) {
+	struct direct_declarator *dd = decl->declarator->direct_declarator;
+	// TODO handle pointer and type
+
+	if (dd->id == NULL) {
+		panic("only support id case right now");
+	}
+	cgasm_add_param_sym(ctx, dd->id);
+}
+
 static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_list) {
 	assert(dynarr_size(suff_list) == 1);
 	struct direct_declarator_suffix *suff = dynarr_get(suff_list, 0);
 	if (suff->param_type_list != NULL) {
-		panic("ni");
+		if (suff->param_type_list->has_ellipsis) {
+			panic("ellipsis is not supported yet");
+		}
+
+		DYNARR_FOREACH_BEGIN(suff->param_type_list->param_decl_list, parameter_declaration, each);
+			register_parameter(ctx, each);
+		DYNARR_FOREACH_END();
 	}
 }
 
