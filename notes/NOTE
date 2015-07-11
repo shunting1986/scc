@@ -1,3 +1,6 @@
+if+ else
+only if
+
 KEYLIST
   TODO: handle if, recursion, switch, array def & use, struct def & dot, ptr & general pointer, break, continue, && || short cut
   TODO: support preprocessor

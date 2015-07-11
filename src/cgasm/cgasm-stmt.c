@@ -132,6 +132,41 @@ static void cgasm_iteration_statement(struct cgasm_context *ctx, struct iteratio
 	}
 }
 
+/*
+ * handle the if statement without else
+ */
+static void cgasm_if_statement(struct cgasm_context *ctx, struct expression *cond, struct statement *stmt) {
+	panic("ni");
+}
+
+/*
+ * handle the if statement with else
+ */
+static void cgasm_ifelse_statement(struct cgasm_context *ctx, struct expression *cond, struct statement *truestmt, struct statement *falsestmt) {
+	panic("ni");
+}
+
+static void cgasm_switch_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
+	panic("ni");
+}
+
+static void cgasm_selection_statement(struct cgasm_context *ctx, struct selection_statement *stmt) {
+	switch (stmt->selType) {
+	case SEL_TYPE_IF:
+		if (stmt->if_stmt.falsestmt != NULL) {
+			cgasm_ifelse_statement(ctx, stmt->if_stmt.expr, stmt->if_stmt.truestmt, stmt->if_stmt.falsestmt);
+		} else {
+			cgasm_if_statement(ctx, stmt->if_stmt.expr, stmt->if_stmt.truestmt);
+		}
+		break;
+	case SEL_TYPE_SWITCH:
+		cgasm_switch_statement(ctx, stmt->switch_stmt.expr, stmt->switch_stmt.stmt);
+		break;
+	default:
+		panic("ni");
+	}
+}
+
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
@@ -142,6 +177,9 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
 		break;
 	case ITERATION_STATEMENT:
 		cgasm_iteration_statement(ctx, (struct iteration_statement *) stmt);
+		break;
+	case SELECTION_STATEMENT:
+		cgasm_selection_statement(ctx, (struct selection_statement *) stmt);
 		break;
 	case COMPOUND_STATEMENT:
 		cgasm_push_symtab(ctx);
