@@ -219,7 +219,7 @@ struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, st
 /* binary op           */
 /***********************/
 struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
-	int lhs_reg = REG_EAX;
+	int lhs_reg = REG_EAX; // REVISE MUL if we change this register
 	int rhs_reg = REG_ECX;
 	struct expr_val res;
 #define LOAD_TO_REG() do { \
@@ -242,6 +242,11 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	case TOK_SUB:
 		LOAD_TO_REG();
 		cgasm_println(ctx, "subl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_STAR:
+		LOAD_TO_REG(); 
+		cgasm_println(ctx, "mull %%%s", get_reg_str_code(rhs_reg));
 		STORE_TO_TEMP();
 		break;
 	case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:
