@@ -87,3 +87,6 @@ clean:
 	rm -f $(LIB_SCC)
 	rm -f test/runtest
 	rm -f scc
+
+btest:
+	@integration-test/batch-test.sh

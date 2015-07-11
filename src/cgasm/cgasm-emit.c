@@ -44,9 +44,9 @@ char line[512];
 static void cgasm_func_vprintln(struct cgasm_func_context *ctx, int ind, const char *fmt, va_list va) {
 	vsnprintf(line, sizeof(line), fmt, va);
 	if (DEBUG) {
-		printf("[DEBUG] ");
-		printf("%s", line);
-		printf("\n");
+		fprintf(stderr, "[DEBUG] ");
+		fprintf(stderr, "%s", line);
+		fprintf(stderr, "\n");
 	}
 	if (ind) {
 		cbuf_add_str(ctx->code_buf, "  "); // indent

@@ -6,5 +6,6 @@ obj/
 tags
 libscc.a
 test/runtest
+temp/
 
 scc
