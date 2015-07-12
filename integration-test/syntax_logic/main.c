@@ -7,9 +7,9 @@ int check(int v) {
 
 int
 main() {
-	int a, b;
-	while (scanf("%d%d", &a, &b) != -1) {
-		if (check(a) != 0 && check(b) != 0) {
+	int a, b, c;
+	while (scanf("%d%d%d", &a, &b, &c) != -1) {
+		if (check(a) != 0 && check(b) != 0 && check(c) != 0) {
 			printf("true\n");
 		} else {
 			printf("false\n");
