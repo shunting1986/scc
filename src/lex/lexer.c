@@ -8,6 +8,9 @@
 #include <inc/util.h>
 #include <inc/keyword.h>
 
+#undef DEBUG
+#define DEBUG 0
+
 struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = mallocz(sizeof(*lexer));
 	lexer->cstream = cstream;
@@ -73,6 +76,9 @@ void lexer_dump_remaining(struct lexer *lexer) {
 union token expect(struct lexer *lexer, int tok_tag) {
 	union token tok = lexer_next_token(lexer);
 	if (tok.tok_tag != tok_tag) {
+#if DEBUG
+		lexer_dump_remaining(lexer); 
+#endif
 		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
 	}
 	return tok;

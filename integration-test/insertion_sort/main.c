@@ -6,7 +6,8 @@ int n;
 void sort() {
 	int i, j;
 	for (i = 1; i < n; i++) {
-		int v = arr[i];
+		int v; // purposely put the initializer in the following statement since we do not support intializer yet
+		v = arr[i];
 		for (j = i - 1; j >= 0 && arr[j] > v; j--) {
 			arr[j + 1] = arr[j];
 		}

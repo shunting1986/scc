@@ -9,6 +9,7 @@ KEYLIST
 	TODO: type conversion?
 	TODO: switch, struct def & dot & ptr, general pointer, break, continue
   TODO: support preprocessor
+	TODO: support initializer
 
 TODO: make the compiler support both 32 bit and 64 bit asm?
 
