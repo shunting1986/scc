@@ -1,12 +1,22 @@
 #include <inc/symtab.h>
 #include <inc/util.h>
-#include <inc/htab.h>
 
 struct symtab *symtab_init(struct symtab *enclosing) {
 	struct symtab *tab = (struct symtab *) mallocz(sizeof(*tab));
 	tab->enclosing = enclosing;
 	tab->htab = htab_init();
 	return tab;
+}
+
+/*
+ * XXX: the current implementation is iterate thru the hash table. If this becomes
+ * a bottleneck, we can optimize by maintaining a parallel list. This change can 
+ * be transparent to the upper level code.
+ *
+ * This method does not recursively iterate thru the enclosing symbol table
+ */
+void symtab_iter(struct symtab *symtab, void *ctx, htab_iter_fn_type *func) {
+	htab_iter(symtab->htab, ctx, func);
 }
 
 void symtab_destroy(struct symtab *stab) {

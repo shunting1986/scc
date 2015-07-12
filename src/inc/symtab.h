@@ -1,6 +1,8 @@
 #ifndef _INC_SYMTAB_H
 #define _INC_SYMTAB_H
 
+#include <inc/htab.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,6 +50,7 @@ struct symbol *symtab_new_local_var(char *name, int ind);
 struct symbol *symtab_new_global_var(char *name);
 void symtab_add(struct symtab *stab, struct symbol *sym);
 struct symbol *symtab_lookup(struct symtab *stab, const char *id);
+void symtab_iter(struct symtab *symtab, void *ctx, htab_iter_fn_type *func);
 
 #ifdef __cplusplus
 }

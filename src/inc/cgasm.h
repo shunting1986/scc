@@ -56,6 +56,7 @@ void cgasm_add_param_sym(struct cgasm_context *ctx, char *id);
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 void cgasm_push_symtab(struct cgasm_context *ctx);
 void cgasm_pop_symtab(struct cgasm_context *ctx);
+void cgasm_dump_global_vars(struct cgasm_context *ctx);
 
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);

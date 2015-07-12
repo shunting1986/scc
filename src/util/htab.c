@@ -53,6 +53,7 @@ struct hashtab *htab_init() {
 	return htab;
 }
 
+// XXX this can take use of the htab_iter function
 void htab_destroy(struct hashtab *tab) {
 	int i;
 	for (i = 0; i < tab->nbucket; i++) {
@@ -64,6 +65,17 @@ void htab_destroy(struct hashtab *tab) {
 	}
 	free(tab->buckets);
 	free(tab);
+}
+
+void htab_iter(struct hashtab *tab, void *ctx, htab_iter_fn_type *func) {
+	int i;
+	for (i = 0; i < tab->nbucket; i++) {
+		struct hashtab_item *cur, *next;
+		for (cur = tab->buckets[i]; cur != NULL; cur = next) {
+			next = cur->next;
+			func(ctx, cur->key, cur->val);
+		}
+	}
 }
 
 void *htab_query(struct hashtab *htab, const char *key) {

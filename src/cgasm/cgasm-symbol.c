@@ -52,3 +52,33 @@ void cgasm_add_param_sym(struct cgasm_context *ctx, char *id) {
 	symtab_add(ctx->top_stab, symtab_new_param(id, ind));
 }
 
+static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
+	struct cgasm_context *ctx = _ctx;
+	struct global_var_symbol *sym = _val;
+	assert(sym->type == SYMBOL_GLOBAL_VAR);
+	(void) ctx;
+
+	// TODO only support int right now
+	cgasm_println_noind(ctx, "%s:", sym->name);
+	cgasm_println(ctx, ".long 0");
+}
+
+/*
+ * dump the definition of global variables
+ */
+void cgasm_dump_global_vars(struct cgasm_context *ctx) {
+	struct symtab *stab = ctx->top_stab;
+	assert(stab != NULL);
+	assert(stab->enclosing == NULL);
+
+	/* 
+	 * This is very implement. Missing this will still generate compilable code,
+	 * but since the data is actually reside in text segment, whenever the code
+	 * attemp to write the location, the prog will trigger segmentation fault.
+	 */
+	cgasm_println(ctx, ".data"); 
+
+	symtab_iter(stab, ctx, cgasm_dump_one_global_var);
+}
+
+
