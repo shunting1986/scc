@@ -197,6 +197,8 @@ struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenod
 	switch (rawexpr->nodeType) {
 	case INCLUSIVE_OR_EXPRESSION:
 		return cgasm_inclusive_or_expression(ctx, (void *) rawexpr);
+	case LOGICAL_AND_EXPRESSION:
+		return cgasm_logical_and_expression(ctx, (void *) rawexpr);
 	default:
 		panic("ni %s", node_type_str(rawexpr->nodeType));
 	}

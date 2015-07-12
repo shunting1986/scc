@@ -35,7 +35,13 @@ static struct expr_val cgasm_expression_statement(struct cgasm_context *ctx, str
 }
 
 static void cgasm_goto_ifcond_logic_and(struct cgasm_context *ctx, struct expr_val lhs, struct syntreebasenode *rhs_lazy, int goto_label, int itemreverse) {
-	panic("ni");
+	int out_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_goto_ifcond(ctx, lhs, out_label, 1 - itemreverse);
+	cgasm_goto_ifcond(ctx, cgasm_eval_expr(ctx, rhs_lazy), out_label, 1 - itemreverse);
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(goto_label, buf));
+	cgasm_emit_jump_label(ctx, out_label);
 }
 
 static void cgasm_goto_ifcond_logic_or(struct cgasm_context *ctx, struct expr_val lhs, struct syntreebasenode *rhs_lazy, int goto_label, int itemreverse) {
@@ -90,6 +96,10 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 	case TOK_EQ:
 		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		cgasm_println(ctx, "jz %s", get_jump_label_str(goto_label, buf));
+		break;
+	case TOK_NE:
+		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "jnz %s", get_jump_label_str(goto_label, buf));
 		break;
 	case TOK_GT:
 		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
