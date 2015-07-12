@@ -20,6 +20,18 @@ main() {
 		} else {
 			printf("false\n");
 		}
+
+		if (check(a) != 0 && check(b) != 0 || check(c) != 0) {
+			printf("true\n");
+		} else {
+			printf("false\n");
+		}
+
+		if ((check(a) != 0 || check(b) != 0) && check(c) != 0) {
+			printf("true\n");
+		} else {
+			printf("false\n");
+		}
 	}
 	return 0;
 }
