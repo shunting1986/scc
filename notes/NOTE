@@ -1,5 +1,6 @@
 KEYLIST
-  TODO: global var
+  TODO: global var : check the generated asm code
+	TODO: auto add ret instruction
   TODO: array def & use (multi-dimen), matrix multi
 	TODO: type system; I'd better extract the pure type out of syntax tree
 	TODO: n-queen

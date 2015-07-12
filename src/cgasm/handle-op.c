@@ -27,11 +27,19 @@ static void cgasm_get_lval_local_var_asm_code(struct cgasm_context *ctx, struct 
 	sprintf(buf, "%d(%%ebp)", cgasm_get_local_var_offset(ctx, sym));
 }
 
+static void cgasm_get_lval_global_var_asm_code(struct cgasm_context *ctx, struct global_var_symbol *sym, char *buf) {
+	assert(buf != NULL);
+	sprintf(buf, "%s", sym->name);
+}
+
 static void cgasm_get_lval_sym_asm_code(struct cgasm_context *ctx, struct symbol *sym, char *buf) {
 	assert(buf != NULL);
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
 		cgasm_get_lval_local_var_asm_code(ctx, (struct local_var_symbol *) sym, buf);
+		break;
+	case SYMBOL_GLOBAL_VAR:
+		cgasm_get_lval_global_var_asm_code(ctx, (struct global_var_symbol *) sym, buf);
 		break;
 	default:
 		panic("ni %d", sym->type);
@@ -74,6 +82,10 @@ static void cgasm_load_param_to_reg(struct cgasm_context *ctx, struct param_symb
 	cgasm_println(ctx, "movl %d(%%ebp), %%%s", cgasm_get_param_offset(ctx, sym), get_reg_str_code(reg));
 }
 
+static void cgasm_load_global_var_to_reg(struct cgasm_context *ctx, struct global_var_symbol *sym, int reg) {
+	cgasm_println(ctx, "movl %s, %%%s", sym->name, get_reg_str_code(reg));
+}
+
 static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
@@ -81,6 +93,9 @@ static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym,
 		break;
 	case SYMBOL_PARAM:
 		cgasm_load_param_to_reg(ctx, (struct param_symbol *) sym, reg);
+		break;
+	case SYMBOL_GLOBAL_VAR:
+		cgasm_load_global_var_to_reg(ctx, (struct global_var_symbol *) sym, reg);
 		break;
 	default:
 		panic("ni %d %s", sym->type, sym->name);
@@ -168,10 +183,17 @@ static void cgasm_push_local_var_addr(struct cgasm_context *ctx, struct local_va
 	cgasm_println(ctx, "pushl %%eax");
 }
 
+static void cgasm_push_global_var_addr(struct cgasm_context *ctx, struct global_var_symbol *sym) {
+	cgasm_println(ctx, "pushl $%s", sym->name);
+}
+
 static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
 		cgasm_push_local_var_addr(ctx, (struct local_var_symbol *) sym);
+		break;
+	case SYMBOL_GLOBAL_VAR:
+		cgasm_push_global_var_addr(ctx, (struct global_var_symbol *) sym);
 		break;
 	default:
 		panic("ni %d", sym->type);

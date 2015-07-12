@@ -4,10 +4,11 @@ int a;
 
 void inc() {
 	a++;
+	return;
 }
 
 int
-main(void) {
+main() {
 	while (scanf("%d", &a) != -1) {
 		inc();
 		printf("%d\n", a);

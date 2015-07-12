@@ -6,6 +6,9 @@
 #include <inc/util.h>
 #include <inc/dynarr.h>
 
+#undef DEBUG
+#define DEBUG 0
+
 static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator);
@@ -97,6 +100,12 @@ static struct declaration_specifiers *parse_declaration_specifiers(struct parser
 		}
 		dynarr_add(darr, nd);
 	}
+
+#if DEBUG
+	if (dynarr_size(darr) == 0) {
+		lexer_dump_remaining(parser->lexer); // TODO
+	}
+#endif
 
 	assert(dynarr_size(darr) > 0);
 	return declaration_specifiers_init(darr);

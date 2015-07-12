@@ -59,7 +59,11 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 }
 
 static void register_parameter(struct cgasm_context *ctx, struct parameter_declaration *decl) {
-	struct direct_declarator *dd = decl->declarator->direct_declarator;
+	struct direct_declarator *dd = NULL;
+	if (decl->declarator == NULL) {
+		panic("require declarator right now");
+	}
+	dd = decl->declarator->direct_declarator;
 	// TODO handle pointer and type
 
 	if (dd->id == NULL) {
