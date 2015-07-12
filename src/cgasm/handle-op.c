@@ -245,6 +245,12 @@ struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, st
 /***********************/
 /* binary op           */
 /***********************/
+// for logic and/or
+struct expr_val cgasm_handle_binary_op_lazy(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct syntreebasenode *rhs) {
+	assert(tok_tag == TOK_LOGIC_AND || tok_tag == TOK_LOGIC_OR);
+	return condcode_expr(tok_tag, lhs, void_expr_val(), rhs);
+}
+
 struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	int lhs_reg = REG_EAX; // REVISE MUL if we change this register
 	int rhs_reg = REG_ECX;
@@ -277,8 +283,7 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		STORE_TO_TEMP();
 		break;
 	case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:
-	case TOK_LOGIC_AND:
-		res = condcode_expr(tok_tag, lhs, rhs);
+		res = condcode_expr(tok_tag, lhs, rhs, NULL);
 		break;
 	default:
 		panic("ni %s", token_tag_str(tok_tag));

@@ -52,8 +52,6 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 	cgasm_println(ctx, "subl $%d, %%esp", func_ctx->nlocal_word * 4);
 	cgasm_dump_buffered_code(ctx, func_ctx);
 
-	cgasm_dump_string_literals(ctx);
-	 
 	// destroy func context
 	func_context_destroy(func_ctx);
 

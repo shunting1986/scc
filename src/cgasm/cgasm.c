@@ -56,8 +56,13 @@ static void cgasm_external_declaration(struct cgasm_context *ctx, struct externa
 	}
 }
 
+static void cgasm_leave_translation_unit(struct cgasm_context *ctx) {
+	cgasm_dump_string_literals(ctx); 
+}
+
 static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit) {
 	DYNARR_FOREACH_BEGIN(trans_unit->external_decl_list, external_declaration, each);
 		cgasm_external_declaration(ctx, each);
 	DYNARR_FOREACH_END();
+	cgasm_leave_translation_unit(ctx);
 }

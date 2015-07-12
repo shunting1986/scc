@@ -59,6 +59,7 @@ void cgasm_pop_symtab(struct cgasm_context *ctx);
 
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
+struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenode *rawexpr);
 
 // asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);
@@ -73,6 +74,7 @@ char *get_jump_label_str(int no, char *buf);
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand);
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs);
+struct expr_val cgasm_handle_binary_op_lazy(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct syntreebasenode *rhs);
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op);
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem);

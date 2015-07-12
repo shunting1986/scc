@@ -1,5 +1,6 @@
 KEYLIST
   TODO: handle && || short cut, array def & use, switch, struct def & dot, ptr & general pointer, break, continue
+	TODO: && chain up, || chain up, && mixed with ||
 	TODO: n-queen
 	TODO: typedef
 	TODO: type conversion?

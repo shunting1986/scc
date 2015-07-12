@@ -46,7 +46,7 @@ struct expr_val void_expr_val() {
 	return ret;
 }
 
-struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs) {
+struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, struct syntreebasenode *rhs_lazy) {
 	struct expr_val ret;
 	struct condcode *cc = mallocz(sizeof(*cc));
 	ret.type = EXPR_VAL_CC;
@@ -55,6 +55,7 @@ struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs) 
 	cc->op = op;
 	cc->lhs = lhs;
 	cc->rhs = rhs;
+	cc->rhs_lazy = rhs_lazy;
 	return ret;
 }
 

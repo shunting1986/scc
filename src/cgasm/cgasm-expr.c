@@ -105,9 +105,13 @@ static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct c
 	int i; \
 	accum = cgasm_ ## subexpr_type(ctx, dynarr_get(subexpr_list, 0)); \
 	for (i = 1; i < dynarr_size(subexpr_list); i++) { \
-		struct expr_val extra = cgasm_ ## subexpr_type(ctx, dynarr_get(subexpr_list, i)); \
 		int op = oplist == NULL ? single_op : (int) (long) dynarr_get(oplist, i - 1); \
-		accum = cgasm_handle_binary_op(ctx, op, accum, extra); \
+		if (op != TOK_LOGIC_AND && op != TOK_LOGIC_OR) { \
+			struct expr_val extra = cgasm_ ## subexpr_type(ctx, dynarr_get(subexpr_list, i)); \
+			accum = cgasm_handle_binary_op(ctx, op, accum, extra); \
+		} else { \
+			accum = cgasm_handle_binary_op_lazy(ctx, op, accum, dynarr_get(subexpr_list, i)); \
+		} \
 	} \
 	accum; \
 })
@@ -187,4 +191,13 @@ struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *e
 	DYNARR_FOREACH_END();
 
 	return ret;
+}
+
+struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenode *rawexpr) {
+	switch (rawexpr->nodeType) {
+	case INCLUSIVE_OR_EXPRESSION:
+		return cgasm_inclusive_or_expression(ctx, (void *) rawexpr);
+	default:
+		panic("ni %s", node_type_str(rawexpr->nodeType));
+	}
 }

@@ -4,6 +4,7 @@
 
 
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt);
+static void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse);
 
 static void cgasm_return_statement(struct cgasm_context *ctx, struct expression *expr) {
 	if (expr != NULL) {
@@ -33,23 +34,24 @@ static struct expr_val cgasm_expression_statement(struct cgasm_context *ctx, str
 	return cgasm_expression(ctx, stmt->expr);
 }
 
-static void cgasm_goto_ifcond_logic_and(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int goto_label, int itemreverse) {
+static void cgasm_goto_ifcond_logic_and(struct cgasm_context *ctx, struct expr_val lhs, struct syntreebasenode *rhs_lazy, int goto_label, int itemreverse) {
 	panic("ni");
 }
 
-static void cgasm_goto_ifcond_logic_or(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int goto_label, int itemreverse) {
-	panic("ni");
+static void cgasm_goto_ifcond_logic_or(struct cgasm_context *ctx, struct expr_val lhs, struct syntreebasenode *rhs_lazy, int goto_label, int itemreverse) {
+	cgasm_goto_ifcond(ctx, lhs, goto_label, itemreverse);
+	cgasm_goto_ifcond(ctx, cgasm_eval_expr(ctx, rhs_lazy), goto_label, itemreverse);
 }
 
-static void cgasm_goto_ifcond_logic(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs, int goto_label, int reverse) {
+static void cgasm_goto_ifcond_logic(struct cgasm_context *ctx, int op, struct expr_val lhs, struct syntreebasenode *rhs_lazy, int goto_label, int reverse) {
 	assert(op == TOK_LOGIC_AND || op == TOK_LOGIC_OR);
 	int finalop = reverse ? TOK_LOGIC_AND + TOK_LOGIC_OR - op : op;
 	int itemreverse = reverse;
 
 	if (finalop == TOK_LOGIC_AND) {
-		cgasm_goto_ifcond_logic_and(ctx, lhs, rhs, goto_label, itemreverse);
+		cgasm_goto_ifcond_logic_and(ctx, lhs, rhs_lazy, goto_label, itemreverse);
 	} else {
-		cgasm_goto_ifcond_logic_or(ctx, lhs, rhs, goto_label, itemreverse);
+		cgasm_goto_ifcond_logic_or(ctx, lhs, rhs_lazy, goto_label, itemreverse);
 	}
 }
 
@@ -60,32 +62,23 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 	char buf[128];
 	struct expr_val lhs = ccexpr->lhs;
 	struct expr_val rhs = ccexpr->rhs;
+	struct syntreebasenode *rhs_lazy = ccexpr->rhs_lazy;
 	free(ccexpr); // free condcode after evaluation
 	ccexpr = NULL;
 
 	if (op == TOK_LOGIC_AND || op == TOK_LOGIC_OR) {
-		cgasm_goto_ifcond_logic(ctx, op, lhs, rhs, goto_label, reverse);
+		cgasm_goto_ifcond_logic(ctx, op, lhs, rhs_lazy, goto_label, reverse);
 		return;
 	}
 
 	// handle reverse
 	if (reverse) {
 		switch (op) {
-		case TOK_NE:
-			op = TOK_EQ;
-			break;
-		case TOK_LE:
-			op = TOK_GT;
-			break;
-		case TOK_GT:
-			op = TOK_LE;
-			break;
-		case TOK_LT:
-			op = TOK_GE;
-			break;
-		case TOK_GE:
-			op = TOK_LT;
-			break;
+		case TOK_NE: op = TOK_EQ; break;
+		case TOK_LE: op = TOK_GT; break;
+		case TOK_GT: op = TOK_LE; break;
+		case TOK_LT: op = TOK_GE; break;
+		case TOK_GE: op = TOK_LT; break;
 		default:
 			panic("ni %s", token_tag_str(op));
 		}
