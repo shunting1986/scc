@@ -1,11 +1,11 @@
 KEYLIST
-  TODO: global var : check the generated asm code
-	TODO: auto add ret instruction
-  TODO: array def & use (multi-dimen), matrix multi
+  TODO: array def & use (multi-dimen), matrix multi <==
+	TODO: sort
+
 	TODO: type system; I'd better extract the pure type out of syntax tree
 	TODO: n-queen
-	TODO: sort
 	TODO: typedef
+	TODO: auto add ret instruction
 	TODO: type conversion?
 	TODO: switch, struct def & dot & ptr, general pointer, break, continue
   TODO: support preprocessor
@@ -26,5 +26,5 @@ Compiler optimization
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call, && || short cut
+- support for, while, if, (recursive) function call, && || short cut, global variable
 - a simple integration test framework
