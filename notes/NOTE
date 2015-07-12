@@ -1,13 +1,12 @@
-  DONE support && chain
-	TODO || chain
-	TODO && || mix
-
 KEYLIST
-  TODO: handle && || short cut, array def & use, switch, struct def & dot, ptr & general pointer, break, continue
-	TODO: && chain up, || chain up, && mixed with ||
+  TODO: global var
+  TODO: array def & use (multi-dimen), matrix multi
+	TODO: type system; I'd better extract the pure type out of syntax tree
 	TODO: n-queen
+	TODO: sort
 	TODO: typedef
 	TODO: type conversion?
+	TODO: switch, struct def & dot & ptr, general pointer, break, continue
   TODO: support preprocessor
 
 TODO: make the compiler support both 32 bit and 64 bit asm?
@@ -26,5 +25,5 @@ Compiler optimization
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call
+- support for, while, if, (recursive) function call, && || short cut
 - a simple integration test framework
