@@ -115,9 +115,15 @@ static struct unary_expression *parse_unary_expression(struct parser *parser) {
 static struct cast_expression *parse_cast_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
 	if (tok.tok_tag == TOK_LPAREN) {
-		panic("parse_cast_expression does not support starting with '(' yet"); // TODO
+		union token nxtok = lexer_next_token(parser->lexer);
+		if (initiate_type_name(nxtok)) {
+			panic("does not support type cast yet");
+		}
+		lexer_put_back(parser->lexer, nxtok);
+		lexer_put_back(parser->lexer, tok);
+	} else {
+		lexer_put_back(parser->lexer, tok); 
 	}
-	lexer_put_back(parser->lexer, tok);
 
 	struct cast_expression *cast_expr = cast_expression_init();
 	cast_expr->unary_expr = parse_unary_expression(parser);

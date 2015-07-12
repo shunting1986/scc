@@ -11,6 +11,7 @@ static struct init_declarator *parse_init_declarator_with_la(struct parser *pars
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator);
 static struct declarator *parse_declarator(struct parser *parser);
 static int initiate_type_qualifier(union token tok);
+static int initiate_type_specifier(union token tok);
 
 struct parser *parser_init(struct lexer *lexer) {
 	struct parser *parser = malloc(sizeof(*parser));
@@ -33,6 +34,10 @@ struct syntree *parse(struct parser *parser) {
 	}
 
 	return syntree_init(tu);
+}
+
+int initiate_type_name(union token tok) {
+	return initiate_type_specifier(tok) || initiate_type_qualifier(tok);
 }
 
 // TODO handle TYPE_NAME here

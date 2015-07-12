@@ -48,6 +48,8 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
 		return symbol_expr_val(cgasm_lookup_sym(ctx, expr->id));
 	} else if (expr->const_val_tok.tok_tag != TOK_UNDEF) {
 		return const_expr_val(expr->const_val_tok);
+	} else if (expr->expr != NULL) {
+		return cgasm_expression(ctx, expr->expr);
 	} else {
 		panic("ni");
 	}
