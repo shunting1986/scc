@@ -61,25 +61,26 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
 static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struct postfix_expression *expr) {
 	struct postfix_expression_suffix *suff;
 	char *id;
-	// function call
+	// function call TODO unify this into the general processing
 	if ((id = expr->prim_expr->id) != NULL && dynarr_size(expr->suff_list) == 1 && (suff = dynarr_get(expr->suff_list, 0))->arg_list != NULL) {
 		return cgasm_function_call(ctx, id, suff->arg_list);
 	}
 
-	// primary expression
-	if (dynarr_size(expr->suff_list) == 0) {
-		return cgasm_primary_expression(ctx, expr->prim_expr);
-	}
-
-	// post ++
-	if (dynarr_size(expr->suff_list) == 1) {
-		struct postfix_expression_suffix *suff = dynarr_get(expr->suff_list, 0);
-		if (suff->is_inc) {
-			struct expr_val val = cgasm_primary_expression(ctx, expr->prim_expr);
-			return cgasm_handle_post_inc(ctx, val);
+	// first, we get expr_val from the primary expression
+	struct expr_val result_val = cgasm_primary_expression(ctx, expr->prim_expr);
+	DYNARR_FOREACH_BEGIN(expr->suff_list, postfix_expression_suffix, each);
+		if (each->is_inc) {
+			result_val = cgasm_handle_post_inc(ctx, result_val);
+		} else if (each->is_dec) {
+			result_val = cgasm_handle_post_dec(ctx, result_val);
+		} else if (each->ind) {
+			struct expr_val ind_val = cgasm_expression(ctx, each->ind);
+			result_val = cgasm_handle_index_op(ctx, result_val, ind_val);
+		} else {
+			panic("ni");
 		}
-	}
-	panic("ni");
+	DYNARR_FOREACH_END();
+	return result_val;
 }
 
 static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct unary_expression *expr) {

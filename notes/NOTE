@@ -1,5 +1,8 @@
 KEYLIST
-  TODO: array def & use (multi-dimen), matrix multi <==
+  TODO: array def & use (multi-dimen), matrix multi <== 
+	      think about the difference between array and pointer
+
+				define the array as either global var or local var
 	TODO: sort
 
 	TODO: type system; I'd better extract the pure type out of syntax tree

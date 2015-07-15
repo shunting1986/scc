@@ -83,6 +83,8 @@ void cgasm_store_reg_to_temp_var(struct cgasm_context *ctx, int reg, struct temp
 void cgasm_handle_ret(struct cgasm_context *ctx);
 void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_post_inc(struct cgasm_context *ctx, struct expr_val val);
+struct expr_val cgasm_handle_post_dec(struct cgasm_context *ctx, struct expr_val val);
+struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val base_val, struct expr_val ind_val);
 
 #ifdef __cplusplus
 }

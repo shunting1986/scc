@@ -59,4 +59,10 @@ struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, 
 	return ret;
 }
 
+struct expr_val expr_val_add_deref_flag(struct expr_val val) {
+	assert((val.type & EXPR_VAL_FLAG_DEREF) == 0);
+	val.type |= EXPR_VAL_FLAG_DEREF;
+	return val;
+}
+
 

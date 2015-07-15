@@ -85,6 +85,7 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 		case TOK_GT: op = TOK_LE; break;
 		case TOK_LT: op = TOK_GE; break;
 		case TOK_GE: op = TOK_LT; break;
+		case TOK_EQ: op = TOK_NE; break;
 		default:
 			panic("ni %s", token_tag_str(op));
 		}

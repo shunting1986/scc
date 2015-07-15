@@ -66,7 +66,7 @@ static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val 
 		cgasm_get_lval_temp_asm_code(ctx, val.temp_var, buf);
 		break;
 	default:
-		panic("ni %d", val.type);
+		panic("ni 0x%x", val.type);
 	}
 	return buf;
 }
@@ -86,6 +86,10 @@ static void cgasm_load_global_var_to_reg(struct cgasm_context *ctx, struct globa
 	cgasm_println(ctx, "movl %s, %%%s", sym->name, get_reg_str_code(reg));
 }
 
+static void cgasm_load_global_var_addr_to_reg(struct cgasm_context *ctx, struct global_var_symbol *sym, int reg) {
+	cgasm_println(ctx, "movl $%s, %%%s", sym->name, get_reg_str_code(reg));
+}
+
 static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
@@ -96,6 +100,16 @@ static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym,
 		break;
 	case SYMBOL_GLOBAL_VAR:
 		cgasm_load_global_var_to_reg(ctx, (struct global_var_symbol *) sym, reg);
+		break;
+	default:
+		panic("ni %d %s", sym->type, sym->name);
+	}
+}
+
+static void cgasm_load_sym_addr_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
+	switch (sym->type) {
+	case SYMBOL_GLOBAL_VAR:
+		cgasm_load_global_var_addr_to_reg(ctx, (struct global_var_symbol *) sym, reg);
 		break;
 	default:
 		panic("ni %d %s", sym->type, sym->name);
@@ -139,8 +153,15 @@ static void cgasm_load_cc_to_reg(struct cgasm_context *ctx, struct condcode *cc,
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
+static void cgasm_deref_reg(struct cgasm_context *ctx, int reg) {
+	cgasm_println(ctx, "movl (%%%s), %%%s", get_reg_str_code(reg), get_reg_str_code(reg));
+}
+
 void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
-	switch (val.type) {
+	switch (val.type & ~EXPR_VAL_FLAG_MASK) {
+	case EXPR_VAL_SYMBOL_ADDR:
+		cgasm_load_sym_addr_to_reg(ctx, val.sym, reg);
+		break;
 	case EXPR_VAL_SYMBOL:
 		cgasm_load_sym_to_reg(ctx, val.sym, reg);
 		break;
@@ -154,8 +175,12 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 		cgasm_load_cc_to_reg(ctx, val.cc, reg);
 		break;
 	default:
-		panic("ni %d", val.type);
+		panic("ni 0x%x", val.type);
 		break;
+	}
+
+	if (val.type & EXPR_VAL_FLAG_DEREF) {
+		cgasm_deref_reg(ctx, reg);
 	}
 }
 
@@ -214,6 +239,13 @@ static void cgasm_push_temp(struct cgasm_context *ctx, struct temp_var temp) {
 }
 
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
+	if (val.type & EXPR_VAL_FLAG_DEREF) {
+		int reg = REG_EAX;
+		// load to reg and then push reg
+		cgasm_load_val_to_reg(ctx, val, reg);
+		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
+		return;
+	}
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL_ADDR:
 		cgasm_push_sym_addr(ctx, val.sym);
@@ -228,7 +260,7 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		cgasm_push_temp(ctx, val.temp_var);
 		break;
 	default:
-		panic("ni %d", val.type);
+		panic("ni 0x%x", val.type);
 	}
 }
 
@@ -236,8 +268,13 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 /* unary op            */
 /***********************/
 struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_val operand) {
+	if (operand.type & EXPR_VAL_FLAG_DEREF) {
+		operand.type &= ~EXPR_VAL_FLAG_DEREF;
+		return operand;
+	}
+
 	if (operand.type != EXPR_VAL_SYMBOL) {
-		panic("'&' can only be applied to symbol");
+		panic("'&' can only be applied to lval 0x%x", operand.type);
 	}
 	operand.type = EXPR_VAL_SYMBOL_ADDR;
 	return operand;
@@ -304,7 +341,13 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		cgasm_println(ctx, "mull %%%s", get_reg_str_code(rhs_reg));
 		STORE_TO_TEMP();
 		break;
-	case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:
+	case TOK_LSHIFT:
+		LOAD_TO_REG();
+		assert(rhs_reg == REG_ECX);
+		cgasm_println(ctx, "shll %%cl, %%%s", get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_EQ: case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:
 		res = condcode_expr(tok_tag, lhs, rhs, NULL);
 		break;
 	default:
@@ -323,6 +366,16 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	int rhs_reg = REG_EAX;
 	char buf[128];
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
+
+	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
+		int lhs_reg = REG_ECX;
+
+		lhs.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
+		cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
+		lhs.type |= EXPR_VAL_FLAG_DEREF; 
+		cgasm_println(ctx, "movl %%%s, (%%%s)", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		return lhs;
+	}
 
 	switch (op) {
 	case TOK_ASSIGN:
@@ -360,15 +413,39 @@ void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val) {
 /*******************************/
 /* inc/dec                     */
 /*******************************/
-struct expr_val cgasm_handle_post_inc(struct cgasm_context *ctx, struct expr_val val) {
+static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
 	struct expr_val temp_var = cgasm_alloc_temp_var(ctx);
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_store_reg_to_mem(ctx, reg, temp_var);
-	cgasm_println(ctx, "incl %%%s", get_reg_str_code(reg));
+	cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
 	cgasm_store_reg_to_mem(ctx, reg, val);
 	return temp_var;
 }
+
+struct expr_val cgasm_handle_post_inc(struct cgasm_context *ctx, struct expr_val val) {
+	return cgasm_handle_post_incdec(ctx, val, 1);
+}
+
+struct expr_val cgasm_handle_post_dec(struct cgasm_context *ctx, struct expr_val val) {
+	return cgasm_handle_post_incdec(ctx, val, 0);
+}
+
+/**********************************/
+/* index op                       */
+/**********************************/
+struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val base_val, struct expr_val ind_val) {
+	// TODO this is special for array, need have a general and reliable to handle it
+	if (base_val.type == EXPR_VAL_SYMBOL) {
+		base_val.type = EXPR_VAL_SYMBOL_ADDR;
+	}
+
+	struct expr_val offset_val = cgasm_handle_binary_op(ctx, TOK_LSHIFT, ind_val, const_expr_val(wrap_int_const_to_token(2))); // TODO handle the various size
+	struct expr_val result_val = cgasm_handle_binary_op(ctx, TOK_ADD, base_val, offset_val);
+	return expr_val_add_deref_flag(result_val);
+}
+
+
 
 

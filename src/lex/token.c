@@ -55,3 +55,11 @@ const char *token_tag_str(int tok_tag) {
 	return token_tag_str_list[tok_tag];
 }
 
+union token wrap_int_const_to_token(int val) {
+	union token tok;
+	tok.const_val.tok_tag = TOK_CONSTANT_VALUE;
+	tok.const_val.flags = CONST_VAL_TOK_INTEGER;
+	tok.const_val.ival = val;
+	return tok;
+}
+

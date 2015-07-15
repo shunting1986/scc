@@ -22,6 +22,10 @@ struct temp_var {
 		// may optimize to use register in future
 };
 
+// add a flag is better than add a extra field in expr_val
+#define EXPR_VAL_FLAG_DEREF (1 << 30)
+#define EXPR_VAL_FLAG_MASK (0xff << 24)
+
 enum {
 	EXPR_VAL_TEMP,
 	EXPR_VAL_SYMBOL,
@@ -37,6 +41,8 @@ struct condcode;
 
 struct expr_val {
 	int type;
+
+	// TODO how to handle type here: we can store the type without deref being handled?
 	union {
 		struct symbol *sym;
 		struct temp_var temp_var;
@@ -47,7 +53,7 @@ struct expr_val {
 };
 
 struct condcode {
-	int op; // TOK_NE, TOK_LE, TOK_GE, TOK_GT, TOK_LT, TOK_LOGIC_AND ...
+	int op; // TOK_EQ, TOK_NE, TOK_LE, TOK_GE, TOK_GT, TOK_LT, TOK_LOGIC_AND ...
 	struct expr_val lhs, rhs;
 	struct syntreebasenode *rhs_lazy;
 };
@@ -59,6 +65,7 @@ struct expr_val const_expr_val(union token tok);
 struct expr_val void_expr_val();
 struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, struct syntreebasenode *rhs_lazy);
 const char *get_reg_str_code(unsigned int reg);
+struct expr_val expr_val_add_deref_flag(struct expr_val val);
 
 #ifdef __cplusplus
 }

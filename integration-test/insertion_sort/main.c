@@ -13,12 +13,14 @@ void sort() {
 		}
 		arr[j + 1] = v;
 	}
+	return; // XXX need auto inserting return
 }
 
 int
 main() {
 	int i;
-	while (scanf("%d", &n) != EOF && n > 0) {
+	// while (scanf("%d", &n) != EOF && n > 0) {
+	while (scanf("%d", &n) != -1 && n > 0) {
 		for (i = 0; i < n; i++) {
 			scanf("%d", &arr[i]);
 		}
