@@ -25,7 +25,7 @@ static void setup_keyword_hashtab() {
 	int tok = 0;
 	const char *s;
 	keyword_hashtab = htab_init();
-	keyword_hashtab->nofreekey = keyword_hashtab->nofreeval = 1;
+	keyword_hashtab->val_free_fn = htab_nop_val_free;
 
 	for (tok = 0; tok < TOK_TOTAL_NUM; tok++) {
 		s = keyword_str_list[tok];

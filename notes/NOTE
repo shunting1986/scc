@@ -1,12 +1,20 @@
+  DONE: support insertion sort
+	DONE: support one dimension array by global var
+
+	TODO: allocate the correct space to the global array !!!!
+	1. when register the symbol, also register the type (take care of array)
+	2. refer to the type when dump global var.
+
 KEYLIST
+  TODO: support local one dimension array
+	TODO: support multip-dimen array
+	TODO: support pointer..
+
   TODO: array def & use (multi-dimen), matrix multi <== 
 	      think about the difference between array and pointer
 
-				define the array as either global var or local var
-	TODO: sort
-
-	TODO: type system; I'd better extract the pure type out of syntax tree
 	TODO: n-queen
+	TODO: type system; I'd better extract the pure type out of syntax tree
 	TODO: typedef
 	TODO: auto add ret instruction
 	TODO: type conversion?

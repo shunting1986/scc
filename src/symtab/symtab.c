@@ -5,6 +5,7 @@ struct symtab *symtab_init(struct symtab *enclosing) {
 	struct symtab *tab = (struct symtab *) mallocz(sizeof(*tab));
 	tab->enclosing = enclosing;
 	tab->htab = htab_init();
+	tab->htab->val_free_fn = symbol_destroy;
 	return tab;
 }
 
@@ -67,5 +68,13 @@ struct symbol *symtab_new_global_var(char *name) {
 	sym->type = SYMBOL_GLOBAL_VAR;
 	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
 	return (struct symbol *) sym;
+}
+
+void symbol_destroy(void *_sym) {
+	struct symbol *sym = _sym;
+	if (sym->ctype) {
+		free(sym->ctype); // may need finer control
+	}
+	free(sym);
 }
 

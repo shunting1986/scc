@@ -23,11 +23,12 @@ static struct hashtab_item *alloc_item(const char *key, void *val) {
 }
 
 static void destroy_item(struct hashtab *tab, struct hashtab_item *item) {
-	if (!tab->nofreekey) {
-		free((void *) item->key);
-	}
-	if (!tab->nofreeval) {
+	free((void *) item->key);
+
+	if (tab->val_free_fn == NULL) {
 		free(item->val);
+	} else {
+		tab->val_free_fn(item->val);
 	}
 	free(item);
 }
@@ -99,4 +100,6 @@ void htab_insert(struct hashtab *htab, const char *key, void *val) {
 	htab->buckets[bind] = item;
 }
 
-
+void htab_nop_val_free(void *val) {
+	// do nothing
+}

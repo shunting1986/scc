@@ -23,22 +23,26 @@ enum {
 struct symbol {
 	int type;
 	char name[SYMBOL_MAX_LEN];
+	struct type *ctype;
 };
 
 struct global_var_symbol {
 	int type;
 	char name[SYMBOL_MAX_LEN];
+	struct type *ctype;
 };
 
 struct local_var_symbol {
 	int type;
 	char name[SYMBOL_MAX_LEN];
+	struct type *ctype;
 	int var_ind;
 };
 
 struct param_symbol {
 	int type;
 	char name[SYMBOL_MAX_LEN];
+	struct type *ctype;
 	int param_ind;
 };
 
@@ -51,6 +55,8 @@ struct symbol *symtab_new_global_var(char *name);
 void symtab_add(struct symtab *stab, struct symbol *sym);
 struct symbol *symtab_lookup(struct symtab *stab, const char *id);
 void symtab_iter(struct symtab *symtab, void *ctx, htab_iter_fn_type *func);
+
+void symbol_destroy(void *_sym);
 
 #ifdef __cplusplus
 }
