@@ -2,6 +2,7 @@
 #define _INC_SYMTAB_H
 
 #include <inc/htab.h>
+#include <inc/type.h>
 
 #ifdef __cplusplus
 extern "C" {

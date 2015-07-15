@@ -28,7 +28,7 @@ TODO: make the compiler support both 32 bit and 64 bit asm?
 - NOTE: use stack to store temporary right now. Need implement advanced register allocation algorithms
 - TODO: let the make file support dependency on header file
 
-NOTE: we can try to compile mongoose/memcached with my compiler :)
+NOTE: we can try to compile mongoose/memcached/ITSELF!! with my compiler :)
 
 need distinguish declarator and abstract_declarator <== parse these 2 at the same time
 

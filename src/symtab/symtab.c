@@ -73,7 +73,7 @@ struct symbol *symtab_new_global_var(char *name) {
 void symbol_destroy(void *_sym) {
 	struct symbol *sym = _sym;
 	if (sym->ctype) {
-		free(sym->ctype); // may need finer control
+		type_destroy(sym->ctype);
 	}
 	free(sym);
 }
