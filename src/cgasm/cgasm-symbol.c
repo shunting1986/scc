@@ -58,9 +58,9 @@ static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
 	assert(sym->type == SYMBOL_GLOBAL_VAR);
 	(void) ctx;
 
-	// TODO only support int right now
-	cgasm_println_noind(ctx, "%s:", sym->name);
-	cgasm_println(ctx, ".long 0");
+	// TODO does not consider initializer yet
+	assert(sym->ctype != NULL);
+	cgasm_println(ctx, ".comm %s, %d, %d", sym->name, sym->ctype->size, 4); // XXX hardcode to 4 byte alignment right now
 }
 
 /*
