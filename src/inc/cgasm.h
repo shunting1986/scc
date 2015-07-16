@@ -25,6 +25,7 @@ struct cgasm_context {
 	int state_reg[8];
 
 	int nasm_label;
+	int const_required;
 };
 
 struct cgasm_func_context {
@@ -61,6 +62,7 @@ void cgasm_dump_global_vars(struct cgasm_context *ctx);
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
 struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenode *rawexpr);
+int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr);
 
 // asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);

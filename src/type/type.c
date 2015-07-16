@@ -2,12 +2,18 @@
 #include <inc/util.h>
 #include <inc/syntree.h>
 #include <inc/dynarr.h>
+#include <inc/cgasm.h>
+
+// TODO make expression parsing completely independent of cgasm module
+static struct cgasm_context CONST_REQUIRED_CONTEXT = {
+	.const_required = 1,
+};
 
 void type_destroy(struct type *type) {
 	panic("ni");
 }
 
-static struct type *alloc_base_type(int tag, int size) {
+static struct type *alloc_type(int tag, int size) {
 	struct type *type = mallocz(sizeof(*type));
 	type->tag = tag;
 	type->size = size;
@@ -19,7 +25,14 @@ static struct type *alloc_base_type(int tag, int size) {
  * XXX think how to reclaim memory for types
  */
 static struct type *get_int_type() {
-	return alloc_base_type(T_INT, 4);
+	return alloc_type(T_INT, 4);
+}
+
+static struct type *get_array_type(struct type *elem_type, int dim) {
+	struct type *ret_type = alloc_type(T_ARRAY, dim * elem_type->size);
+	ret_type->subtype = elem_type;
+	ret_type->dim = dim;
+	return ret_type;
 }
 
 struct type *parse_type_from_decl_specifiers(struct declaration_specifiers *decl_specifiers) {
@@ -81,5 +94,24 @@ struct type *parse_type_from_decl_specifiers(struct declaration_specifiers *decl
  * that each element in the list is one dimension of the array
  */
 struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist) {
-	panic("ni");
+	assert(dynarr_size(sufflist) > 0);
+	struct type *final_type = base_type;
+	int i;
+
+	for (i = dynarr_size(sufflist) - 1; i >= 0; i--) {
+		struct direct_declarator_suffix *suff = dynarr_get(sufflist, i);
+		int dim;
+		if (suff->empty_bracket) {
+			dim = -1;
+		} else if (suff->const_expr) {
+			dim = cgasm_interpret_const_expr(&CONST_REQUIRED_CONTEXT, suff->const_expr);
+		} else {
+			panic("require array dimension");
+		}
+		final_type = get_array_type(final_type, dim);
+	}
+
+	return final_type;
 }
+
+

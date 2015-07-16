@@ -20,7 +20,7 @@ struct type {
 	struct type *subtype; // used for ptr and array
 
 	union {
-		int unused; // placeholder
+		int dim; // for array
 	};
 };
 

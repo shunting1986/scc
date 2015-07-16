@@ -4,8 +4,27 @@
 #include <inc/syntree-node.h>
 #include <inc/dynarr.h>
 
+#define cgasm_constant_expression cgasm_conditional_expression
+
+static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr);
 static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
 static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr);
+
+int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr) {
+	assert(ctx->const_required);
+	struct expr_val val = cgasm_constant_expression(ctx, expr);
+
+	if (val.type != EXPR_VAL_CONST_VAL) {
+		panic("constant value required");
+	}
+
+	union token const_tok = val.const_val;
+	assert(const_tok.tok_tag == TOK_CONSTANT_VALUE);
+	if (!(const_tok.const_val.flags & CONST_VAL_TOK_INTEGER)) {
+		panic("integer constant required");
+	}
+	return const_tok.const_val.ival;
+}
 
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
