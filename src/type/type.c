@@ -4,13 +4,27 @@
 #include <inc/dynarr.h>
 #include <inc/cgasm.h>
 
+static struct type int_type = {
+	.tag = T_INT,
+	.size = 4,
+};
+
 // TODO make expression parsing completely independent of cgasm module
 static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 	.const_required = 1,
 };
 
 void type_destroy(struct type *type) {
-	panic("ni");
+	switch (type->tag) {
+	case T_INT: // we should have a separate place to free the reused types
+		break;
+	case T_ARRAY:
+		type_destroy(type->subtype);
+		free(type);
+		break;
+	default:
+		panic("ni %d", type->tag);
+	}
 }
 
 static struct type *alloc_type(int tag, int size) {
@@ -25,7 +39,7 @@ static struct type *alloc_type(int tag, int size) {
  * XXX think how to reclaim memory for types
  */
 static struct type *get_int_type() {
-	return alloc_type(T_INT, 4);
+	return &int_type;
 }
 
 static struct type *get_array_type(struct type *elem_type, int dim) {

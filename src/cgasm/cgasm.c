@@ -24,6 +24,8 @@ static struct cgasm_context *cgasm_context_init(FILE *fp) {
 }
 
 static void cgasm_context_destroy(struct cgasm_context *ctx) {
+	assert(ctx->func_ctx == NULL);
+	cgasm_pop_symtab(ctx);
 	cgasm_destroy_str_literals(ctx);
 	free(ctx);
 }
@@ -72,7 +74,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		// register symbol id with type 'final_type'
-		panic("ni");
+		cgasm_add_decl_sym(ctx, id, final_type);
 	DYNARR_FOREACH_END();
 #endif
 }

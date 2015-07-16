@@ -55,17 +55,19 @@ struct symbol *symtab_new_param(char *name, int ind) {
 	return (struct symbol *) sym;
 }
 
-struct symbol *symtab_new_local_var(char *name, int ind) {
+struct symbol *symtab_new_local_var(char *name, int ind, struct type *ctype) {
 	struct local_var_symbol *sym = mallocz(sizeof(*sym));
 	sym->type = SYMBOL_LOCAL_VAR;
+	sym->ctype = ctype;
 	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
 	sym->var_ind = ind;
 	return (struct symbol *) sym;
 }
 
-struct symbol *symtab_new_global_var(char *name) {
+struct symbol *symtab_new_global_var(char *name, struct type *ctype) {
 	struct global_var_symbol *sym = mallocz(sizeof(*sym));
 	sym->type = SYMBOL_GLOBAL_VAR;
+	sym->ctype = ctype;
 	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
 	return (struct symbol *) sym;
 }
