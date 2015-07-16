@@ -28,7 +28,8 @@ int search(int step) {
 	}
 
 	for (i = 0; i < n; i++) {
-		if (check(step, i)) {
+		// if (check(step, i)) { // does not support this yet
+		if (check(step, i) != 0) {
 			state[step] = i;
 			ret += search(step + 1);
 		}

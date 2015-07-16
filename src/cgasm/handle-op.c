@@ -245,6 +245,13 @@ static void cgasm_push_temp(struct cgasm_context *ctx, struct temp_var temp) {
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
 
+static void cgasm_push_const_val(struct cgasm_context *ctx, union token const_tok) {
+	if (!(const_tok.const_val.flags & CONST_VAL_TOK_INTEGER)) {
+		panic("only support integer right now");
+	}
+	cgasm_println(ctx, "pushl $%d", const_tok.const_val.ival);
+}
+
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 	if (val.type & EXPR_VAL_FLAG_DEREF) {
 		int reg = REG_EAX;
@@ -265,6 +272,9 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		break;
 	case EXPR_VAL_TEMP:
 		cgasm_push_temp(ctx, val.temp_var);
+		break;
+	case EXPR_VAL_CONST_VAL:
+		cgasm_push_const_val(ctx, val.const_val);
 		break;
 	default:
 		panic("ni 0x%x", val.type);
@@ -293,8 +303,14 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 		assert(operand.const_val.const_val.flags & CONST_VAL_TOK_INTEGER);
 		operand.const_val.const_val.ival = -operand.const_val.const_val.ival;
 		return operand;
+	} else {
+		int reg = REG_EAX;
+		struct expr_val temp = cgasm_alloc_temp_var(ctx);
+		cgasm_load_val_to_reg(ctx, operand, reg);
+		cgasm_println(ctx, "negl %%%s", get_reg_str_code(reg));
+		cgasm_store_reg_to_mem(ctx, reg, temp);
+		return temp;
 	}
-	panic("ni");
 }
 
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {
