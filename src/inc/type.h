@@ -10,10 +10,12 @@ extern "C" {
 enum {
 	T_INT,
 	T_ARRAY,
+	T_NONE, // this means no type specified. Different to T_VOID
+	T_VOID,
 };
 
 struct type {
-	int tag;
+	int tag; // T_INT etc.
 	int size;
 	struct type *subtype; // used for ptr and array
 
