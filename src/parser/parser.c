@@ -243,7 +243,14 @@ static struct declarator *parse_declarator(struct parser *parser) {
 }
 
 static struct initializer *parse_initializer(struct parser *parser) {
-	panic("parse_initializer ni");
+	union token tok = lexer_next_token(parser->lexer);
+	struct initializer *initializer = initializer_init();
+	if (tok.tok_tag == TOK_LBRACE) {
+		panic("struct intializer is not supported yet");
+	}
+	lexer_put_back(parser->lexer, tok);
+	initializer->expr = parse_assignment_expression(parser);
+	return initializer;
 }
 
 static struct init_declarator *parse_init_declarator(struct parser *parser) {

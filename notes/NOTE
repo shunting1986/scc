@@ -1,20 +1,16 @@
   DONE: support insertion sort
 	DONE: support one dimension array by global var
 	DONE: allocate the correct space to the global array 
-
-
-  TODO: support local one dimension array
-
-KEYLIST
-	TODO: support multip-dimen array
-	TODO: support pointer..
-
-	TODO: how to reclaim the memory for 'type' object
-
-  TODO: array def & use (multi-dimen), matrix multi <== 
-	      think about the difference between array and pointer
+  DONE: support local one dimension array
+	DONE: support initializer
 
 	TODO: n-queen
+	TODO: support multip-dimen array, matrix multi
+
+KEYLIST
+	TODO: support pointer..
+	TODO: how to reclaim the memory for 'type' object
+
 	TODO: type system; I'd better extract the pure type out of syntax tree
 	TODO: typedef
 	TODO: auto add ret instruction

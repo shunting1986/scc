@@ -14,8 +14,7 @@ main() {
 		for (i = n - 1; i >= 1; i--) {
 			for (j = 0; j < i; j++) {
 				if (arr[j] > arr[j + 1]) {
-					int t;
-					t = arr[j];
+					int t = arr[j];
 					arr[j] = arr[j + 1];
 					arr[j + 1] = t;
 				}

@@ -28,16 +28,18 @@ struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id) {
 	return sym;
 }
 
-void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {
+struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
+	struct symbol *ret;
 	cgasm_check_sym_redef(ctx, id);
 	if (func_ctx == NULL) {
 		assert(ctx->top_stab->enclosing == NULL);
-		symtab_add(ctx->top_stab, symtab_new_global_var(id, type));
+		symtab_add(ctx->top_stab, ret = symtab_new_global_var(id, type));
 	} else {
 		assert(ctx->top_stab->enclosing != NULL);	
-		symtab_add(ctx->top_stab, symtab_new_local_var(id, func_alloc_space(func_ctx, type->size), type)); // idx start from 0
+		symtab_add(ctx->top_stab, ret = symtab_new_local_var(id, func_alloc_space(func_ctx, type->size), type)); // idx start from 0
 	}
+	return ret;
 }
 
 // ind start from 0

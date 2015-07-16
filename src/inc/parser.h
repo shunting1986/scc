@@ -31,6 +31,7 @@ int initiate_type_name(union token tok);
 struct expression *parse_expression(struct parser *parser);
 struct conditional_expression *parse_conditional_expression(struct parser *parser);
 #define parse_constant_expression parse_conditional_expression
+struct assignment_expression *parse_assignment_expression(struct parser *parser);
 
 #ifdef __cplusplus
 }

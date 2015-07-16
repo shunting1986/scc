@@ -10,7 +10,6 @@
 
 #define D 1
 
-static struct assignment_expression *parse_assignment_expression(struct parser *parser);
 static struct cast_expression *parse_cast_expression(struct parser *parser);
 
 static struct primary_expression *parse_primary_expression(struct parser *parser) {
@@ -372,7 +371,7 @@ static int is_assign_op(int tok_tag) {
  * that's not a problem since anyway this happens a lot: f(a, 1), a and 1 will be nested in
  * assignment expression. The benefit we get is a cleaner function definitions.
  */
-static struct assignment_expression *parse_assignment_expression(struct parser *parser) {
+struct assignment_expression *parse_assignment_expression(struct parser *parser) {
 	struct conditional_expression *cond_expr = parse_conditional_expression(parser);
 	struct assignment_expression *assign_expr = assignment_expression_init();
 	union token tok;

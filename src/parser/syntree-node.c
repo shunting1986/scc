@@ -369,4 +369,8 @@ struct selection_statement *selection_statement_init(int selType) {
 	return stmt;
 }
 
-
+struct initializer *initializer_init() {
+	struct initializer *initializer = mallocz(sizeof(*initializer));
+	initializer->nodeType = INITIALIZER;
+	return initializer;
+}

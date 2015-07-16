@@ -7,7 +7,6 @@
 #define cgasm_constant_expression cgasm_conditional_expression
 
 static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr);
-static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
 static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr);
 
 int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr) {
@@ -195,7 +194,7 @@ static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, s
 	return right_most;
 }
 
-static struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr) {
+struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr) {
 	struct expr_val val = cgasm_conditional_expression(ctx, expr->cond_expr);
 	int i;
 	for (i = dynarr_size(expr->unary_expr_list) - 1; i >= 0; i--) {

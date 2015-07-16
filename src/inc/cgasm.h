@@ -54,7 +54,7 @@ void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 void cgasm_println_noind(struct cgasm_context *ctx, const char *fmt, ...);
 
 // cgasm-symbol.c
-void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type);
+struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type);
 void cgasm_add_param_sym(struct cgasm_context *ctx, char *id);
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 void cgasm_push_symtab(struct cgasm_context *ctx);
@@ -65,6 +65,7 @@ void cgasm_dump_global_vars(struct cgasm_context *ctx);
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
 struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenode *rawexpr);
 int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr);
+struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
 
 // asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);

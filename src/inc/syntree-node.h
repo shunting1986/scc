@@ -56,7 +56,10 @@ struct external_declaration *external_declaration_init(struct declaration_specif
 
 struct initializer {
 	int nodeType;
+	struct assignment_expression *expr; // the assignment expression
 };
+
+struct initializer *initializer_init();
 
 struct init_declarator {
 	int nodeType;
