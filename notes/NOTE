@@ -1,12 +1,11 @@
   DONE: support insertion sort
 	DONE: support one dimension array by global var
+	DONE: allocate the correct space to the global array 
 
-	TODO: allocate the correct space to the global array !!!!
-	1. when register the symbol, also register the type (take care of array)
-	2. refer to the type when dump global var.
+
+  TODO: support local one dimension array
 
 KEYLIST
-  TODO: support local one dimension array
 	TODO: support multip-dimen array
 	TODO: support pointer..
 
