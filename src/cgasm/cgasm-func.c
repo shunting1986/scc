@@ -4,6 +4,13 @@
 #include <inc/cbuf.h>
 #include <inc/dynarr.h>
 
+int func_alloc_space(struct cgasm_func_context *func_ctx, int size) {
+	assert(size > 0);
+	int nword = (size + 3) >> 2;
+	func_ctx->nlocal_word += nword;
+	return func_ctx->nlocal_word - 1;
+}
+
 static struct cgasm_func_context *func_context_init() {
 	struct cgasm_func_context *ctx = (struct cgasm_func_context *) mallocz(sizeof(*ctx));
 	ctx->code_buf = cbuf_init();

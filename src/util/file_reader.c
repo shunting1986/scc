@@ -1,4 +1,5 @@
 #include <inc/file_reader.h>
+#include <inc/util.h>
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -21,7 +22,9 @@ struct file_reader *file_reader_init(const char *path) {
 	struct file_reader *fr = malloc(sizeof(*fr));
 	fr->path = strdup(path);
 	fr->fd = open(path, O_RDONLY);
-	assert(fr->fd >= 0);
+	if (fr->fd < 0) {
+		panic("file not found: %s", fr->path);
+	}
 	fr->pos = fr->len = 0;
 	fr->putback = -1;
 	return fr;

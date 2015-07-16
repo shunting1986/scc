@@ -36,7 +36,7 @@ void cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) 
 		symtab_add(ctx->top_stab, symtab_new_global_var(id, type));
 	} else {
 		assert(ctx->top_stab->enclosing != NULL);	
-		symtab_add(ctx->top_stab, symtab_new_local_var(id, func_ctx->nlocal_word++, type)); // idx start from 0
+		symtab_add(ctx->top_stab, symtab_new_local_var(id, func_alloc_space(func_ctx, type->size), type)); // idx start from 0
 	}
 }
 

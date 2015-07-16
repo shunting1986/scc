@@ -43,6 +43,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 
 // cgasm-func.c
 void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
+int func_alloc_space(struct cgasm_func_context *func_ctx, int size);
 
 // cgasm-stmt.c
 void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt);
