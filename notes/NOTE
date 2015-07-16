@@ -4,7 +4,8 @@
   DONE: support local one dimension array
 	DONE: support initializer
 
-	TODO: n-queen
+	TODO: n-queen <==
+
 	TODO: support multip-dimen array, matrix multi
 
 KEYLIST
