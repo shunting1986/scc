@@ -59,7 +59,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/nqueen/main.c
+	./scc integration-test/matrix-mul/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

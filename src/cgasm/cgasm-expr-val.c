@@ -61,8 +61,17 @@ struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, 
 
 struct expr_val expr_val_add_deref_flag(struct expr_val val) {
 	assert((val.type & EXPR_VAL_FLAG_DEREF) == 0);
+	assert(expr_val_get_type(val)->tag == T_PTR);
 	val.type |= EXPR_VAL_FLAG_DEREF;
 	return val;
 }
 
+int expr_val_get_elem_size(struct expr_val val) {
+	panic("ni");
+}
+
+struct type *expr_val_get_type(struct expr_val val) {
+	// do validation to make sure type is correct set up
+	panic("ni");
+}
 

@@ -11,6 +11,7 @@ enum {
 	T_INT,
 	T_ARRAY,
 	T_NONE, // this means no type specified. Different to T_VOID
+	T_PTR,
 	T_VOID,
 };
 
