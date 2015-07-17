@@ -1,13 +1,14 @@
   DONE: support 1 dim ptr
 
 	TODO: support 2 dim ptr <===
+	      Need support type for parameters
 KEYLIST
+	TODO: auto add ret instruction
 	TODO: typedef <==
 	TODO: struct
   TODO: support preprocessor
 
 
-	TODO: auto add ret instruction
 	TODO: switch, struct def & dot & ptr, break, continue
 	TODO: support struct initializer
 	TODO: array + struct

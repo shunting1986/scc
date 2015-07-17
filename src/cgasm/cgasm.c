@@ -39,58 +39,6 @@ void cgasm_tree(struct syntree *tree) {
 	cgasm_context_destroy(ctx);
 }
 
-void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
-	// function declaration
-	if (is_func_decl_init_declarator_list(init_declarator_list)) {
-		return; // XXX ignore function declaration right now
-	}
-
-#ifdef NAIVE_IMPL
-	struct dynarr *idlist = extract_id_list_from_init_declarator_list(init_declarator_list);
-	DYNARR_FOREACH_PLAIN_BEGIN(idlist, char *, each);
-		cgasm_add_decl_sym(ctx, each);
-	DYNARR_FOREACH_END();
-#else
-	struct type *base_type = parse_type_from_decl_specifiers(decl_specifiers);
-	struct type *final_type = base_type;
-	(void) final_type;
-	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
-		struct declarator *declarator = each->declarator;
-		struct direct_declarator *dd = declarator->direct_declarator;
-		char *id = dd->id;
-		if (id == NULL) {
-			panic("only support declarator with direct id right now");
-		}
-
-		// handle ptr
-		DYNARR_FOREACH_BEGIN(declarator->ptr_list, type_qualifier_list, each);
-			// XXX ignore the type qualifier right now
-			(void) each;
-			final_type = get_ptr_type(final_type);
-		DYNARR_FOREACH_END();
-
-		if (dynarr_size(dd->suff_list) > 0) {
-			struct direct_declarator_suffix *suff = dynarr_get(dd->suff_list, 0);
-			if (suff->empty_bracket || suff->const_expr) {
-				final_type = parse_array_type(base_type, dd->suff_list);
-			} else {
-				panic("case not handled yet");
-			}
-		}
-
-		// register symbol id with type 'final_type'
-		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type);
-
-		// handle initializer (XXX does not support struct initializer yet)
-		// TODO: need handle global intializer correctly..
-		struct initializer *initializer = each->initializer;
-		if (initializer != NULL && initializer->expr != NULL) {
-			(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
-		}
-	DYNARR_FOREACH_END();
-#endif
-}
-
 static void cgasm_external_declaration(struct cgasm_context *ctx, struct external_declaration *external_decl) {
 	if (external_decl->func_def_declarator != NULL) {
 		cgasm_function_definition(ctx, external_decl->decl_specifiers, external_decl->func_def_declarator, external_decl->compound_stmt);

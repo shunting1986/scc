@@ -50,7 +50,7 @@ struct param_symbol {
 struct symtab *symtab_init(struct symtab *enclosing);
 void symtab_destroy(struct symtab *stab);
 struct symbol *symtab_lookup_norec(struct symtab *stab, const char *id);
-struct symbol *symtab_new_param(char *name, int ind);
+struct symbol *symtab_new_param(char *name, int ind, struct type *ctype);
 struct symbol *symtab_new_local_var(char *name, int ind, struct type *ctype);
 struct symbol *symtab_new_global_var(char *name, struct type *ctype);
 void symtab_add(struct symtab *stab, struct symbol *sym);

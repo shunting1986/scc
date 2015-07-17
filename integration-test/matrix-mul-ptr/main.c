@@ -18,6 +18,7 @@ void freearr(int **arr, int n) {
 		free(arr[i]);
 	}
 	free(arr);
+	return; // OH MY GOD, I must fix the return problem !!!
 }
 
 int 

@@ -71,12 +71,13 @@ static void register_parameter(struct cgasm_context *ctx, struct parameter_decla
 		panic("require declarator right now");
 	}
 	dd = decl->declarator->direct_declarator;
-	// TODO handle pointer and type
 
 	if (dd->id == NULL) {
 		panic("only support id case right now");
 	}
-	cgasm_add_param_sym(ctx, dd->id);
+
+	struct type *type = parse_type_from_declaration(decl->decl_specifiers, decl->declarator);
+	cgasm_add_param_sym(ctx, dd->id, type);
 }
 
 static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_list) {

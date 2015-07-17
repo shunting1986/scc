@@ -47,9 +47,10 @@ void symtab_add(struct symtab *stab, struct symbol *sym) {
 	htab_insert(stab->htab, sym->name, sym);
 }
 
-struct symbol *symtab_new_param(char *name, int ind) {
+struct symbol *symtab_new_param(char *name, int ind, struct type *ctype) {
 	struct param_symbol *sym = mallocz(sizeof(*sym));
 	sym->type = SYMBOL_PARAM;
+	sym->ctype = ctype;
 	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
 	sym->param_ind = ind;
 	return (struct symbol *) sym;

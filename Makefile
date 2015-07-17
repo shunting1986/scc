@@ -32,6 +32,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgasm/cgasm-symbol.c \
 	cgasm/cgasm-expr.c \
 	cgasm/cgasm-expr-val.c \
+	cgasm/cgasm-decl.c \
 	cgasm/asm-label.c \
 	cgasm/handle-op.c \
 	cgasm/cgasm-stmt.c \
@@ -59,7 +60,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/syntax-ptr-1dim/main.c
+	./scc integration-test/matrix-mul-ptr/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

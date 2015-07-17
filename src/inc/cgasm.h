@@ -55,7 +55,7 @@ void cgasm_println_noind(struct cgasm_context *ctx, const char *fmt, ...);
 
 // cgasm-symbol.c
 struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type);
-void cgasm_add_param_sym(struct cgasm_context *ctx, char *id);
+void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, struct type *type);
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 void cgasm_push_symtab(struct cgasm_context *ctx);
 void cgasm_pop_symtab(struct cgasm_context *ctx);
@@ -90,6 +90,9 @@ void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_post_inc(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_post_dec(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val base_val, struct expr_val ind_val);
+
+// cgasm-decl.c
+struct type *parse_type_from_declaration(struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
 
 #ifdef __cplusplus
 }

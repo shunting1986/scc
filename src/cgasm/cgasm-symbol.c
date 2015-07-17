@@ -43,7 +43,7 @@ struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct ty
 }
 
 // ind start from 0
-void cgasm_add_param_sym(struct cgasm_context *ctx, char *id) {
+void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, struct type *type) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
 	int ind;
 	assert(func_ctx != NULL);
@@ -51,7 +51,8 @@ void cgasm_add_param_sym(struct cgasm_context *ctx, char *id) {
 	assert(ctx->top_stab->enclosing != NULL);
 	cgasm_check_sym_redef(ctx, id);
 	ind = func_ctx->nparam_word++;
-	symtab_add(ctx->top_stab, symtab_new_param(id, ind));
+	// XXX assume the size of parameter is 4 bytes right now
+	symtab_add(ctx->top_stab, symtab_new_param(id, ind, type));
 }
 
 static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
