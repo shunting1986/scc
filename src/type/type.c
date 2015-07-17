@@ -34,6 +34,10 @@ void type_destroy(struct type *type) {
 		type_destroy(type->subtype);
 		free(type);
 		break;
+	case T_PTR:
+		type_destroy(type->subtype);
+		free(type);
+		break;
 	default:
 		panic("ni %d", type->tag);
 	}
@@ -161,9 +165,9 @@ struct type *type_get_elem_type(struct type *parent_type) {
 	case T_ARRAY:
 		return parent_type->subtype;
 	case T_PTR:
-		panic("ptr");
+		return parent_type->subtype;
 	default:
-		panic("invalid type");
+		panic("invalid type %d", parent_type->tag);
 	}
 }
 
@@ -172,6 +176,12 @@ struct type *type_deref(struct type *type) {
 	CHECK_MAGIC(type);
 	assert(type->tag == T_PTR);
 	return type->subtype;
+}
+
+int type_get_tag(struct type *type) {
+	assert(type != NULL);
+	CHECK_MAGIC(type);
+	return type->tag;
 }
 
 

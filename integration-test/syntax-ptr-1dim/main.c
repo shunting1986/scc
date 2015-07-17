@@ -3,12 +3,13 @@
 
 int a;
 int n;
-int *p1 = &a;
+int *p1;
 
 int
 main() {
 	int *p2;
 	int i;
+	p1 = &a;
 	while (scanf("%d%d", &n, p1) != -1) {
 		p2 = malloc(n * 4);
 		for (i = 0; i < n; i++) {

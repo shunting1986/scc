@@ -39,6 +39,7 @@ int type_get_size(struct type *type);
 struct type *type_get_elem_type(struct type *parent_type);
 struct type *type_deref(struct type *type);
 struct type *get_ptr_type(struct type *elem_type);
+int type_get_tag(struct type *type);
 
 #ifdef __cplusplus
 }

@@ -313,12 +313,22 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 	}
 }
 
+static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr_val operand) {
+	// TODO type memory management
+	if (!expr_val_has_deref_flag(operand) && type_get_tag(operand.ctype) == T_PTR) {
+		return expr_val_add_deref_flag(operand);
+	}
+	panic("only support ptr right now");
+}
+
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {
 	switch (tok_tag) {
 	case TOK_AMPERSAND:
 		return cgasm_handle_ampersand(ctx, operand);
 	case TOK_SUB:
 		return cgasm_handle_negate(ctx, operand);
+	case TOK_STAR:
+		return cgasm_handle_deref(ctx, operand);
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
 	}

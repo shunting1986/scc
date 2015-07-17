@@ -55,14 +55,19 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 	struct type *final_type = base_type;
 	(void) final_type;
 	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
-		// TODO initialier is ignored right now
-		// TODO pointer is ignored right now
 		struct declarator *declarator = each->declarator;
 		struct direct_declarator *dd = declarator->direct_declarator;
 		char *id = dd->id;
 		if (id == NULL) {
 			panic("only support declarator with direct id right now");
 		}
+
+		// handle ptr
+		DYNARR_FOREACH_BEGIN(declarator->ptr_list, type_qualifier_list, each);
+			// XXX ignore the type qualifier right now
+			(void) each;
+			final_type = get_ptr_type(final_type);
+		DYNARR_FOREACH_END();
 
 		if (dynarr_size(dd->suff_list) > 0) {
 			struct direct_declarator_suffix *suff = dynarr_get(dd->suff_list, 0);
@@ -77,6 +82,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type);
 
 		// handle initializer (XXX does not support struct initializer yet)
+		// TODO: need handle global intializer correctly..
 		struct initializer *initializer = each->initializer;
 		if (initializer != NULL && initializer->expr != NULL) {
 			(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
