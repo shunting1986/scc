@@ -1,12 +1,10 @@
-  DONE: support 1 dim ptr
-
-	TODO: support 2 dim ptr <===
-	      Need support type for parameters
 KEYLIST
-	TODO: auto add ret instruction
-	TODO: typedef <==
+	TODO: auto add ret instruction <==
+
 	TODO: struct
+	TODO: typedef <==
   TODO: support preprocessor
+
 
 
 	TODO: switch, struct def & dot & ptr, break, continue
@@ -34,6 +32,6 @@ TODO: make the compiler support both 32 bit and 64 bit asm?
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array
+- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework

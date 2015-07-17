@@ -40,6 +40,20 @@ void *dynarr_get(struct dynarr *darr, int ind) {
 	return darr->list[ind];
 }
 
+void *dynarr_first(struct dynarr *darr) {
+	if (darr->size == 0) {
+		panic("index out of range");
+	}
+	return darr->list[0];
+}
+
+void *dynarr_last(struct dynarr *darr) {
+	if (darr->size == 0) {
+		panic("index out of range");
+	}
+	return darr->list[darr->size - 1];
+}
+
 void dynarr_destroy(struct dynarr *darr) {
 	if (darr->list) {
 		free(darr->list);

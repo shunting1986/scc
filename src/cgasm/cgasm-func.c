@@ -100,6 +100,10 @@ void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_spe
 
 	// handle parameters
 	register_parameters(ctx, func_def_declarator->direct_declarator->suff_list);
+
+	// rewrite the syntax tree if we need add return statement
+	add_return_cond(compound_stmt);	
+
 	cgasm_compound_statement(ctx, compound_stmt);
 	cgasm_leave_function(ctx);
 }

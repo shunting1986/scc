@@ -1,6 +1,24 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
+static int is_return_stmt(struct syntreebasenode *stmt) {
+	struct jump_statement *ret_stmt;
+	return stmt->nodeType == JUMP_STATEMENT && (ret_stmt = (struct jump_statement *) stmt)->init_tok_tag == TOK_RETURN;
+}
+
+/*
+ * return 1 if return statement is added
+ */
+int add_return_cond(struct compound_statement *compound_stmt) {
+	struct dynarr *stmtList = compound_stmt->stmtList;
+	int ret = 0;
+	if (dynarr_size(stmtList) == 0 || !is_return_stmt(dynarr_last(stmtList))) {
+		dynarr_add(stmtList, jump_statement_init(TOK_RETURN));
+		ret = 1;
+	}
+	return ret;
+}
+
 static int is_func_decl_direct_declarator_suffix(struct direct_declarator_suffix *suff) {
 	return suff->empty_paren || suff->param_type_list != NULL;
 }
