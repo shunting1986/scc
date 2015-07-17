@@ -1,16 +1,16 @@
+  DONE: support 1 dim ptr
+
+	TODO: support 2 dim ptr <===
 KEYLIST
-	TODO: use ptr to simulate one dim array
+	TODO: typedef <==
+	TODO: struct
+  TODO: support preprocessor
 
 
-	TODO: support pointer.. (support use ptr to ptr to simulate two dim array)
-
-	TODO: typedef
 	TODO: auto add ret instruction
 	TODO: switch, struct def & dot & ptr, break, continue
 	TODO: support struct initializer
-	TODO: arary + struct
-
-  TODO: support preprocessor
+	TODO: array + struct
 
 - NOTE: the only external resource I refer is the grammar of C language
 - TODO: let the make file support dependency on header file
