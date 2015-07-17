@@ -459,11 +459,15 @@ struct expr_val cgasm_handle_post_dec(struct cgasm_context *ctx, struct expr_val
 /* index op                       */
 /**********************************/
 struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val base_val, struct expr_val ind_val) {
-	int elemsize = expr_val_get_elem_size(base_val);
+	struct type *parent_type = expr_val_get_type(base_val);
+	struct type *elemtype = type_get_elem_type(parent_type);
+	int elemsize = type_get_size(elemtype);
 
-	// this is special for array
+	// this is special for array symbol
 	if (base_val.type == EXPR_VAL_SYMBOL && base_val.sym->ctype->tag == T_ARRAY) {
 		base_val.type = EXPR_VAL_SYMBOL_ADDR;
+	} else if (parent_type->tag == T_ARRAY && expr_val_has_deref_flag(base_val)) {
+		base_val = expr_val_remove_deref_flag(base_val);
 	}
 
 	// TODO can optimize for power of 2
@@ -471,7 +475,10 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 	struct expr_val offset_val = cgasm_handle_binary_op(ctx, TOK_STAR, ind_val, const_expr_val(wrap_int_const_to_token(elemsize))); 
 
 	struct expr_val result_val = cgasm_handle_binary_op(ctx, TOK_ADD, base_val, offset_val);
-	panic("need handle expression type..."); // TODO
+
+	// handle expression type 
+	// TODO reclaim type memory
+	result_val.ctype = get_ptr_type(elemtype);
 	return expr_val_add_deref_flag(result_val);
 }
 

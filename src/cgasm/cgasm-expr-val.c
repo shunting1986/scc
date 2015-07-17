@@ -16,6 +16,9 @@ struct expr_val symbol_expr_val(struct symbol *sym) {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_SYMBOL;
 	ret.sym = sym;
+
+	// set expr_val type
+	ret.ctype = sym->ctype;
 	return ret;
 }
 
@@ -59,19 +62,40 @@ struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, 
 	return ret;
 }
 
+int expr_val_has_deref_flag(struct expr_val val) {
+	return (val.type & EXPR_VAL_FLAG_DEREF) != 0;
+}
+
 struct expr_val expr_val_add_deref_flag(struct expr_val val) {
 	assert((val.type & EXPR_VAL_FLAG_DEREF) == 0);
-	assert(expr_val_get_type(val)->tag == T_PTR);
+	assert(val.ctype->tag == T_PTR);
 	val.type |= EXPR_VAL_FLAG_DEREF;
 	return val;
 }
 
-int expr_val_get_elem_size(struct expr_val val) {
-	panic("ni");
+struct expr_val expr_val_remove_deref_flag(struct expr_val val) {
+	assert((val.type & EXPR_VAL_FLAG_DEREF) != 0);
+	assert(val.ctype->tag == T_PTR);
+	val.type &= ~EXPR_VAL_FLAG_DEREF;
+	return val;
 }
 
+int expr_val_get_elem_size(struct expr_val val) {
+	struct type *expr_type = expr_val_get_type(val);
+	struct type *elem_type = type_get_elem_type(expr_type);
+	return type_get_size(elem_type);
+}
+
+/*
+ * handle deref flag here
+ */
 struct type *expr_val_get_type(struct expr_val val) {
-	// do validation to make sure type is correct set up
-	panic("ni");
+	struct type *type = val.ctype;
+	assert(type != NULL);
+
+	if (val.type & EXPR_VAL_FLAG_DEREF) {
+		type = type_deref(type);
+	}
+	return type;
 }
 

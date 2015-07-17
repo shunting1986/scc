@@ -34,7 +34,7 @@ runonetest() {
 	err_file=output.err
 	exe_file=prog
 	$CC $prog > $WS_ROOT/$asm_file 2> $WS_ROOT/$err_file
-	if gcc -m32 $WS_ROOT/$asm_file -o $WS_ROOT/$exe_file 
+	if gcc -m32 -g $WS_ROOT/$asm_file -o $WS_ROOT/$exe_file 
 	then
 		true
 	else

@@ -42,7 +42,8 @@ struct condcode;
 struct expr_val {
 	int type;
 
-	// TODO how to handle type here: we can store the type without deref being handled?
+	// We store the type without deref being handled here
+	struct type *ctype;
 	union {
 		struct symbol *sym;
 		struct temp_var temp_var;
@@ -68,6 +69,8 @@ const char *get_reg_str_code(unsigned int reg);
 struct expr_val expr_val_add_deref_flag(struct expr_val val);
 struct type *expr_val_get_type(struct expr_val val);
 int expr_val_get_elem_size(struct expr_val val);
+int expr_val_has_deref_flag(struct expr_val val);
+struct expr_val expr_val_remove_deref_flag(struct expr_val val);
 
 #ifdef __cplusplus
 }

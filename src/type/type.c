@@ -4,8 +4,19 @@
 #include <inc/dynarr.h>
 #include <inc/cgasm.h>
 
+#if TYPE_DEBUG
+#define INIT_MAGIC .magic = TYPE_MAGIC,
+#define CHECK_MAGIC(type) assert(type->magic == TYPE_MAGIC)
+#define SET_MAGIC(type) type->magic = TYPE_MAGIC
+#else
+#define INIT_MAGIC
+#define CHECK_MAGIC(type)
+#define SET_MAGIC(type)
+#endif
+
 static struct type int_type = {
 	.tag = T_INT,
+	INIT_MAGIC
 	.size = 4,
 };
 
@@ -15,6 +26,7 @@ static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 };
 
 void type_destroy(struct type *type) {
+	CHECK_MAGIC(type);
 	switch (type->tag) {
 	case T_INT: // we should have a separate place to free the reused types
 		break;
@@ -31,6 +43,7 @@ static struct type *alloc_type(int tag, int size) {
 	struct type *type = mallocz(sizeof(*type));
 	type->tag = tag;
 	type->size = size;
+	SET_MAGIC(type);
 	return type;
 }
 
@@ -40,6 +53,12 @@ static struct type *alloc_type(int tag, int size) {
  */
 static struct type *get_int_type() {
 	return &int_type;
+}
+
+struct type *get_ptr_type(struct type *elem_type) {
+	struct type *ret_type = alloc_type(T_PTR, 4);
+	ret_type->subtype = elem_type;
+	return ret_type;
 }
 
 static struct type *get_array_type(struct type *elem_type, int dim) {
@@ -126,6 +145,33 @@ struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist) {
 	}
 
 	return final_type;
+}
+
+int type_get_size(struct type *type) {
+	assert(type != NULL);
+	CHECK_MAGIC(type);
+	return type->size;
+}
+
+struct type *type_get_elem_type(struct type *parent_type) {
+	assert(parent_type != NULL);
+	CHECK_MAGIC(parent_type);
+
+	switch (parent_type->tag) {
+	case T_ARRAY:
+		return parent_type->subtype;
+	case T_PTR:
+		panic("ptr");
+	default:
+		panic("invalid type");
+	}
+}
+
+struct type *type_deref(struct type *type) {
+	assert(type != NULL);
+	CHECK_MAGIC(type);
+	assert(type->tag == T_PTR);
+	return type->subtype;
 }
 
 
