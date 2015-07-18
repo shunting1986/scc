@@ -34,6 +34,7 @@ int lexer_is_typedef(struct lexer *lexer, const char *s);
 struct typedef_tab *typedef_tab_init(struct typedef_tab *enclosing);
 void lexer_push_typedef_tab(struct lexer *lexer);
 void lexer_pop_typedef_tab(struct lexer *lexer);
+void lexer_register_typedef(struct lexer *lexer, char *id);
 
 #ifdef __cplusplus
 }

@@ -59,3 +59,13 @@ struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_
 	DYNARR_FOREACH_END();
 	return darr;
 }
+
+int has_typedef(struct declaration_specifiers *decl_specifiers) {
+	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
+		struct storage_class_specifier *scspec;
+		if (each->nodeType == STORAGE_CLASS_SPECIFIER && (scspec = (void *) each)->tok_tag == TOK_TYPEDEF) {
+			return true;
+		}
+	DYNARR_FOREACH_END();
+	return false;
+}

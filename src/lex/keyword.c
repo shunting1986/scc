@@ -15,6 +15,7 @@ static const char *keyword_str_list[] = {
 	[TOK_FOR] = "for",
 	[TOK_IF] = "if",
 	[TOK_ELSE] = "else",
+	[TOK_TYPEDEF] = "typedef",
 	[TOK_TOTAL_NUM] = NULL,
 };
 

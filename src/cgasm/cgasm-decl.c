@@ -45,6 +45,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 	DYNARR_FOREACH_PLAIN_BEGIN(idlist, char *, each);
 		cgasm_add_decl_sym(ctx, each);
 	DYNARR_FOREACH_END();
+	// TODO free idlist
 #else
 	struct type *base_type = parse_type_from_decl_specifiers(decl_specifiers);
 	struct type *final_type = NULL;
