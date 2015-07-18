@@ -43,6 +43,15 @@ void type_destroy(struct type *type) {
 	}
 }
 
+struct type *type_get(struct type *type) {
+	type->ref_cnt++;
+	return type;
+}
+
+void type_put(struct type *type) {
+	panic("ni"); // TODO need revise type_destroy
+}
+
 static struct type *alloc_type(int tag, int size) {
 	struct type *type = mallocz(sizeof(*type));
 	type->tag = tag;

@@ -22,6 +22,7 @@ struct type {
 	int tag; // T_INT etc.
 	int size;
 	struct type *subtype; // used for ptr and array
+	int ref_cnt;
 
 #if TYPE_DEBUG
 	int magic;
@@ -40,6 +41,8 @@ struct type *type_get_elem_type(struct type *parent_type);
 struct type *type_deref(struct type *type);
 struct type *get_ptr_type(struct type *elem_type);
 int type_get_tag(struct type *type);
+struct type *type_get(struct type *type);
+void type_put(struct type *type);
 
 #ifdef __cplusplus
 }

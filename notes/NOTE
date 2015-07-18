@@ -2,6 +2,8 @@ KEYLIST
 	TODO: typedef  <===
 	TODO: sizeof typename <==
 
+	TODO: setup reference count mechanism for type struct. Can also use this mechanism to verify if we have memleak about type
+
 	TODO: struct <===, first we should learn the scope rule for struct
 NOTE:
   the scope of struct/union/enum/typedef/func is similar to variable. When we exit a brace, these definitions are gone as well.
