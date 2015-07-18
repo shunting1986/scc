@@ -10,7 +10,7 @@ union token {
 
 	struct {
 		int tok_tag;
-		char *s;
+		char *s; // TYPE_NAME and IDENTIFIER both use this
 	} id;
 
 	struct {

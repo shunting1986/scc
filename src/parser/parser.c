@@ -302,9 +302,14 @@ static struct init_declarator_list *parse_init_declarator_list_with_la(struct pa
 	return init_declarator_list_init(darr);
 }
 
+static void register_potential_typedefs(struct parser *parser, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
+	panic("ni");
+}
+
 struct declaration *parse_declaration(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
+	register_potential_typedefs(parser, decl_specifiers, init_declarator_list);
 	return declaration_init(decl_specifiers, init_declarator_list);
 }
 
@@ -348,6 +353,8 @@ static struct external_declaration *parse_external_decl(struct parser *parser) {
 
 			// set external decl
 			external_decl->init_declarator_list = init_declarator_list;
+
+			register_potential_typedefs(parser, decl_specifiers, init_declarator_list);
 		}
 	}
 

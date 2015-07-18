@@ -13,6 +13,7 @@ static int initiate_compound_statement(union token tok) {
 
 struct compound_statement *parse_compound_statement(struct parser *parser) {
 	expect(parser->lexer, TOK_LBRACE);
+	lexer_push_typedef_tab(parser->lexer);
 
 	// look one token ahead to determing if this is a declaration or statement or empty block
 	union token tok = lexer_next_token(parser->lexer);
@@ -31,6 +32,7 @@ struct compound_statement *parse_compound_statement(struct parser *parser) {
 		}
 		tok = lexer_next_token(parser->lexer);
 	}
+	lexer_pop_typedef_tab(parser->lexer);
 	return compound_statement_init(declList, stmtList);
 }
 

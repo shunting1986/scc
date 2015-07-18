@@ -14,6 +14,7 @@
 struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = mallocz(sizeof(*lexer));
 	lexer->cstream = cstream;
+	lexer->typedef_tab = typedef_tab_init(NULL);
 	return lexer;
 }
 
@@ -24,6 +25,7 @@ void lexer_destroy(struct lexer *lexer) {
 		token_destroy(lexer->putback_stk[i]);
 	}
 	lexer->nputback = 0;
+	lexer_pop_typedef_tab(lexer);
 	free(lexer);
 }
 
@@ -143,12 +145,15 @@ repeat:
 		cbuf_destroy(cbuf);
 
 		token_tag = check_keyword_token(s);
-		if (token_tag == TOK_UNDEF) {
+		if (token_tag != TOK_UNDEF) {
+			tok.tok_tag = token_tag;
+		} else if (lexer_is_typedef(lexer, s)) {
+			tok.tok_tag = TOK_TYPE_NAME;
+			tok.id.s = s;
+		} else {
 			// this is an identifier
 			tok.tok_tag = TOK_IDENTIFIER;
 			tok.id.s = s;
-		} else {
-			tok.tok_tag = token_tag;
 		}
 		break;
 	case EOF:

@@ -1,12 +1,16 @@
 KEYLIST
-	TODO: auto add ret instruction <==
+	TODO: typedef  <===
+	TODO: sizeof typename <==
 
-	TODO: struct
-	TODO: typedef <==
+	TODO: struct <===, first we should learn the scope rule for struct
+NOTE:
+  the scope of struct/union/enum/typedef/func is similar to variable. When we exit a brace, these definitions are gone as well.
+	struct union, enum share a name space; typedef, func, var share one. 
+	func is special. 1. it can have multiple declaration in one scope; 2. inner scope can not have different specification to outer one
+
   TODO: support preprocessor
 
-
-
+  TODO: how to handle the case that different function in one translation unit can define label with the same name?
 	TODO: switch, struct def & dot & ptr, break, continue
 	TODO: support struct initializer
 	TODO: array + struct
@@ -32,6 +36,6 @@ TODO: make the compiler support both 32 bit and 64 bit asm?
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer
+- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer, automatically add trailing return statement
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework
