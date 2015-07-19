@@ -60,6 +60,7 @@ struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 void cgasm_push_symtab(struct cgasm_context *ctx);
 void cgasm_pop_symtab(struct cgasm_context *ctx);
 void cgasm_dump_global_vars(struct cgasm_context *ctx);
+struct type *cgasm_get_type_from_type_name(struct cgasm_context *ctx, char *id);
 
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
@@ -92,7 +93,7 @@ struct expr_val cgasm_handle_post_dec(struct cgasm_context *ctx, struct expr_val
 struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val base_val, struct expr_val ind_val);
 
 // cgasm-decl.c
-struct type *parse_type_from_declaration(struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
+struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
 
 #ifdef __cplusplus
 }

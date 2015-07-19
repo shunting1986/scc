@@ -4,8 +4,11 @@
 
 static struct type *parse_type_from_declarator(struct type *base_type, struct declarator *declarator);
 
-struct type *parse_type_from_declaration(struct declaration_specifiers *decl_specifiers, struct declarator *declarator) {
-	struct type *base_type = parse_type_from_decl_specifiers(decl_specifiers);
+/*
+ * need ctx for typedef
+ */
+struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator) {
+	struct type *base_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
 	return parse_type_from_declarator(base_type, declarator);
 }
 
@@ -47,7 +50,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 	DYNARR_FOREACH_END();
 	// TODO free idlist
 #else
-	struct type *base_type = parse_type_from_decl_specifiers(decl_specifiers);
+	struct type *base_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
 	struct type *final_type = NULL;
 	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
 		struct declarator *declarator = each->declarator;

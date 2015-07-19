@@ -76,7 +76,7 @@ static void register_parameter(struct cgasm_context *ctx, struct parameter_decla
 		panic("only support id case right now");
 	}
 
-	struct type *type = parse_type_from_declaration(decl->decl_specifiers, decl->declarator);
+	struct type *type = parse_type_from_declaration(ctx, decl->decl_specifiers, decl->declarator);
 	cgasm_add_param_sym(ctx, dd->id, type);
 }
 

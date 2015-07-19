@@ -80,7 +80,11 @@ static struct type_specifier *parse_type_specifier(struct parser *parser) {
 	if (tok.tok_tag == TOK_STRUCT || tok.tok_tag == TOK_UNION || tok.tok_tag == TOK_ENUM) {
 		panic("struct, union, enum not supported yet");
 	} else {
-		return type_specifier_init(tok.tok_tag);
+		struct type_specifier *sp = type_specifier_init(tok.tok_tag);
+		if (tok.tok_tag == TOK_TYPE_NAME) {
+			sp->type_name = tok.id.s;
+		}
+		return sp;
 	}
 }
 

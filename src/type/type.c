@@ -81,16 +81,21 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
-struct type *parse_type_from_decl_specifiers(struct declaration_specifiers *decl_specifiers) {
+/*
+ * We need pass in context since type_name need refer to the symbol table
+ */
+struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers) {
 	int has_unsigned = 0;
 	int num_long = 0;
 	int basetype = T_NONE;
 	struct type_specifier *type_specifier;
-	struct type *type = NULL;
+	struct type *type = NULL; // type name will set this directly
 
 	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
 		switch (each->nodeType) {
-		case STORAGE_CLASS_SPECIFIER: case TYPE_QUALIFIER:
+		case STORAGE_CLASS_SPECIFIER: 
+			break; // XXX ignore storage class here
+		case TYPE_QUALIFIER:
 			panic("not supported yet");
 			break;
 		case TYPE_SPECIFIER:
@@ -106,7 +111,16 @@ struct type *parse_type_from_decl_specifiers(struct declaration_specifiers *decl
 				has_unsigned = true;
 				break;
 			case TOK_INT:
+				if (basetype != T_NONE) {
+					panic("multi type specified");
+				}
 				basetype = T_INT;
+				break;
+			case TOK_TYPE_NAME:
+				if (type != NULL) {
+					panic("type already set");
+				}
+				type = cgasm_get_type_from_type_name(ctx, type_specifier->type_name);
 				break;
 			default:
 				panic("not supported %s", token_tag_str(type_specifier->tok_tag));
@@ -117,6 +131,13 @@ struct type *parse_type_from_decl_specifiers(struct declaration_specifiers *decl
 			break;
 		}
 	DYNARR_FOREACH_END();
+
+	if (type != NULL) {
+		if (num_long > 0 || has_unsigned || basetype != T_NONE) {
+			panic("other type mixed with type name");
+		}
+		return type;
+	}
 
 	if (num_long > 0) {
 		panic("'long' not support yet");

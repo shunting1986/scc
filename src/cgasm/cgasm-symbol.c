@@ -28,6 +28,11 @@ struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id) {
 	return sym;
 }
 
+struct type *cgasm_get_type_from_type_name(struct cgasm_context *ctx, char *id) {
+	struct symbol *sym = cgasm_lookup_sym(ctx, id);
+	return sym->ctype;
+}
+
 struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
 	struct symbol *ret;

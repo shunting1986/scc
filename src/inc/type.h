@@ -33,8 +33,10 @@ struct type {
 	};
 };
 
+struct cgasm_context;
+
 void type_destroy(struct type *type);
-struct type *parse_type_from_decl_specifiers(struct declaration_specifiers *decl_specifiers);
+struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers);
 struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist);
 int type_get_size(struct type *type);
 struct type *type_get_elem_type(struct type *parent_type);
