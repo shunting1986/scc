@@ -374,3 +374,19 @@ struct initializer *initializer_init() {
 	initializer->nodeType = INITIALIZER;
 	return initializer;
 }
+
+struct type_name *type_name_init(struct specifier_qualifier_list *sqlist) {
+	struct type_name *tn = mallocz(sizeof(*tn));
+	tn->nodeType = TYPE_NAME;
+	tn->sqlist = sqlist;
+	return tn;
+}
+
+struct specifier_qualifier_list *specifier_qualifier_list_init(struct dynarr *darr) {
+	struct specifier_qualifier_list *list = mallocz(sizeof(*list));
+	list->nodeType = SPECIFIER_QUALIFIER_LIST;
+	list->darr = darr;
+	return list;
+}
+	
+

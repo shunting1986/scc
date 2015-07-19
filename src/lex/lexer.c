@@ -147,7 +147,7 @@ repeat:
 		token_tag = check_keyword_token(s);
 		if (token_tag != TOK_UNDEF) {
 			tok.tok_tag = token_tag;
-		} else if (lexer_is_typedef(lexer, s)) {
+		} else if (!lexer->typedef_disabled && lexer_is_typedef(lexer, s)) {
 			tok.tok_tag = TOK_TYPE_NAME;
 			tok.id.s = s;
 		} else {

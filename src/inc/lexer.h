@@ -20,6 +20,7 @@ struct lexer {
 	int nputback;
 
 	struct typedef_tab *typedef_tab;
+	int typedef_disabled;
 };
 
 struct lexer *lexer_init(struct file_reader *cstream);

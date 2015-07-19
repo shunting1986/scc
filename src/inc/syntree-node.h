@@ -85,6 +85,13 @@ struct declaration {
 
 struct declaration *declaration_init(struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 
+struct specifier_qualifier_list {
+	int nodeType;
+	struct dynarr *darr;
+};
+
+struct specifier_qualifier_list *specifier_qualifier_list_init(struct dynarr *darr);
+
 struct declaration_specifiers {
 	int nodeType;
 	struct dynarr *darr;
@@ -316,6 +323,13 @@ struct postfix_expression {
 
 struct postfix_expression *postfix_expression_init(struct primary_expression *prim_expr);
 
+struct type_name {
+	int nodeType;
+	struct specifier_qualifier_list *sqlist;
+};
+
+struct type_name *type_name_init(struct specifier_qualifier_list *sqlist);
+
 struct unary_expression {
 	int nodeType;
 	struct unary_expression *inc_unary;
@@ -326,6 +340,10 @@ struct unary_expression {
 	struct cast_expression *unary_op_cast;
 
 	struct postfix_expression *postfix_expr;
+
+	struct unary_expression *sizeof_expr;
+
+	struct type_name *sizeof_type;
 };
 struct unary_expression *unary_expression_init(void);
 

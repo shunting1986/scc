@@ -11,6 +11,7 @@
 #define D 1
 
 static struct cast_expression *parse_cast_expression(struct parser *parser);
+static struct unary_expression *parse_unary_expression(struct parser *parser);
 
 static struct primary_expression *parse_primary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
@@ -27,6 +28,9 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 		expect(parser->lexer, TOK_RPAREN);
 		prim_expr->expr = expr;
 	} else {
+#if D
+		lexer_dump_remaining(parser->lexer);
+#endif
 		// we may destroy primary expression first
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
@@ -96,6 +100,28 @@ static int is_unary_op(int tok_tag) {
 		tok_tag == TOK_EXCLAMATION;
 }
 
+static void parse_sizeof(struct parser *parser, struct unary_expression *unary_expr) {
+	union token tok;
+	tok = lexer_next_token(parser->lexer);
+
+	if (tok.tok_tag != TOK_LPAREN) {
+		lexer_put_back(parser->lexer, tok);
+		unary_expr->sizeof_expr = parse_unary_expression(parser);
+	} else {
+		parser->lexer->typedef_disabled = 0;
+		union token nxtok = lexer_next_token(parser->lexer);
+		if (initiate_type_specifier(nxtok) || initiate_type_qualifier(nxtok)) {
+			lexer_put_back(parser->lexer, nxtok);
+			unary_expr->sizeof_type = parse_type_name(parser);
+			expect(parser->lexer, TOK_RPAREN);
+		} else {
+			lexer_put_back(parser->lexer, nxtok);
+			lexer_put_back(parser->lexer, tok);
+			unary_expr->sizeof_expr = parse_unary_expression(parser);
+		}
+	}
+}
+
 static struct unary_expression *parse_unary_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
 	struct unary_expression *unary_expr = unary_expression_init();
@@ -111,7 +137,8 @@ static struct unary_expression *parse_unary_expression(struct parser *parser) {
 		unary_expr->unary_op_cast = parse_cast_expression(parser);
 		return unary_expr;
 	} else if (tok.tok_tag == TOK_SIZEOF) {
-		panic("parse_unary_expression: sizeof not supported");
+		parse_sizeof(parser, unary_expr);
+		return unary_expr;
 	} else {
 		lexer_put_back(parser->lexer, tok);
 		struct postfix_expression *post_expr = parse_postfix_expression(parser);

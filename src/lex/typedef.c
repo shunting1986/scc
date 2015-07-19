@@ -17,8 +17,17 @@ void lexer_push_typedef_tab(struct lexer *lexer) {
 	lexer->typedef_tab = typedef_tab_init(lexer->typedef_tab);
 }
 
+static void typedef_tab_destroy(struct typedef_tab *tab) {
+	htab_destroy(tab->htab);
+	free(tab);
+}
+
 void lexer_pop_typedef_tab(struct lexer *lexer) {
-	panic("ni");
+	// pop the top tab
+	struct typedef_tab *old_tab = lexer->typedef_tab;
+	assert(old_tab != NULL);
+	lexer->typedef_tab = old_tab->enclosing;
+	typedef_tab_destroy(old_tab);
 }
 
 struct typedef_tab *typedef_tab_init(struct typedef_tab *enclosing) {

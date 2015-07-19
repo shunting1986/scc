@@ -13,8 +13,7 @@ static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator);
 static struct declarator *parse_declarator(struct parser *parser);
-static int initiate_type_qualifier(union token tok);
-static int initiate_type_specifier(union token tok);
+static int initiate_storage_class_specifier(union token tok);
 
 struct parser *parser_init(struct lexer *lexer) {
 	struct parser *parser = malloc(sizeof(*parser));
@@ -43,12 +42,11 @@ int initiate_type_name(union token tok) {
 	return initiate_type_specifier(tok) || initiate_type_qualifier(tok);
 }
 
-// TODO handle TYPE_NAME here
-static int initiate_type_specifier(union token tok) {
+int initiate_type_specifier(union token tok) {
 	static int type_tag_list[] = {
 		TOK_VOID, TOK_CHAR, TOK_SHORT, TOK_INT, TOK_LONG, TOK_FLOAT,
 		TOK_DOUBLE, TOK_SIGNED, TOK_UNSIGNED, TOK_STRUCT, TOK_UNION,
-		TOK_ENUM,
+		TOK_ENUM, TOK_TYPE_NAME,
 		TOK_UNDEF, // the last one
 	};
 	int i;
@@ -68,6 +66,12 @@ static int initiate_storage_class_specifier(union token tok) {
 		|| tok.tok_tag == TOK_REGISTER;
 }
 
+struct type_name *parse_type_name(struct parser *parser) {
+	struct specifier_qualifier_list *sqlist = parse_specifier_qualifier_list(parser);
+	// TODO abstract declarator is not handled yet
+	return type_name_init(sqlist);
+}
+
 /* TODO handle TYPE_NAME
  * We already know that a type_specifier is following
  */
@@ -80,19 +84,30 @@ static struct type_specifier *parse_type_specifier(struct parser *parser) {
 	}
 }
 
-static struct declaration_specifiers *parse_declaration_specifiers(struct parser *parser) {
+enum {
+	INTERNAL_PARSE_SPECIFIER = 1,
+	INTERNAL_PARSE_QUALIFIER = 2,
+	INTERNAL_PARSE_STORAGE_CLASS = 4,
+	INTERNAL_PARSE_ALL = INTERNAL_PARSE_SPECIFIER | INTERNAL_PARSE_QUALIFIER | INTERNAL_PARSE_STORAGE_CLASS,
+};
+
+static struct dynarr *parse_specifier_qualifier_sc_internal(struct parser *parser, int mask) {
 	union token tok;
 	void *nd;
 	struct dynarr *darr = dynarr_init();
 
+	parser->lexer->typedef_disabled = 0;
+
 	while (1) { 
 		tok = lexer_next_token(parser->lexer);
-		if (initiate_type_specifier(tok)) {
+		if ((mask & INTERNAL_PARSE_SPECIFIER) && initiate_type_specifier(tok)) {
 			lexer_put_back(parser->lexer, tok);
 			nd = parse_type_specifier(parser);
-		} else if (initiate_type_qualifier(tok)) {
+
+			parser->lexer->typedef_disabled = 1;
+		} else if ((mask & INTERNAL_PARSE_QUALIFIER) && initiate_type_qualifier(tok)) {
 			nd = type_qualifier_init(tok.tok_tag);
-		} else if (initiate_storage_class_specifier(tok)) {
+		} else if ((mask & INTERNAL_PARSE_STORAGE_CLASS) && initiate_storage_class_specifier(tok)) {
 			nd = storage_class_specifier_init(tok.tok_tag);
 		} else {
 			lexer_put_back(parser->lexer, tok);
@@ -108,6 +123,16 @@ static struct declaration_specifiers *parse_declaration_specifiers(struct parser
 #endif
 
 	assert(dynarr_size(darr) > 0);
+	return darr;
+}
+
+struct specifier_qualifier_list *parse_specifier_qualifier_list(struct parser *parser) {
+	struct dynarr *darr = parse_specifier_qualifier_sc_internal(parser, INTERNAL_PARSE_SPECIFIER | INTERNAL_PARSE_QUALIFIER);
+	return specifier_qualifier_list_init(darr);
+}
+
+static struct declaration_specifiers *parse_declaration_specifiers(struct parser *parser) {
+	struct dynarr *darr = parse_specifier_qualifier_sc_internal(parser, INTERNAL_PARSE_ALL);
 	return declaration_specifiers_init(darr);
 }
 
@@ -201,7 +226,7 @@ static struct direct_declarator *parse_direct_declarator(struct parser *parser) 
 	return dd;
 }
 
-static int initiate_type_qualifier(union token tok) {
+int initiate_type_qualifier(union token tok) {
 	return tok.tok_tag == TOK_CONST || tok.tok_tag == TOK_VOLATILE;
 }
 
@@ -324,11 +349,12 @@ struct declaration *parse_declaration(struct parser *parser) {
  * Checks if the token initiates a declaration (or statement). Used by parse_compound_statement
  */
 int initiate_declaration(union token tok) {
-	return tok.tok_tag == TOK_INT; // TODO: refine this
+	return initiate_type_specifier(tok) || initiate_type_qualifier(tok) || initiate_storage_class_specifier(tok);
 }
 
 // assume no EOF found; 
 static struct external_declaration *parse_external_decl(struct parser *parser) {
+	parser->lexer->typedef_disabled = 0;
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
 	struct external_declaration *external_decl = external_declaration_init(decl_specifiers);
 	struct declarator *declarator = NULL;

@@ -16,6 +16,7 @@ struct compound_statement *parse_compound_statement(struct parser *parser) {
 	lexer_push_typedef_tab(parser->lexer);
 
 	// look one token ahead to determing if this is a declaration or statement or empty block
+	parser->lexer->typedef_disabled = 0;
 	union token tok = lexer_next_token(parser->lexer);
 	struct dynarr *declList = dynarr_init();
 	struct dynarr *stmtList = dynarr_init();
@@ -30,6 +31,7 @@ struct compound_statement *parse_compound_statement(struct parser *parser) {
 			lexer_put_back(parser->lexer, tok);
 			dynarr_add(stmtList, parse_statement(parser));
 		}
+		parser->lexer->typedef_disabled = 0;
 		tok = lexer_next_token(parser->lexer);
 	}
 	lexer_pop_typedef_tab(parser->lexer);

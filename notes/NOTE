@@ -35,6 +35,9 @@ TODO: analyze memleak
 TODO: use stack to store temporary right now. Need implement advanced register allocation algorithms
 TODO: make the compiler support both 32 bit and 64 bit asm?
 
+TODO: syntax
+- abstract declarator
+
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
