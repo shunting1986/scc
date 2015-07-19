@@ -16,7 +16,7 @@ main() {
 
 		y = 8;
 		printf("sizeof(y++) %d\n", sizeof(++y)); 
-		printf("y = %d\n", y); // NOTE: gcc report 8 here
+		// printf("y = %d\n", y); // NOTE: gcc report 8 here
 	}
 	return 0;	
 }

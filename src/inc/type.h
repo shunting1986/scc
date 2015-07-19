@@ -18,8 +18,11 @@ enum {
 	T_VOID,
 };
 
+#define TYPE_FLAG_STATIC 1
+
 struct type {
 	int tag; // T_INT etc.
+	int flags;
 	int size;
 	struct type *subtype; // used for ptr and array
 	int ref_cnt;
@@ -37,6 +40,7 @@ struct cgasm_context;
 
 void type_destroy(struct type *type);
 struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers);
+struct type *parse_type_from_specifier_qualifier_list(struct cgasm_context *ctx, struct specifier_qualifier_list *list);
 struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist);
 int type_get_size(struct type *type);
 struct type *type_get_elem_type(struct type *parent_type);

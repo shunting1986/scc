@@ -76,7 +76,8 @@ struct symbol *symtab_new_global_var(char *name, struct type *ctype) {
 void symbol_destroy(void *_sym) {
 	struct symbol *sym = _sym;
 	if (sym->ctype) {
-		type_destroy(sym->ctype);
+		// type_destroy(sym->ctype); // should just dec the ref count
+		type_put(sym->ctype);
 	}
 	free(sym);
 }

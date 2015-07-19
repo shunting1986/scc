@@ -107,6 +107,24 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 	} else if (expr->unary_op_cast != NULL) {
 		struct expr_val val = cgasm_cast_expression(ctx, expr->unary_op_cast);
 		return cgasm_handle_unary_op(ctx, expr->unary_op, val);
+	} else if (expr->sizeof_expr) {
+		// TODO we should not interp the expression. Retrieve the type is enough
+		struct expr_val val = cgasm_unary_expression(ctx, expr->sizeof_expr);
+		return int_const_expr_val(type_get_size(val.ctype));
+	} else if (expr->sizeof_type) {
+		// TODO: abstract declarator is not handled yet
+		struct type *type = parse_type_from_specifier_qualifier_list(ctx, expr->sizeof_type->sqlist);
+		return int_const_expr_val(type_get_size(type));
+	} else if (expr->inc_unary) {
+		struct expr_val val = cgasm_unary_expression(ctx, expr->inc_unary);
+		struct expr_val ret = cgasm_handle_pre_inc(ctx, val);
+		type_put(val.ctype);
+		return ret;
+	} else if (expr->dec_unary) {
+		struct expr_val val = cgasm_unary_expression(ctx, expr->dec_unary);
+		struct expr_val ret = cgasm_handle_pre_dec(ctx, val);
+		type_put(val.ctype);
+		return ret;
 	} else {
 		panic("ni");
 	}

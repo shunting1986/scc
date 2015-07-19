@@ -457,6 +457,24 @@ static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struc
 	return temp_var;
 }
 
+static struct expr_val cgasm_handle_pre_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
+	int reg = REG_EAX;
+
+	cgasm_load_val_to_reg(ctx, val, reg);
+	cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+	cgasm_store_reg_to_mem(ctx, reg, val);
+	return val;
+
+}
+
+struct expr_val cgasm_handle_pre_inc(struct cgasm_context *ctx, struct expr_val val) {
+	return cgasm_handle_pre_incdec(ctx, val, true);
+}
+
+struct expr_val cgasm_handle_pre_dec(struct cgasm_context *ctx, struct expr_val val) {
+	return cgasm_handle_pre_incdec(ctx, val, false);
+}
+
 struct expr_val cgasm_handle_post_inc(struct cgasm_context *ctx, struct expr_val val) {
 	return cgasm_handle_post_incdec(ctx, val, 1);
 }

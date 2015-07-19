@@ -61,7 +61,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/syntax-typedef/main.c
+	./scc integration-test/bubble-sort/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

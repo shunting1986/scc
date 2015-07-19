@@ -1,3 +1,4 @@
+  NOTE: pass typedef test but fail other tests, need check (I guess it's caused by type dec ref)
 KEYLIST
 	TODO: typedef  <===
 	TODO: sizeof typename <==
@@ -37,6 +38,8 @@ TODO: make the compiler support both 32 bit and 64 bit asm?
 
 TODO: syntax
 - abstract declarator
+- avoid allocate space for typedef
+- avoid interp the expression inside sizeof (e.g. ++)
 
 ========== DONE
 - translate sample.c back to C

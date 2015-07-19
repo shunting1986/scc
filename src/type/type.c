@@ -4,6 +4,8 @@
 #include <inc/dynarr.h>
 #include <inc/cgasm.h>
 
+#define DEBUG 1
+
 #if TYPE_DEBUG
 #define INIT_MAGIC .magic = TYPE_MAGIC,
 #define CHECK_MAGIC(type) assert(type->magic == TYPE_MAGIC)
@@ -16,6 +18,7 @@
 
 static struct type int_type = {
 	.tag = T_INT,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
 	INIT_MAGIC
 	.size = 4,
 };
@@ -27,6 +30,9 @@ static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 
 void type_destroy(struct type *type) {
 	CHECK_MAGIC(type);
+#if DEBUG
+	fprintf(stderr, "type destroy %p, %d\n", type, type->tag); 
+#endif
 	switch (type->tag) {
 	case T_INT: // we should have a separate place to free the reused types
 		break;
@@ -39,17 +45,30 @@ void type_destroy(struct type *type) {
 		free(type);
 		break;
 	default:
-		panic("ni %d", type->tag);
+		panic("ni %p, %d", type, type->tag);
 	}
 }
 
 struct type *type_get(struct type *type) {
+	CHECK_MAGIC(type);
+	// no reference count handling for static allocated type object
+	if (type->flags & TYPE_FLAG_STATIC) {
+		return type;
+	}
 	type->ref_cnt++;
 	return type;
 }
 
 void type_put(struct type *type) {
-	panic("ni"); // TODO need revise type_destroy
+	CHECK_MAGIC(type);
+	// no reference count handling for static allocated type object
+	if (type->flags & TYPE_FLAG_STATIC) {
+		return;
+	}
+	assert(type->ref_cnt > 0);
+	if (--type->ref_cnt == 0) {
+		type_destroy(type);
+	} 
 }
 
 static struct type *alloc_type(int tag, int size) {
@@ -82,16 +101,16 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 }
 
 /*
- * We need pass in context since type_name need refer to the symbol table
- */
-struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers) {
+ * darr is a list of type_specifier, type_qualifier, storage_class_specifier (maybe missing) for specifier_qualifier_list case)
+ */ 
+static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, struct dynarr *darr) {
 	int has_unsigned = 0;
 	int num_long = 0;
 	int basetype = T_NONE;
 	struct type_specifier *type_specifier;
 	struct type *type = NULL; // type name will set this directly
 
-	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
+	DYNARR_FOREACH_BEGIN(darr, syntreebasenode, each);
 		switch (each->nodeType) {
 		case STORAGE_CLASS_SPECIFIER: 
 			break; // XXX ignore storage class here
@@ -136,7 +155,7 @@ struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct d
 		if (num_long > 0 || has_unsigned || basetype != T_NONE) {
 			panic("other type mixed with type name");
 		}
-		return type;
+		return type_get(type); // should inc the ref count
 	}
 
 	if (num_long > 0) {
@@ -155,6 +174,18 @@ struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct d
 	}
 	return type;
 }
+
+struct type *parse_type_from_specifier_qualifier_list(struct cgasm_context *ctx, struct specifier_qualifier_list *list) {
+	return parse_type_from_raw_type_list(ctx, list->darr);
+}
+
+/*
+ * We need pass in context since type_name need refer to the symbol table
+ */
+struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers) {
+	return parse_type_from_raw_type_list(ctx, decl_specifiers->darr);
+}
+
 
 /*
  * the sufflist is the list of direct_declarator_suffix. This method will assum
