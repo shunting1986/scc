@@ -7,6 +7,7 @@
 #include <inc/cbuf.h>
 #include <inc/util.h>
 #include <inc/keyword.h>
+#include <inc/pp.h>
 
 #undef DEBUG
 #define DEBUG 0
@@ -277,8 +278,9 @@ repeat:
 		}
 		break;
 	case '#':
-		discard_line(lexer); // ignore preprocess right now
-		goto repeat;
+		// discard_line(lexer); // ignore preprocess right now
+		pp_entry(lexer);
+		goto repeat; // XXX is always 'goto' suitable
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}

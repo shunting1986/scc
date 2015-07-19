@@ -25,6 +25,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	parser/syntree-node.c \
 	parser/syntree-check.c \
 	parser/syntree-visitor.c \
+	pp/pp.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
 	cgasm/cgasm.c \
@@ -61,7 +62,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/bubble-sort/main.c
+	./scc integration-test/sum/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
