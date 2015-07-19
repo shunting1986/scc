@@ -16,6 +16,8 @@
 #define SET_MAGIC(type)
 #endif
 
+static int type_allocated, type_freed;
+
 static struct type int_type = {
 	.tag = T_INT,
 	.flags = TYPE_FLAG_STATIC, // statically allocated
@@ -28,24 +30,49 @@ static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 	.const_required = 1,
 };
 
+void register_type_ref(struct cgasm_context *ctx, struct type *type) {
+	dynarr_add(ctx->type_ref_list, type_get(type));
+}
+
+void free_type_ref_in_list(struct cgasm_context *ctx) {
+	DYNARR_FOREACH_BEGIN(ctx->type_ref_list, type, each);
+		type_put(each);
+	DYNARR_FOREACH_END();
+	dynarr_clear(ctx->type_ref_list);
+}
+
+void verify_type_memory_release() {
+#if DEBUG
+	fprintf(stderr, "type statistic: allocated %d, freed %d\n", type_allocated, type_freed);
+#endif
+	assert(type_allocated == type_freed);
+}
+
 void type_destroy(struct type *type) {
 	CHECK_MAGIC(type);
-#if DEBUG
-	fprintf(stderr, "type destroy %p, %d\n", type, type->tag); 
-#endif
+	struct type *tofree = NULL;
+
 	switch (type->tag) {
 	case T_INT: // we should have a separate place to free the reused types
 		break;
 	case T_ARRAY:
-		type_destroy(type->subtype);
-		free(type);
+		type_put(type->subtype);
+		tofree = type;
 		break;
 	case T_PTR:
-		type_destroy(type->subtype);
-		free(type);
+		type_put(type->subtype);
+		tofree = type;
 		break;
 	default:
 		panic("ni %p, %d", type, type->tag);
+	}
+
+	if (tofree) {
+		type_freed++;
+#if DEBUG
+	fprintf(stderr, "\033[31mtype destroy %p, %d\033[0m\n", tofree, tofree->tag); 
+#endif
+		free(tofree);
 	}
 }
 
@@ -73,9 +100,13 @@ void type_put(struct type *type) {
 
 static struct type *alloc_type(int tag, int size) {
 	struct type *type = mallocz(sizeof(*type));
+#if DEBUG
+	fprintf(stderr, "\033[31mallocated type %p, %d\033[0m\n", type, tag); 
+#endif
 	type->tag = tag;
 	type->size = size;
 	SET_MAGIC(type);
+	type_allocated++;
 	return type;
 }
 
@@ -89,13 +120,13 @@ static struct type *get_int_type() {
 
 struct type *get_ptr_type(struct type *elem_type) {
 	struct type *ret_type = alloc_type(T_PTR, 4);
-	ret_type->subtype = elem_type;
+	ret_type->subtype = type_get(elem_type);
 	return ret_type;
 }
 
 static struct type *get_array_type(struct type *elem_type, int dim) {
 	struct type *ret_type = alloc_type(T_ARRAY, dim * elem_type->size);
-	ret_type->subtype = elem_type;
+	ret_type->subtype = type_get(elem_type);
 	ret_type->dim = dim;
 	return ret_type;
 }
@@ -155,7 +186,7 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 		if (num_long > 0 || has_unsigned || basetype != T_NONE) {
 			panic("other type mixed with type name");
 		}
-		return type_get(type); // should inc the ref count
+		return type; // should inc the ref count
 	}
 
 	if (num_long > 0) {

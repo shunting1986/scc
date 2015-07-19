@@ -49,6 +49,9 @@ struct type *get_ptr_type(struct type *elem_type);
 int type_get_tag(struct type *type);
 struct type *type_get(struct type *type);
 void type_put(struct type *type);
+void register_type_ref(struct cgasm_context *ctx, struct type *type);
+void free_type_ref_in_list(struct cgasm_context *ctx);
+void verify_type_memory_release();
 
 #ifdef __cplusplus
 }

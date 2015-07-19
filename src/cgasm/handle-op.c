@@ -507,6 +507,7 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 	// handle expression type 
 	// TODO reclaim type memory
 	result_val.ctype = get_ptr_type(elemtype);
+	register_type_ref(ctx, result_val.ctype); // register the type reference so that we can later release it
 	return expr_val_add_deref_flag(result_val);
 }
 

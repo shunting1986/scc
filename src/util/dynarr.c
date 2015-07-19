@@ -60,3 +60,7 @@ void dynarr_destroy(struct dynarr *darr) {
 	}
 	free(darr);
 }
+
+void dynarr_clear(struct dynarr *darr) {
+	darr->size = 0;
+}

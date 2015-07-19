@@ -27,6 +27,8 @@ struct cgasm_context {
 
 	int nasm_label;
 	int const_required;
+
+	struct dynarr *type_ref_list; // this is a list of type ref that need to release when finish parsing each function
 };
 
 struct cgasm_func_context {
