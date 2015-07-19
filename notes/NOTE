@@ -1,18 +1,14 @@
-  NOTE: pass typedef test but fail other tests, need check (I guess it's caused by type dec ref)
-	TODO: setup reference count mechanism for type struct. Can also use this mechanism to verify if we have memleak about type
-
 KEYLIST
-	TODO: typedef  <===
-	TODO: sizeof typename <==
+  TODO: support preprocessor <==
 
-
-	TODO: struct <===, first we should learn the scope rule for struct
 NOTE:
+	TODO: struct <===, first we should learn the scope rule for struct
+
   the scope of struct/union/enum/typedef/func is similar to variable. When we exit a brace, these definitions are gone as well.
 	struct union, enum share a name space; typedef, func, var share one. 
 	func is special. 1. it can have multiple declaration in one scope; 2. inner scope can not have different specification to outer one
 
-  TODO: support preprocessor
+	TODO: support function declaration
 
   TODO: how to handle the case that different function in one translation unit can define label with the same name?
 	TODO: switch, struct def & dot & ptr, break, continue
@@ -45,6 +41,6 @@ TODO: syntax
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer, automatically add trailing return statement
+- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer, automatically add trailing return statement, typedef, reference count mechanism for type structure
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework
