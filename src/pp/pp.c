@@ -66,6 +66,9 @@ void pp_entry(struct lexer *lexer) {
 		pp_include(lexer);
 		break;
 	default:
+#if DEBUG
+		lexer_dump_remaining(lexer);
+#endif
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
 

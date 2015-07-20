@@ -12,6 +12,8 @@
 #undef DEBUG
 #define DEBUG 0
 
+static char lexer_next_char(struct lexer *lexer);
+
 struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = mallocz(sizeof(*lexer));
 	lexer->cstream = cstream;
@@ -121,6 +123,24 @@ static void discard_line(struct lexer *lexer) {
 	}
 }
 
+static void parse_multi_line_comment(struct lexer *lexer) {
+	// NOTE: use file_reader_next_char instead of lexer_next_char since
+	// we do not allow the comments spread thru multi files
+	char ch = '\0';
+	char nxtch = file_reader_next_char(lexer->cstream);
+	if (ch == EOF) {
+		panic("unterminated comment");
+	}
+
+	while (!(ch == '*' && nxtch == '/')) {
+		ch = nxtch;
+		nxtch = file_reader_next_char(lexer->cstream);
+		if (nxtch == EOF) {
+			panic("unterminated comment");
+		}
+	}
+}
+
 static char lexer_next_char(struct lexer *lexer) {
 	char ch = file_reader_next_char(lexer->cstream);	
 	if (ch == EOF) {
@@ -215,13 +235,15 @@ repeat:
 		tok.tok_tag = handle_bicase(lexer, '=', TOK_NE, TOK_EXCLAMATION);
 		break;
 	case '/':
-		// XXX not support comments yet
 		ch = file_reader_next_char(lexer->cstream);
 		if (ch == '=') {
 			tok.tok_tag = TOK_DIV_ASSIGN;
 		} else if (ch == '/') {
 			// one line comment
 			discard_line(lexer);
+			goto repeat;
+		} else if (ch == '*') {
+			parse_multi_line_comment(lexer);
 			goto repeat;
 		} else {
 			file_reader_put_back(lexer->cstream, ch);
