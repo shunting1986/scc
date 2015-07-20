@@ -20,26 +20,27 @@ static const char *keyword_str_list[] = {
 	[TOK_TOTAL_NUM] = NULL,
 };
 
-struct hashtab *keyword_hashtab = NULL;
+static struct hashtab *keyword_hashtab = NULL;
 
-// TODO handle the table destroy
-static void setup_keyword_hashtab() {
+struct hashtab *setup_keyword_hashtab(const char *list[], int size) {
 	int tok = 0;
 	const char *s;
-	keyword_hashtab = htab_init();
-	keyword_hashtab->val_free_fn = htab_nop_val_free;
+	struct hashtab *tab = htab_init();
+	tab->val_free_fn = htab_nop_val_free;
 
-	for (tok = 0; tok < TOK_TOTAL_NUM; tok++) {
-		s = keyword_str_list[tok];
+	for (tok = 0; tok < size; tok++) {
+		s = list[tok];
 		if (s != NULL) {
-			htab_insert(keyword_hashtab, s, (void *) (long) tok);
+			htab_insert(tab, s, (void *) (long) tok);
 		}
 	}
+	return tab;
 }
 
 int check_keyword_token(char *s) {
+	// TODO handle the table destroy
 	if (keyword_hashtab == NULL) {
-		setup_keyword_hashtab();
+		keyword_hashtab = setup_keyword_hashtab(keyword_str_list, TOK_TOTAL_NUM);
 	}
 	void *ret = htab_query(keyword_hashtab, s);
 	if (ret == NULL) {
@@ -49,6 +50,9 @@ int check_keyword_token(char *s) {
 	}
 }
 
+/*
+ * Used to dump the syntree back to C
+ */
 const char *keyword_str(int tok_tag) {
 	if (tok_tag >= 0 && tok_tag < TOK_TOTAL_NUM) {
 		const char *cstr = keyword_str_list[tok_tag];

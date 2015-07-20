@@ -21,6 +21,8 @@ struct lexer {
 
 	struct typedef_tab *typedef_tab;
 	int typedef_disabled;
+
+	int in_pp_context; // indicate if we are in preprocessor context
 };
 
 struct lexer *lexer_init(struct file_reader *cstream);

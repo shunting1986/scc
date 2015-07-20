@@ -145,9 +145,19 @@ repeat:
 		s = cbuf_transfer(cbuf);
 		cbuf_destroy(cbuf);
 
+		if (lexer->in_pp_context) {
+			token_tag = check_pp_keyword(s);	
+			if (token_tag != TOK_UNDEF) {
+				tok.tok_tag = token_tag;
+				free(s);
+				break;
+			}
+		}
+
 		token_tag = check_keyword_token(s);
 		if (token_tag != TOK_UNDEF) {
 			tok.tok_tag = token_tag;
+			free(s);
 		} else if (!lexer->typedef_disabled && lexer_is_typedef(lexer, s)) {
 			tok.tok_tag = TOK_TYPE_NAME;
 			tok.id.s = s;

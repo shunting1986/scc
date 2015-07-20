@@ -7,7 +7,11 @@ extern "C" {
 
 #include <inc/lexer.h>
 
+// pp.c
 void pp_entry(struct lexer *lexer);
+
+// keyword.c
+int check_pp_keyword(char *s);
 
 #ifdef __cplusplus
 }
