@@ -4,13 +4,6 @@
 #include <inc/dynarr.h>
 #include <inc/util.h>
 
-// only need support append. No need to support deleting
-struct dynarr {
-	void **list;
-	int size;
-	int capa;
-};
-
 struct dynarr *dynarr_init() {
 	struct dynarr *darr = calloc(1, sizeof(*darr));
 	return darr;

@@ -56,6 +56,7 @@ void pp_entry(struct lexer *lexer) {
 #if DEBUG
 		// lexer_dump_remaining(lexer);
 #endif
+		token_dump(tok);
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
 

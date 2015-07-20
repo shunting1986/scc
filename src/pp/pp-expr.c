@@ -40,8 +40,25 @@ static int pp_unary_expr(struct lexer *lexer) {
 	}
 }
 
-void drain_stk_below_pred(struct intstack *stk, int waterline) {
-	panic("ni");
+static int perform_op(int op, int lhs, int rhs) {
+	switch (op) {
+	case TOK_LOGIC_AND:
+		return lhs && rhs;
+	default:
+		panic("unsupported op %s", token_tag_str(op));
+	}
+}
+
+static void drain_stk_below_pred(struct intstack *stk, int waterline_pred) {
+	assert(intstack_size(stk) > 0 && intstack_size(stk) % 2 == 1);
+	int v = intstack_pop(stk);
+
+	while (intstack_size(stk) > 0 && pp_get_op_pred(intstack_top(stk)) >= waterline_pred) {
+		int op = intstack_pop(stk);
+		int lhs = intstack_pop(stk);
+		v = perform_op(op, lhs, v);
+	}
+	intstack_push(stk, v);
 }
 
 /*

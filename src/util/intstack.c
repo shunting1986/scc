@@ -6,13 +6,16 @@ void intstack_push(struct intstack *stk, int v) {
 }
 
 int intstack_pop(struct intstack *stk) {
-	panic("ni");
+	assert(dynarr_size(stk) > 0);
+	return (int) (long) stk->list[--stk->size];
 }
 
 int intstack_top(struct intstack *stk) {
-	panic("ni");
+	assert(dynarr_size(stk) > 0);
+	return (int) (long) stk->list[stk->size - 1];
 }
 
 int intstack_subtop(struct intstack *stk) {
-	panic("ni");
+	assert(dynarr_size(stk) >= 2);
+	return (int) (long) stk->list[stk->size - 2];
 }

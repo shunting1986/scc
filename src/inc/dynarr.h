@@ -5,7 +5,13 @@
 extern "C" {
 #endif
 
-struct dynarr;
+// only need support append. No need to support deleting
+struct dynarr {
+	void **list;
+	int size;
+	int capa;
+};
+
 struct dynarr *dynarr_init();
 int dynarr_size(struct dynarr *darr);
 void dynarr_destroy(struct dynarr *darr);
