@@ -34,6 +34,9 @@ void pop_want_newline(struct lexer *lexer, int oldval);
 void pp_push_if_item(struct lexer *lexer, int item, int flag);
 int pp_in_skip_mode(struct lexer *lexer);
 
+// pp-include.c
+void pp_include(struct lexer *lexer);
+
 // macro-symtab.c
 int macro_defined(struct lexer *lexer, const char *s);
 
