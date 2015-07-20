@@ -53,7 +53,9 @@ static void pp_include(struct lexer *lexer) {
 	const char *incl_path = parse_string_literal(lexer, term_tok);
 	(void) incl_path;
 
-	open_header_file(lexer, incl_path, incl_tok);
+	if (!pp_in_skip_mode(lexer)) {
+		open_header_file(lexer, incl_path, incl_tok);
+	}
 }
 
 static void pp_ifndef(struct lexer *lexer) {
@@ -63,10 +65,11 @@ static void pp_ifndef(struct lexer *lexer) {
 	union token nxtok = expect(lexer, TOK_NEWLINE);
 	(void) nxtok;
 
+	int flags = pp_in_skip_mode(lexer) ? IF_FLAG_ALWAYS_SKIP : 0;
 	if (macro_defined(lexer, tok.id.s)) {
-		pp_push_if_item(lexer, IF_FALSE, 0);
+		pp_push_if_item(lexer, IF_FALSE, flags);
 	} else {
-		pp_push_if_item(lexer, IF_TRUE, 0);
+		pp_push_if_item(lexer, IF_TRUE, flags);
 	}
 
 	pop_want_newline(lexer, old_want_newline);
@@ -78,10 +81,6 @@ void pp_entry(struct lexer *lexer) {
 
 	union token tok = lexer_next_token(lexer);
 	lexer->in_pp_context = old_in_pp_context;
-
-	if (pp_in_skip_mode(lexer)) {
-		panic("pp can not support skip mode yet"); // TODO
-	}
 
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
