@@ -23,6 +23,8 @@ struct lexer *lexer_init(struct file_reader *cstream) {
 	// setup macro tab
 	lexer->macro_tab = htab_init();
 	lexer->macro_tab->val_free_fn = macro_destroy;
+
+	lexer->if_stack = dynarr_init();
 	return lexer;
 }
 
@@ -37,6 +39,8 @@ void lexer_destroy(struct lexer *lexer) {
 
 	// free macro tab
 	htab_destroy(lexer->macro_tab);
+
+	dynarr_destroy(lexer->if_stack);
 
 	free(lexer);
 }
@@ -352,7 +356,12 @@ repeat:
 	default:
 		panic("lexer_next_token unexpected character %c", ch);
 	}
-	// printf("lexer_next_token %d\n", tok.tok_tag);
+
+	// check if we should skip the token
+	if (pp_in_skip_mode(lexer)) {
+		token_destroy(tok);
+		goto repeat;
+	}
 	return tok;
 }
 

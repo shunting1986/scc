@@ -27,6 +27,7 @@ struct lexer {
 	int want_newline;
 
 	struct hashtab *macro_tab;
+	struct dynarr *if_stack;
 };
 
 struct lexer *lexer_init(struct file_reader *cstream);

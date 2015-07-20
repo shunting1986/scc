@@ -62,7 +62,12 @@ static void pp_ifndef(struct lexer *lexer) {
 	union token tok = expect(lexer, TOK_IDENTIFIER);
 	union token nxtok = expect(lexer, TOK_NEWLINE);
 	(void) nxtok;
-	panic("ni %s %d", tok.id.s, macro_defined(lexer, tok.id.s));
+
+	if (macro_defined(lexer, tok.id.s)) {
+		pp_push_if_item(lexer, IF_FALSE, 0);
+	} else {
+		pp_push_if_item(lexer, IF_TRUE, 0);
+	}
 
 	pop_want_newline(lexer, old_want_newline);
 }
@@ -73,6 +78,10 @@ void pp_entry(struct lexer *lexer) {
 
 	union token tok = lexer_next_token(lexer);
 	lexer->in_pp_context = old_in_pp_context;
+
+	if (pp_in_skip_mode(lexer)) {
+		panic("pp can not support skip mode yet"); // TODO
+	}
 
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
