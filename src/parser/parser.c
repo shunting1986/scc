@@ -7,7 +7,7 @@
 #include <inc/dynarr.h>
 
 #undef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 
 static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
@@ -122,7 +122,7 @@ static struct dynarr *parse_specifier_qualifier_sc_internal(struct parser *parse
 
 #if DEBUG
 	if (dynarr_size(darr) == 0) {
-		lexer_dump_remaining(parser->lexer); // TODO
+		lexer_dump_remaining(parser->lexer); 
 	}
 #endif
 

@@ -31,18 +31,20 @@ void lexer_destroy(struct lexer *lexer) {
 }
 
 /* XXX: escape is not handled yet */
-void parse_string_literal(struct lexer *lexer, union token *ptok) {
+/* XXX: caller should take care of freeing the memory */
+char *parse_string_literal(struct lexer *lexer, int term_tag) {
 	struct cbuf *buf = cbuf_init();
 	char ch = file_reader_next_char(lexer->cstream);
-	while (ch != '"' && ch != EOF) {
+	while (ch != term_tag && ch != EOF) {
 		cbuf_add(buf, ch);
 		ch = file_reader_next_char(lexer->cstream);
 	}
 	if (ch == EOF) {
 		panic("unterminated string literal");
 	}
-	ptok->tok_tag = TOK_STRING_LITERAL;
-	ptok->str.s = cbuf_transfer(buf);
+	char *ret = cbuf_transfer(buf);
+	cbuf_destroy(buf);
+	return ret;
 }
 
 // XXX: only handle decimal integer right now
@@ -67,12 +69,16 @@ void lexer_put_back(struct lexer *lexer, union token token) {
 // for debugging
 void lexer_dump_remaining(struct lexer *lexer) {
 	union token tok;
+	int tot = 0;
 	while (1) {
 		tok = lexer_next_token(lexer);
 		if (tok.tok_tag == TOK_EOF) {
 			break;
 		}
 		token_dump(tok);
+		if (++tot >= 20) { // dump the first 20
+			break;
+		}
 	}
 }
 
@@ -115,6 +121,14 @@ static void discard_line(struct lexer *lexer) {
 	}
 }
 
+static char lexer_next_char(struct lexer *lexer) {
+	char ch = file_reader_next_char(lexer->cstream);	
+	if (ch == EOF) {
+		panic("handle header file");
+	}
+	return ch;
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	int ch;
 	union token tok;
@@ -127,7 +141,7 @@ union token lexer_next_token(struct lexer *lexer) {
 	}
 
 repeat:
-	ch = file_reader_next_char(lexer->cstream);	
+	ch = lexer_next_char(lexer);
 	switch (ch) {
 	case '0' ... '9':
 		file_reader_put_back(lexer->cstream, ch);
@@ -271,7 +285,13 @@ repeat:
 		}
 		break;
 	case '"':
-		parse_string_literal(lexer, &tok);
+		if (lexer->in_pp_context) { // in pp context, return " directly so the processing is similar to < include
+			tok.tok_tag = TOK_QUOTATION;
+		} else {
+			char *s = parse_string_literal(lexer, TOK_QUOTATION);
+			tok.tok_tag = TOK_STRING_LITERAL;
+			tok.str.s = s;
+		}
 		break;
 	case '.':
 		ch = file_reader_next_char(lexer->cstream);

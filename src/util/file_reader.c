@@ -7,24 +7,15 @@
 #include <stdio.h>
 #include <unistd.h>
 
-struct file_reader {
-	char *path;
-	int fd;
-
-	int putback;
-
-	char buf[256];
-	int pos;
-	int len;
-};
-
 struct file_reader *file_reader_init(const char *path) {
+	int fd = open(path, O_RDONLY);
+	if (fd < 0) {
+		return NULL;
+	}
+
 	struct file_reader *fr = malloc(sizeof(*fr));
 	fr->path = strdup(path);
-	fr->fd = open(path, O_RDONLY);
-	if (fr->fd < 0) {
-		panic("file not found: %s", fr->path);
-	}
+	fr->fd = fd;
 	fr->pos = fr->len = 0;
 	fr->putback = -1;
 	return fr;

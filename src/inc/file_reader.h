@@ -5,7 +5,18 @@
 extern "C" {
 #endif
 
-struct file_reader;
+struct file_reader {
+	char *path;
+	int fd;
+
+	int putback;
+
+	char buf[256];
+	int pos;
+	int len;
+
+	struct file_reader *prev;
+};
 
 struct file_reader *file_reader_init(const char *path);
 int file_reader_next_char(struct file_reader *fr);

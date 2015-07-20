@@ -8,6 +8,9 @@ main(int argc, char **argv) {
 		panic("Usage: %s [file to compile]");
 	} 
 	struct file_reader *fr = file_reader_init(argv[1]);
+	if (fr == NULL) {
+		panic("file not found %s", argv[1]);
+	}
 	struct lexer *lexer = lexer_init(fr);
 	struct parser *parser = parser_init(lexer);
 
