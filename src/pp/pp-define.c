@@ -24,6 +24,7 @@ static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 }
 
 void pp_define(struct lexer *lexer) {
+	// TODO: note this does not check for the skip mode yet
 	union token idtok = expect(lexer, TOK_IDENTIFIER);
 
 	// we do not use lexer_next_token to handle space correctly

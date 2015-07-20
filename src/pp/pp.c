@@ -23,6 +23,8 @@ static void pp_ifndef(struct lexer *lexer) {
 	pop_want_newline(lexer, old_want_newline);
 }
 
+// TODO: I plan to have a function to skip all the '#if false' code so that we do not
+// need to check for 'skip mode' everywhere
 static void pp_if(struct lexer *lexer) {
 	int old_want_newline = push_want_newline(lexer, 1);
 	int result = pp_expr(lexer);
