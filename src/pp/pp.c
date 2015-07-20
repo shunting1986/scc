@@ -23,6 +23,19 @@ static void pp_ifndef(struct lexer *lexer) {
 	pop_want_newline(lexer, old_want_newline);
 }
 
+static void pp_if(struct lexer *lexer) {
+	int old_want_newline = push_want_newline(lexer, 1);
+	int result = pp_expr(lexer);
+	int flags = pp_in_skip_mode(lexer) ? IF_FLAG_ALWAYS_SKIP : 0;
+	if (result) {
+		pp_push_if_item(lexer, IF_TRUE, flags);
+	} else {
+		pp_push_if_item(lexer, IF_FALSE, flags);
+	}
+
+	pop_want_newline(lexer, old_want_newline);
+}
+
 void pp_entry(struct lexer *lexer) {
 	int old_in_pp_context = lexer->in_pp_context;
 	lexer->in_pp_context = 1;
@@ -36,6 +49,9 @@ void pp_entry(struct lexer *lexer) {
 		break;
 	case PP_TOK_IFNDEF:
 		pp_ifndef(lexer);
+		break;
+	case PP_TOK_IF:
+		pp_if(lexer);
 		break;
 	default:
 #if DEBUG

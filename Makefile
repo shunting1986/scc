@@ -31,6 +31,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	pp/macro-symtab.c \
 	pp/macro.c \
 	pp/pp-include.c \
+	pp/pp-expr.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
 	cgasm/cgasm.c \

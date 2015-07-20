@@ -43,6 +43,9 @@ int macro_defined(struct lexer *lexer, const char *s);
 // macro.c
 void macro_destroy(void *_macro);
 
+// pp-expr.c
+int pp_expr(struct lexer *lexer);
+
 #ifdef __cplusplus
 }
 #endif
