@@ -27,6 +27,9 @@ LIB_SRC_LIST := util/file_reader.c \
 	parser/syntree-visitor.c \
 	pp/pp.c \
 	pp/keyword.c \
+	pp/pp-util.c \
+	pp/macro-symtab.c \
+	pp/macro.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
 	cgasm/cgasm.c \

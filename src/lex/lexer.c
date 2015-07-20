@@ -8,6 +8,7 @@
 #include <inc/util.h>
 #include <inc/keyword.h>
 #include <inc/pp.h>
+#include <inc/htab.h>
 
 #undef DEBUG
 #define DEBUG 0
@@ -18,6 +19,10 @@ struct lexer *lexer_init(struct file_reader *cstream) {
 	struct lexer *lexer = mallocz(sizeof(*lexer));
 	lexer->cstream = cstream;
 	lexer->typedef_tab = typedef_tab_init(NULL);
+
+	// setup macro tab
+	lexer->macro_tab = htab_init();
+	lexer->macro_tab->val_free_fn = macro_destroy;
 	return lexer;
 }
 
@@ -29,6 +34,10 @@ void lexer_destroy(struct lexer *lexer) {
 	}
 	lexer->nputback = 0;
 	lexer_pop_typedef_tab(lexer);
+
+	// free macro tab
+	htab_destroy(lexer->macro_tab);
+
 	free(lexer);
 }
 
@@ -144,6 +153,7 @@ static void parse_multi_line_comment(struct lexer *lexer) {
 static char lexer_next_char(struct lexer *lexer) {
 	char ch = file_reader_next_char(lexer->cstream);	
 	if (ch == EOF) {
+		// TODO should also check #if is paired
 		panic("handle header file");
 	}
 	return ch;
@@ -204,8 +214,14 @@ repeat:
 	case EOF:
 		tok.tok_tag = TOK_EOF;
 		break;
-	case ' ':
 	case '\n':
+		if (lexer->want_newline) {
+			tok.tok_tag = TOK_NEWLINE;
+			break;
+		} else {
+			goto repeat;
+		}
+	case ' ':
 	case '\t':
 		goto repeat;
 	case '(': case ')': case '{': case '}':

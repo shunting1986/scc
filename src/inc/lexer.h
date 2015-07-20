@@ -23,6 +23,10 @@ struct lexer {
 	int typedef_disabled;
 
 	int in_pp_context; // indicate if we are in preprocessor context
+
+	int want_newline;
+
+	struct hashtab *macro_tab;
 };
 
 struct lexer *lexer_init(struct file_reader *cstream);

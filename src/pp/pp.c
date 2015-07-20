@@ -56,22 +56,35 @@ static void pp_include(struct lexer *lexer) {
 	open_header_file(lexer, incl_path, incl_tok);
 }
 
+static void pp_ifndef(struct lexer *lexer) {
+	int old_want_newline = push_want_newline(lexer, 1);
+	
+	union token tok = expect(lexer, TOK_IDENTIFIER);
+	union token nxtok = expect(lexer, TOK_NEWLINE);
+	(void) nxtok;
+	panic("ni %s %d", tok.id.s, macro_defined(lexer, tok.id.s));
+
+	pop_want_newline(lexer, old_want_newline);
+}
+
 void pp_entry(struct lexer *lexer) {
 	int old_in_pp_context = lexer->in_pp_context;
 	lexer->in_pp_context = 1;
 
 	union token tok = lexer_next_token(lexer);
+	lexer->in_pp_context = old_in_pp_context;
+
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
 		pp_include(lexer);
 		break;
+	case PP_TOK_IFNDEF:
+		pp_ifndef(lexer);
+		break;
 	default:
 #if DEBUG
-		lexer_dump_remaining(lexer);
+		// lexer_dump_remaining(lexer);
 #endif
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
-
-// out:
-	lexer->in_pp_context = old_in_pp_context;
 }
