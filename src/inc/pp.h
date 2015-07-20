@@ -42,6 +42,7 @@ void pp_include(struct lexer *lexer);
 // macro-symtab.c
 int macro_defined(struct lexer *lexer, const char *s);
 void define_macro(struct lexer *lexer, const char *name, struct macro *macro);
+void undef_macro(struct lexer *lexer, const char *name);
 
 // macro.c
 enum {
@@ -61,6 +62,7 @@ int pp_expr(struct lexer *lexer);
 
 // pp-define.c
 void pp_define(struct lexer *lexer);
+void pp_undef(struct lexer *lexer);
 
 #ifdef __cplusplus
 }

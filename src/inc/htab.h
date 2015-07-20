@@ -20,6 +20,7 @@ struct hashtab *htab_init();
 void htab_destroy(struct hashtab *tab);
 void *htab_query(struct hashtab *htab, const char *key);
 void htab_insert(struct hashtab *htab, const char *key, void *val);
+int htab_delete(struct hashtab *htab, const char *key);
 void htab_iter(struct hashtab *htab, void *ctx, htab_iter_fn_type *func);
 void htab_nop_val_free(void *val);
 

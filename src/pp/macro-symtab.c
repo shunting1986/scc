@@ -14,3 +14,7 @@ void define_macro(struct lexer *lexer, const char *name, struct macro *macro) {
 	}
 	htab_insert(lexer->macro_tab, name, macro);
 }
+
+void undef_macro(struct lexer *lexer, const char *name) {
+	panic("ni");
+}

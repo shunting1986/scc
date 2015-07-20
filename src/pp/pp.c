@@ -44,6 +44,8 @@ void pp_entry(struct lexer *lexer) {
 
 	union token tok = lexer_next_token(lexer);
 
+	fprintf(stderr, "\033[31mHave a central place to handle skip mode\033[0m\n"); // TODO
+
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
 		pp_include(lexer);
@@ -56,6 +58,9 @@ void pp_entry(struct lexer *lexer) {
 		break;
 	case PP_TOK_DEFINE:
 		pp_define(lexer);
+		break;
+	case PP_TOK_UNDEF:
+		pp_undef(lexer);
 		break;
 	default:
 #if DEBUG

@@ -40,3 +40,11 @@ void pp_define(struct lexer *lexer) {
 		token_destroy(idtok);
 	}
 }
+
+void pp_undef(struct lexer *lexer) {
+	union token idtok = expect(lexer, TOK_IDENTIFIER);
+	undef_macro(lexer, idtok.id.s);
+	token_destroy(idtok);
+}
+
+

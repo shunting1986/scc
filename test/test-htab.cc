@@ -13,5 +13,10 @@ TEST(htab, htab) {
 	ASSERT_TRUE(ans != NULL);
 	ASSERT_TRUE(strcmp("def", (const char *) ans) == 0);
 
+	int r = htab_delete(htab, "abc");
+	ASSERT_TRUE(r > 0);
+	ans = htab_query(htab, "abc");
+	ASSERT_TRUE(ans == NULL);
+
 	htab_destroy(htab);
 }

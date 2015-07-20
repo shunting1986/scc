@@ -100,6 +100,20 @@ void htab_insert(struct hashtab *htab, const char *key, void *val) {
 	htab->buckets[bind] = item;
 }
 
+int htab_delete(struct hashtab *htab, const char *key) {
+	struct hashtab_item **pptr = &htab->buckets[hash_fn((unsigned char *) key) % htab->nbucket];
+	for (; *pptr != NULL; pptr = &(*pptr)->next) {
+		if (strcmp(key, (*pptr)->key) == 0) {
+			// found
+			struct hashtab_item *todel = *pptr;
+			*pptr = todel->next;
+			destroy_item(htab, todel);
+			return 1;
+		}
+	}
+	return 0;
+}
+
 void htab_nop_val_free(void *val) {
 	// do nothing
 }
