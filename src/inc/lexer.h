@@ -33,6 +33,7 @@ struct lexer {
 struct lexer *lexer_init(struct file_reader *cstream);
 union token lexer_next_token(struct lexer *lexer);
 union token expect(struct lexer *lexer, int tok_tag);
+void assume(union token tok, int tok_tag);
 void lexer_put_back(struct lexer *lexer, union token token);
 void lexer_destroy(struct lexer *lexer);
 void lexer_dump_remaining(struct lexer *lexer);

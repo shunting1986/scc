@@ -41,7 +41,6 @@ void pp_entry(struct lexer *lexer) {
 	lexer->in_pp_context = 1;
 
 	union token tok = lexer_next_token(lexer);
-	lexer->in_pp_context = old_in_pp_context;
 
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
@@ -59,4 +58,6 @@ void pp_entry(struct lexer *lexer) {
 #endif
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
+
+	lexer->in_pp_context = old_in_pp_context;
 }

@@ -108,6 +108,12 @@ union token expect(struct lexer *lexer, int tok_tag) {
 	return tok;
 }
 
+void assume(union token tok, int tok_tag) {
+	if (tok.tok_tag != tok_tag) {
+		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
+	}
+}
+
 static int handle_bicase(struct lexer *lexer, int follow_ch, int compound_tok, int simple_tok) {
 	int ch = file_reader_next_char(lexer->cstream);
 	if (ch == follow_ch) {

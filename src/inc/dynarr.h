@@ -31,6 +31,16 @@ void dynarr_clear(struct dynarr *darr);
 #define DYNARR_FOREACH_END() } \
 } while (0)
 
+// intstack.c
+#define intstack dynarr
+#define intstack_init dynarr_init
+#define intstack_destroy dynarr_destroy
+#define intstack_size dynarr_size
+void intstack_push(struct intstack *stk, int v);
+int intstack_pop(struct intstack *stk);
+int intstack_top(struct intstack *stk);
+int intstack_subtop(struct intstack *stk);
+
 #ifdef __cplusplus
 }
 #endif
