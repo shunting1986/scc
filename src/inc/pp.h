@@ -7,6 +7,8 @@ extern "C" {
 
 #include <inc/lexer.h>
 
+struct macro;
+
 
 /* This flag is set if the block is enclosed within a larger skip context or 
  * if this block is part of an if-elsif sequence whose true part already happen
@@ -39,12 +41,26 @@ void pp_include(struct lexer *lexer);
 
 // macro-symtab.c
 int macro_defined(struct lexer *lexer, const char *s);
+void define_macro(struct lexer *lexer, const char *name, struct macro *macro);
 
 // macro.c
+enum {
+	MACRO_OBJ,
+	MACRO_FUNC,
+};
+
+struct macro {
+	int type;
+	struct dynarr *toklist;
+};
+struct macro *obj_macro_init(struct dynarr *toklist);
 void macro_destroy(void *_macro);
 
 // pp-expr.c
 int pp_expr(struct lexer *lexer);
+
+// pp-define.c
+void pp_define(struct lexer *lexer);
 
 #ifdef __cplusplus
 }

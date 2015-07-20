@@ -5,3 +5,7 @@
 int macro_defined(struct lexer *lexer, const char *s) {
 	return htab_query(lexer->macro_tab, s) != NULL;
 }
+
+void define_macro(struct lexer *lexer, const char *name, struct macro *macro) {
+	htab_insert(lexer->macro_tab, name, macro);
+}

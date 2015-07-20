@@ -52,6 +52,9 @@ void pp_entry(struct lexer *lexer) {
 	case PP_TOK_IF:
 		pp_if(lexer);
 		break;
+	case PP_TOK_DEFINE:
+		pp_define(lexer);
+		break;
 	default:
 #if DEBUG
 		// lexer_dump_remaining(lexer);

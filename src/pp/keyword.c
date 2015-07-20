@@ -9,6 +9,7 @@ static const char *keyword_str_list[] = {
 	[PP_TOK_IFNDEF] = "ifndef",
 	[PP_TOK_IF] = "if",
 	[PP_TOK_DEFINED] = "defined",
+	[PP_TOK_DEFINE] = "define",
 	[TOK_TOTAL_NUM] = NULL,
 }; 
 
