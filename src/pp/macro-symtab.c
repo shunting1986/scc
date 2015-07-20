@@ -16,5 +16,5 @@ void define_macro(struct lexer *lexer, const char *name, struct macro *macro) {
 }
 
 void undef_macro(struct lexer *lexer, const char *name) {
-	panic("ni");
+	htab_delete(lexer->macro_tab, name);
 }
