@@ -13,7 +13,7 @@ struct file_reader *file_reader_init(const char *path) {
 		return NULL;
 	}
 
-	struct file_reader *fr = malloc(sizeof(*fr));
+	struct file_reader *fr = mallocz(sizeof(*fr));
 	fr->path = strdup(path);
 	fr->fd = fd;
 	fr->pos = fr->len = 0;

@@ -136,7 +136,7 @@ static int handle_tricase(struct lexer *lexer, int folone, int compone, int folt
 	}
 }
 
-static void discard_line(struct lexer *lexer) {
+void lexer_discard_line(struct lexer *lexer) {
 	char ch;
 	while ((ch = file_reader_next_char(lexer->cstream)) != '\n') {
 	}
@@ -161,10 +161,19 @@ static void parse_multi_line_comment(struct lexer *lexer) {
 }
 
 static char lexer_next_char(struct lexer *lexer) {
-	char ch = file_reader_next_char(lexer->cstream);	
+	char ch;
+repeat:
+	ch = file_reader_next_char(lexer->cstream);	
 	if (ch == EOF) {
-		// TODO should also check #if is paired
-		panic("handle header file");
+		if (dynarr_size(lexer->if_stack) > 0) {
+			panic("#if not paired");
+		}
+		struct file_reader *cur = lexer->cstream;
+		if (cur->prev != NULL) {
+			lexer->cstream = cur->prev;
+			file_reader_destroy(cur);
+			goto repeat;
+		}
 	}
 	return ch;
 }
@@ -266,7 +275,7 @@ repeat:
 			tok.tok_tag = TOK_DIV_ASSIGN;
 		} else if (ch == '/') {
 			// one line comment
-			discard_line(lexer);
+			lexer_discard_line(lexer);
 			goto repeat;
 		} else if (ch == '*') {
 			parse_multi_line_comment(lexer);
@@ -356,11 +365,11 @@ repeat:
 		}
 		break;
 	case '#':
-		// discard_line(lexer); // ignore preprocess right now
+		// lexer_discard_line(lexer); // ignore preprocess right now
 		pp_entry(lexer);
 		goto repeat; // XXX is always 'goto' suitable
 	default:
-		panic("lexer_next_token unexpected character %c", ch);
+		panic("lexer_next_token unexpected character '%c'", ch);
 	}
 
 	// check if we should skip the token

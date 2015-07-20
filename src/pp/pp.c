@@ -7,8 +7,6 @@
 #define DEBUG 1
 
 static void pp_ifndef(struct lexer *lexer) {
-	int old_want_newline = push_want_newline(lexer, 1);
-	
 	union token tok = expect(lexer, TOK_IDENTIFIER);
 	union token nxtok = expect(lexer, TOK_NEWLINE);
 	(void) nxtok;
@@ -19,14 +17,11 @@ static void pp_ifndef(struct lexer *lexer) {
 	} else {
 		pp_push_if_item(lexer, IF_TRUE, flags);
 	}
-
-	pop_want_newline(lexer, old_want_newline);
 }
 
 // TODO: I plan to have a function to skip all the '#if false' code so that we do not
 // need to check for 'skip mode' everywhere
 static void pp_if(struct lexer *lexer) {
-	int old_want_newline = push_want_newline(lexer, 1);
 	int result = pp_expr(lexer);
 	int flags = pp_in_skip_mode(lexer) ? IF_FLAG_ALWAYS_SKIP : 0;
 	if (result) {
@@ -34,17 +29,16 @@ static void pp_if(struct lexer *lexer) {
 	} else {
 		pp_push_if_item(lexer, IF_FALSE, flags);
 	}
-
-	pop_want_newline(lexer, old_want_newline);
 }
 
 void pp_entry(struct lexer *lexer) {
 	int old_in_pp_context = lexer->in_pp_context;
 	lexer->in_pp_context = 1;
+	int old_want_newline = push_want_newline(lexer, 1);
 
 	union token tok = lexer_next_token(lexer);
 
-	fprintf(stderr, "\033[31mHave a central place to handle skip mode\033[0m\n"); // TODO
+	fprintf(stderr, "\033[31mHave a central place to handle skip mode\033[0m, %s\n", token_tag_str(tok.tok_tag)); // TODO
 
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
@@ -58,9 +52,11 @@ void pp_entry(struct lexer *lexer) {
 		break;
 	case PP_TOK_DEFINE:
 		pp_define(lexer);
+		// lexer_discard_line(lexer);
 		break;
 	case PP_TOK_UNDEF:
 		pp_undef(lexer);
+		// lexer_discard_line(lexer);
 		break;
 	default:
 #if DEBUG
@@ -71,4 +67,5 @@ void pp_entry(struct lexer *lexer) {
 	}
 
 	lexer->in_pp_context = old_in_pp_context;
+	pop_want_newline(lexer, old_want_newline);
 }

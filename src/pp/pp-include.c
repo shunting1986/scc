@@ -48,9 +48,13 @@ void pp_include(struct lexer *lexer) {
 	const char *incl_path = parse_string_literal(lexer, term_tok);
 	(void) incl_path;
 
+#if 0
 	if (!pp_in_skip_mode(lexer)) {
 		open_header_file(lexer, incl_path, incl_tok);
 	}
+#else
+	fprintf(stderr, "\033[31m#include is disabled temporarily\033[0m\n");
+#endif
 }
 
 

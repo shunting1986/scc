@@ -38,6 +38,7 @@ void lexer_put_back(struct lexer *lexer, union token token);
 void lexer_destroy(struct lexer *lexer);
 void lexer_dump_remaining(struct lexer *lexer);
 char *parse_string_literal(struct lexer *lexer, int term_tag);
+void lexer_discard_line(struct lexer *lexer);
 
 /* typedef.c */
 int lexer_is_typedef(struct lexer *lexer, const char *s);
