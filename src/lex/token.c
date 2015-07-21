@@ -4,13 +4,59 @@
 #include <inc/token.h>
 #include <inc/util.h>
 
+enum {
+	TOKEN_INVALID = 0,
+	TOKEN_NO_EXTRA_MEM = 1,
+	TOKEN_EXTRA_MEM = 2,
+};
+
+static int token_need_extra_mem[] = {
+#define DEF(tok) [tok] = TOKEN_NO_EXTRA_MEM,
+#define DEFV(tok, val) DEF(tok)
+#define DEFM(tok) [tok] = TOKEN_EXTRA_MEM,
+#include <lex/token.def>
+#undef DEFV
+#undef DEF
+#undef DEFM
+	[TOK_TOTAL_NUM] = TOKEN_INVALID,
+};
+
+union token *token_deep_dup(union token *inp) {
+	assert((unsigned) inp->tok_tag <= TOK_TOTAL_NUM && token_need_extra_mem[inp->tok_tag] != TOKEN_INVALID);
+	union token *out = malloc(sizeof(*out));
+	*out = *inp;
+
+	if (token_need_extra_mem[inp->tok_tag] == TOKEN_EXTRA_MEM) {
+		switch (inp->tok_tag) {
+		case TOK_TYPE_NAME:
+		case TOK_IDENTIFIER:
+			out->id.s = strdup(inp->id.s);
+			break;
+		case TOK_STRING_LITERAL:
+			out->str.s = strdup(inp->str.s);
+			break;
+		default:
+			panic("not supported %s", token_tag_str(inp->tok_tag));
+		}
+	}
+	return out;
+}
+
 void token_destroy(union token token) {
+	unsigned int tag = token.tok_tag;
+	if (tag >= TOK_TOTAL_NUM) {
+		panic("invalid token %d", tag);
+	}
+	int flag = token_need_extra_mem[tag];
+	if (flag == TOKEN_INVALID) {
+		panic("invalid token %d", tag);
+	} 
+	if (flag == TOKEN_NO_EXTRA_MEM) {
+		return;
+	}
+	assert(flag == TOKEN_EXTRA_MEM);
 	switch (token.tok_tag) {
-	case TOK_UNDEF: // special rule for undef
-	case TOK_INT: case TOK_LPAREN: case TOK_RPAREN: case TOK_LBRACE:
-	case TOK_RBRACE: case TOK_COMMA: case TOK_SEMICOLON: case TOK_AMPERSAND:
-	case TOK_ASSIGN: case TOK_ADD: case TOK_RETURN: case TOK_CONSTANT_VALUE:
-		break;
+	case TOK_TYPE_NAME:
 	case TOK_IDENTIFIER:
 		free(token.id.s);
 		break;
@@ -18,7 +64,7 @@ void token_destroy(union token token) {
 		free(token.str.s);
 		break;
 	default:
-		panic("token_destroy %d ni", token.tok_tag);
+		panic("token_destroy %s ni", token_tag_str(tag));
 		break;
 	}
 }
@@ -43,9 +89,12 @@ void token_dump(union token token) {
 static const char *token_tag_str_list[] = {
 #define DEF(tok) [tok] = #tok,
 #define DEFV(tok, val) DEF(tok)
+#define DEFM(tok) DEF(tok)
 #include <lex/token.def>
 #undef DEFV
 #undef DEF
+#undef DEFM
+	[TOK_TOTAL_NUM] = NULL,
 };
 
 const char *token_tag_str(int tok_tag) {

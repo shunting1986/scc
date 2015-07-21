@@ -30,6 +30,15 @@ struct lexer *lexer_init(struct file_reader *cstream) {
 	return lexer;
 }
 
+void normalize_expanded_token_list(struct lexer *lexer) {
+	if (lexer->expanded_macro_pos == dynarr_size(lexer->expanded_macro)) {
+		DYNARR_FOREACH_PLAIN_BEGIN(lexer->expanded_macro, union token *, each);
+			assert(each == NULL);
+		DYNARR_FOREACH_END();
+		dynarr_clear(lexer->expanded_macro);
+	}
+}
+
 void lexer_destroy(struct lexer *lexer) {
 	int i;
 	// order is not important here
@@ -45,9 +54,7 @@ void lexer_destroy(struct lexer *lexer) {
 	dynarr_destroy(lexer->if_stack);
 
 	assert(lexer->expanded_macro_pos == dynarr_size(lexer->expanded_macro));
-	DYNARR_FOREACH_PLAIN_BEGIN(lexer->expanded_macro, union token *, each);
-		assert(each == NULL);
-	DYNARR_FOREACH_END();
+	normalize_expanded_token_list(lexer);
 	dynarr_destroy(lexer->expanded_macro);
 
 	free(lexer);

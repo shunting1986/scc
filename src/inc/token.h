@@ -33,9 +33,11 @@ union token {
 enum {
 #define DEFV(tok, v) tok = v,
 #define DEF(tok) tok,
+#define DEFM(tok) tok,
 #include "lex/token.def"
 #undef DEFV
 #undef DEF
+#undef DEFM
 	TOK_TOTAL_NUM,
 };
 
@@ -43,6 +45,7 @@ void token_destroy(union token token);
 void token_dump(union token token);
 const char *token_tag_str(int tok_tag);
 union token wrap_int_const_to_token(int val);
+union token *token_deep_dup(union token *inp);
 
 #ifdef __cplusplus
 }

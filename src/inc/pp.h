@@ -44,6 +44,7 @@ void pp_include(struct lexer *lexer);
 int macro_defined(struct lexer *lexer, const char *s);
 void define_macro(struct lexer *lexer, const char *name, struct macro *macro);
 void undef_macro(struct lexer *lexer, const char *name);
+struct macro *query_macro_tab(struct lexer *lexer, const char *s);
 
 // macro.c
 enum {

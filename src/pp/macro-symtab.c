@@ -2,6 +2,10 @@
 #include <inc/util.h>
 #include <inc/htab.h>
 
+struct macro *query_macro_tab(struct lexer *lexer, const char *s) {
+	return htab_query(lexer->macro_tab, s);
+}
+
 int macro_defined(struct lexer *lexer, const char *s) {
 	return htab_query(lexer->macro_tab, s) != NULL;
 }
