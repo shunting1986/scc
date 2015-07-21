@@ -50,6 +50,7 @@ int func_alloc_space(struct cgasm_func_context *func_ctx, int size);
 // cgasm-stmt.c
 void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt);
 void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, int goto_label, int reverse);
+void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse);
 
 // cgasm-emit.c
 void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
@@ -69,6 +70,7 @@ struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *e
 struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenode *rawexpr);
 int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr);
 struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
+struct expr_val cgasm_logical_or_expression(struct cgasm_context *ctx, struct logical_or_expression *expr);
 
 // asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);

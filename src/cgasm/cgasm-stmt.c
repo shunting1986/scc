@@ -4,7 +4,6 @@
 
 
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt);
-static void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse);
 
 static void cgasm_return_statement(struct cgasm_context *ctx, struct expression *expr) {
 	if (expr != NULL) {
@@ -124,7 +123,7 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 }
 
 
-static void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse) {
+void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse) {
 	char buf[128];
 	(void) buf;
 

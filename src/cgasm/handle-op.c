@@ -515,7 +515,29 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 /* conditional op                 */
 /**********************************/
 struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_val cond, struct dynarr *inner_expr_list, int inner_expr_ind, struct dynarr *or_expr_list, int or_expr_ind, struct expr_val temp_var) {
-	panic("ni");
+	if (inner_expr_ind == dynarr_size(inner_expr_list)) {
+		assert(or_expr_ind == dynarr_size(or_expr_list));
+		
+		return cgasm_handle_assign_op(ctx, temp_var, cond, TOK_ASSIGN);
+	}
+
+	// similar to if-else
+	int else_label = cgasm_new_label_no(ctx);
+	int exit_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_goto_ifcond(ctx, cond, else_label, true);
+	struct expr_val inner_val = cgasm_expression(ctx, dynarr_get(inner_expr_list, inner_expr_ind));
+	cgasm_handle_assign_op(ctx, temp_var, inner_val, TOK_ASSIGN);
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(exit_label, buf));
+	cgasm_emit_jump_label(ctx, else_label);
+
+	struct expr_val sub_cond = cgasm_logical_or_expression(ctx, dynarr_get(or_expr_list, or_expr_ind));
+	cgasm_handle_conditional(ctx, sub_cond, inner_expr_list, inner_expr_ind + 1, or_expr_list, or_expr_ind + 1, temp_var);
+
+	cgasm_emit_jump_label(ctx, exit_label);
+
+	return temp_var;
 }
 
 
