@@ -32,7 +32,9 @@ void open_header_file(struct lexer *lexer, const char *incl_path, int incl_tok) 
 }
 
 void pp_include(struct lexer *lexer) {
+	int old_want_quotation = push_want_quotation(lexer, 1);
 	union token tok = lexer_next_token(lexer);
+	pop_want_quotation(lexer, old_want_quotation);
 	int incl_tok = tok.tok_tag;
 	int term_tok;
 	(void) term_tok;

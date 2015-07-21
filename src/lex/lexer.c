@@ -36,6 +36,7 @@ void normalize_expanded_token_list(struct lexer *lexer) {
 			assert(each == NULL);
 		DYNARR_FOREACH_END();
 		dynarr_clear(lexer->expanded_macro);
+		lexer->expanded_macro_pos = 0;
 	}
 }
 
@@ -199,7 +200,8 @@ static bool has_more_expanded_token(struct lexer *lexer) {
 
 static union token obtain_next_expanded_token(struct lexer *lexer) {
 	assert(has_more_expanded_token(lexer));
-	union token *ptr = dynarr_get(lexer->expanded_macro, lexer->expanded_macro_pos++);
+	union token *ptr = dynarr_get(lexer->expanded_macro, lexer->expanded_macro_pos);
+	dynarr_set(lexer->expanded_macro, lexer->expanded_macro_pos++, NULL);
 	union token ret = *ptr;
 	free(ptr);
 	return ret;
@@ -377,7 +379,7 @@ repeat:
 		}
 		break;
 	case '"':
-		if (lexer->in_pp_context) { // in pp context, return " directly so the processing is similar to < include
+		if (lexer->want_quotation) { // in pp context, return " directly so the processing is similar to < include
 			tok.tok_tag = TOK_QUOTATION;
 		} else {
 			char *s = parse_string_literal(lexer, TOK_QUOTATION);

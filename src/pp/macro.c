@@ -11,3 +11,10 @@ struct macro *obj_macro_init(struct dynarr *toklist) {
 	macro->toklist = toklist;
 	return macro;
 }
+
+void macro_dump(const char *name, struct macro *macro) {
+	printf("macro %d %s\n", macro->type, name);
+	DYNARR_FOREACH_PLAIN_BEGIN(macro->toklist, union token *, each);
+		token_dump(*each);
+	DYNARR_FOREACH_END();
+}

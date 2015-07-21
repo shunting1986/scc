@@ -23,8 +23,8 @@ struct lexer {
 	int typedef_disabled;
 
 	int in_pp_context; // indicate if we are in preprocessor context
-
 	int want_newline;
+	int want_quotation;
 
 	struct hashtab *macro_tab;
 	struct dynarr *if_stack;

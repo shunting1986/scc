@@ -1,6 +1,16 @@
 #include <inc/pp.h>
 #include <inc/util.h>
 
+int push_want_quotation(struct lexer *lexer, int newval) {
+	int oldval = lexer->want_quotation;
+	lexer->want_quotation = newval;
+	return oldval;
+}
+
+void pop_want_quotation(struct lexer *lexer, int oldval) {
+	lexer->want_quotation = oldval;
+}
+
 int push_want_newline(struct lexer *lexer, int newval) {
 	int oldval = lexer->want_newline;
 	lexer->want_newline = newval;

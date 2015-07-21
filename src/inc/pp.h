@@ -34,6 +34,8 @@ int check_pp_keyword(char *s);
 // pp-util.c
 int push_want_newline(struct lexer *lexer, int newval);
 void pop_want_newline(struct lexer *lexer, int oldval);
+int push_want_quotation(struct lexer *lexer, int newval);
+void pop_want_quotation(struct lexer *lexer, int oldval);
 void pp_push_if_item(struct lexer *lexer, int item, int flag);
 int pp_in_skip_mode(struct lexer *lexer);
 
@@ -58,6 +60,7 @@ struct macro {
 };
 struct macro *obj_macro_init(struct dynarr *toklist);
 void macro_destroy(void *_macro);
+void macro_dump(const char *name, struct macro *macro);
 
 // pp-expr.c
 int pp_expr(struct lexer *lexer);

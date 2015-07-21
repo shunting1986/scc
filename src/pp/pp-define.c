@@ -1,6 +1,9 @@
 #include <inc/util.h>
 #include <inc/pp.h>
 
+#undef DEBUG
+#define DEBUG 0
+
 static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 	struct dynarr *darr = dynarr_init();
 	union token tok;
@@ -21,6 +24,10 @@ static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 	struct dynarr *darr = store_token_until_newline(lexer);
 	struct macro *macro = obj_macro_init(darr);
 	define_macro(lexer, name, macro);
+
+#if DEBUG
+	macro_dump(name, macro);
+#endif
 }
 
 void pp_define(struct lexer *lexer) {
