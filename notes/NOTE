@@ -1,9 +1,13 @@
   DONE: support object macro
 
 KEYLIST
+  0. support conditional <==
+	   + add test case
+		 + support the syntax
   1. support func macro <=== HERE
-
 	2. support skip mode
+	3. support struct
+
 
   TODO: support preprocessor <==
 	TODO: add test cases for #include "xx"
