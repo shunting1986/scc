@@ -1,5 +1,5 @@
 KEYLIST
-  0. test case for obj macro
+  0. test case for obj macro: should make use of the obj macro...
   1. support func macro
 	2. support skip mode
 

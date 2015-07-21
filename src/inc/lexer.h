@@ -28,6 +28,10 @@ struct lexer {
 
 	struct hashtab *macro_tab;
 	struct dynarr *if_stack;
+
+	struct dynarr *expanded_macro; // set the item to NULL when any elem is used
+		// the macro is fully expanded
+	int expanded_macro_pos;
 };
 
 struct lexer *lexer_init(struct file_reader *cstream);

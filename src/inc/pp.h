@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <inc/lexer.h>
+#include <inc/util.h>
 
 struct macro;
 
@@ -63,6 +64,9 @@ int pp_expr(struct lexer *lexer);
 // pp-define.c
 void pp_define(struct lexer *lexer);
 void pp_undef(struct lexer *lexer);
+
+// macro-expand.c
+bool try_expand_macro(struct lexer *lexer, const char *name);
 
 #ifdef __cplusplus
 }

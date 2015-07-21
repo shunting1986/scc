@@ -25,6 +25,8 @@ struct lexer *lexer_init(struct file_reader *cstream) {
 	lexer->macro_tab->val_free_fn = macro_destroy;
 
 	lexer->if_stack = dynarr_init();
+
+	lexer->expanded_macro = dynarr_init();
 	return lexer;
 }
 
@@ -41,6 +43,12 @@ void lexer_destroy(struct lexer *lexer) {
 	htab_destroy(lexer->macro_tab);
 
 	dynarr_destroy(lexer->if_stack);
+
+	assert(lexer->expanded_macro_pos == dynarr_size(lexer->expanded_macro));
+	DYNARR_FOREACH_PLAIN_BEGIN(lexer->expanded_macro, union token *, each);
+		assert(each == NULL);
+	DYNARR_FOREACH_END();
+	dynarr_destroy(lexer->expanded_macro);
 
 	free(lexer);
 }
@@ -178,6 +186,18 @@ repeat:
 	return ch;
 }
 
+static bool has_more_expanded_token(struct lexer *lexer) {
+	return lexer->expanded_macro_pos < dynarr_size(lexer->expanded_macro);
+}
+
+static union token obtain_next_expanded_token(struct lexer *lexer) {
+	assert(has_more_expanded_token(lexer));
+	union token *ptr = dynarr_get(lexer->expanded_macro, lexer->expanded_macro_pos++);
+	union token ret = *ptr;
+	free(ptr);
+	return ret;
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	int ch;
 	union token tok;
@@ -190,6 +210,10 @@ union token lexer_next_token(struct lexer *lexer) {
 	}
 
 repeat:
+	if (has_more_expanded_token(lexer)) {
+		return obtain_next_expanded_token(lexer);
+	}
+
 	ch = lexer_next_char(lexer);
 	switch (ch) {
 	case '0' ... '9':
@@ -224,6 +248,10 @@ repeat:
 		} else if (!lexer->typedef_disabled && lexer_is_typedef(lexer, s)) {
 			tok.tok_tag = TOK_TYPE_NAME;
 			tok.id.s = s;
+		} else if (try_expand_macro(lexer, s)) {
+			// this is a macro
+			free(s);
+			goto repeat;
 		} else {
 			// this is an identifier
 			tok.tok_tag = TOK_IDENTIFIER;

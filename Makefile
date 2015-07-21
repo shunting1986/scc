@@ -30,6 +30,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	pp/keyword.c \
 	pp/pp-util.c \
 	pp/macro-symtab.c \
+	pp/macro-expand.c \
 	pp/macro.c \
 	pp/pp-include.c \
 	pp/pp-expr.c \
