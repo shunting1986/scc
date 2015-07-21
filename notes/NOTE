@@ -1,6 +1,8 @@
+  DONE: support object macro
+
 KEYLIST
-  0. test case for obj macro: should make use of the obj macro...
-  1. support func macro
+  1. support func macro <=== HERE
+
 	2. support skip mode
 
   TODO: support preprocessor <==
@@ -37,6 +39,7 @@ TODO: how to reclaim the memory for 'type' object (may use reference cnt)
 TODO: analyze memleak
 TODO: use stack to store temporary right now. Need implement advanced register allocation algorithms
 TODO: make the compiler support both 32 bit and 64 bit asm?
+TODO: floating point
 
 TODO: syntax
 - abstract declarator
