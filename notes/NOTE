@@ -1,10 +1,6 @@
   DONE: support object macro
 
 KEYLIST
-  0. support conditional <==
-	   + add test case
-		 + support the syntax
-		 + nested conditional expr
   1. support func macro <=== HERE
 	2. support skip mode
 	3. support struct
@@ -54,6 +50,6 @@ TODO: syntax
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer, automatically add trailing return statement, typedef, reference count mechanism for type structure
+- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer, automatically add trailing return statement, typedef, reference count mechanism for type structure, conditional expr
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework

@@ -7,9 +7,9 @@ int check(int v) {
 
 int
 main() {
-	int a, b, c, d;
-	while (scanf("%d%d%d%d", &a, &b, &c, &d) != -1) {
-		printf("%d\n", a > b ? check(c) : check(d));	
+	int a, b, c, d, e;
+	while (scanf("%d%d%d%d%d", &a, &b, &c, &d, &e) != -1) {
+		printf("%d\n", a > 0 ? check(b) : check(c) < 0 ? check(d) : check(e));	
 	}
 	return 0;
 }
