@@ -4,6 +4,7 @@ KEYLIST
   0. support conditional <==
 	   + add test case
 		 + support the syntax
+		 + nested conditional expr
   1. support func macro <=== HERE
 	2. support skip mode
 	3. support struct

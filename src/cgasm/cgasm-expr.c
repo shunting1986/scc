@@ -198,18 +198,20 @@ static struct expr_val cgasm_logical_or_expression(struct cgasm_context *ctx, st
 // right assoc
 static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr) {
 	int or_size = dynarr_size(expr->or_expr_list);
-	struct expr_val right_most;
-	int i;
+	struct expr_val left_most;
 
 	assert(or_size > 0);
 	assert(or_size == dynarr_size(expr->inner_expr_list) + 1);
 
-	right_most = cgasm_logical_or_expression(ctx, dynarr_get(expr->or_expr_list, or_size - 1));
-
-	for (i = or_size - 2; i >= 0; i--) {
-		panic("ni");
+	left_most = cgasm_logical_or_expression(ctx, dynarr_get(expr->or_expr_list, 0));
+	if (or_size == 1) {
+		return left_most;
 	}
-	return right_most;
+
+	struct expr_val temp = cgasm_alloc_temp_var(ctx);
+
+	cgasm_handle_conditional(ctx, left_most, expr->inner_expr_list, 0, expr->or_expr_list, 1, temp);
+	return temp;
 }
 
 struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr) {

@@ -96,6 +96,8 @@ struct expr_val cgasm_handle_pre_inc(struct cgasm_context *ctx, struct expr_val 
 struct expr_val cgasm_handle_pre_dec(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val base_val, struct expr_val ind_val);
 
+struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_val cond, struct dynarr *inner_expr_list, int inner_expr_ind, struct dynarr *or_expr_list, int or_expr_ind, struct expr_val temp_var);
+
 // cgasm-decl.c
 struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
 

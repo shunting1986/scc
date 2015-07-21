@@ -511,6 +511,15 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 	return expr_val_add_deref_flag(result_val);
 }
 
+/**********************************/
+/* conditional op                 */
+/**********************************/
+struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_val cond, struct dynarr *inner_expr_list, int inner_expr_ind, struct dynarr *or_expr_list, int or_expr_ind, struct expr_val temp_var) {
+	panic("ni");
+}
+
+
+
 
 
 
