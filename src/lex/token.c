@@ -3,6 +3,7 @@
 
 #include <inc/token.h>
 #include <inc/util.h>
+#include <inc/dynarr.h>
 
 enum {
 	TOKEN_INVALID = 0,
@@ -67,6 +68,12 @@ void token_destroy(union token token) {
 		panic("token_destroy %s ni", token_tag_str(tag));
 		break;
 	}
+}
+
+void token_list_dump(struct dynarr *darr) {
+	DYNARR_FOREACH_PLAIN_BEGIN(darr, union token *, each);
+		token_dump(*each);
+	DYNARR_FOREACH_END();
 }
 
 void token_dump(union token token) {

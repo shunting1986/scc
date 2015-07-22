@@ -2,7 +2,7 @@
 #include <inc/pp.h>
 
 #undef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 
 static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 	struct dynarr *darr = dynarr_init();
@@ -30,6 +30,36 @@ static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 #endif
 }
 
+/*
+ * not support '...' yet
+ */
+static void pp_define_func_macro(struct lexer *lexer, const char *name) {
+	expect(lexer, TOK_LPAREN);
+	struct dynarr *paramlist = dynarr_init();
+
+	union token tok = lexer_next_token(lexer); 
+	if (tok.tok_tag != TOK_RPAREN) {
+		while (true) {
+			assume(tok, TOK_IDENTIFIER);
+			dynarr_add(paramlist, tok.id.s);
+			tok = lexer_next_token(lexer);
+			if (tok.tok_tag == TOK_RPAREN) {
+				break;
+			} else {
+				assume(tok, TOK_COMMA);
+			}
+			tok = lexer_next_token(lexer);
+		}
+	}
+	struct dynarr *darr = store_token_until_newline(lexer);
+	struct macro *macro = func_macro_init(paramlist, darr);
+	define_macro(lexer, name, macro);
+
+#if DEBUG
+	macro_dump(name, macro);
+#endif
+}
+
 void pp_define(struct lexer *lexer) {
 	// TODO: note this does not check for the skip mode yet
 	union token idtok = expect(lexer, TOK_IDENTIFIER);
@@ -41,11 +71,11 @@ void pp_define(struct lexer *lexer) {
 	}
 
 	if (ch == '(') {
-		panic("function macro not supported yet");
+		pp_define_func_macro(lexer, idtok.id.s);
 	} else {
 		pp_define_object_macro(lexer, idtok.id.s);
-		token_destroy(idtok);
 	}
+	token_destroy(idtok);
 }
 
 void pp_undef(struct lexer *lexer) {
