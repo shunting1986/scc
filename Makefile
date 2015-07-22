@@ -71,7 +71,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/syntax-func-macro/main.c
+	./scc integration-test/syntax-cond-compile/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

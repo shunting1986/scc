@@ -25,7 +25,8 @@ struct lexer {
 	int in_pp_context; // indicate if we are in preprocessor context
 	int want_newline;
 	int want_quotation;
-	int in_expanding_macro;
+	int no_expand_macro; // we should no expand macro when we are in the middle of 
+		// expanding another one or when we are defining macros etc.
 
 	struct hashtab *macro_tab;
 	struct dynarr *if_stack;
@@ -34,6 +35,16 @@ struct lexer {
 		// the macro is fully expanded
 	int expanded_macro_pos;
 };
+
+#define lexer_push_config(lexer, name, newval) ({ \
+	int oldval = lexer->name; \
+	lexer->name = newval; \
+	oldval; \
+})
+
+#define lexer_pop_config(lexer, name, oldval) do { \
+	lexer->name = oldval; \
+} while (0)
 
 struct lexer *lexer_init(struct file_reader *cstream);
 union token lexer_next_token(struct lexer *lexer);

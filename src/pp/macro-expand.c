@@ -168,7 +168,7 @@ static void merge_to_expanded_list(struct lexer *lexer, struct dynarr *expanded_
  * We do not expand macro when we are in the middle of expanding
  */
 bool try_expand_macro(struct lexer *lexer, const char *name) {
-	if (lexer->in_expanding_macro) {
+	if (lexer->no_expand_macro) {
 		return false;
 	}
 
@@ -177,7 +177,7 @@ bool try_expand_macro(struct lexer *lexer, const char *name) {
 		return false;
 	}
 
-	lexer->in_expanding_macro = 1;
+	lexer->no_expand_macro = 1;
 
 	struct dynarr *expanded_list = dynarr_init();
 	if (macro->type == MACRO_OBJ) {
@@ -188,6 +188,6 @@ bool try_expand_macro(struct lexer *lexer, const char *name) {
 	merge_to_expanded_list(lexer, expanded_list); // the caller will release expanded_list
 	// dynarr_destroy(expanded_list);
 
-	lexer->in_expanding_macro = 0;
+	lexer->no_expand_macro = 0;
 	return true;
 }
