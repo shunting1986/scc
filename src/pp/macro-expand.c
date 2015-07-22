@@ -54,12 +54,51 @@ out:
 	return ret;
 }
 
+// XXX use linear scan right now since I assume the list is short
+static int find_param_index(struct dynarr *param_list, const char *name) {
+	int i;
+	for (i = 0; i < dynarr_size(param_list); i++) {
+		const char *item = dynarr_get(param_list, i);
+		if (strcmp(item, name) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static void concat_tok_list_with_deep_dup(struct dynarr *out_list, struct dynarr *arg) {
+	DYNARR_FOREACH_PLAIN_BEGIN(arg, union token *, each);
+		dynarr_add(out_list, token_deep_dup(each));
+	DYNARR_FOREACH_END();
+}
+
 static void expand_func_macro_with_args(struct lexer *lexer, struct dynarr *toklist, struct dynarr *param_list, struct dynarr *arg_list, struct dynarr *out_list) {
-	panic("ni");
+	int ind;
+	DYNARR_FOREACH_PLAIN_BEGIN(toklist, union token *, each);
+		if (each->tok_tag == TOK_IDENTIFIER	&& (ind = find_param_index(param_list, each->id.s)) >= 0) {
+			// concatenate the arg 
+			// XXX can have better batch support
+			concat_tok_list_with_deep_dup(out_list, dynarr_get(arg_list, ind));
+		} else {
+			// append the token
+			dynarr_add(out_list, token_deep_dup(each));
+		}
+	DYNARR_FOREACH_END();
+}
+
+static void release_arg(struct dynarr *arg) {
+	DYNARR_FOREACH_PLAIN_BEGIN(arg, union token *, each);	
+		token_destroy(*each);
+		free(each);
+	DYNARR_FOREACH_END();
+	dynarr_destroy(arg);
 }
 
 static void release_arg_list(struct dynarr *arg_list) {
-	panic("ni");
+	DYNARR_FOREACH_BEGIN(arg_list, dynarr, each);	
+		release_arg(each);
+	DYNARR_FOREACH_END();
+	dynarr_destroy(arg_list);
 }
 
 static void expand_func_macro(struct lexer *lexer, const char *name, struct macro *macro, struct dynarr *out_list) {
