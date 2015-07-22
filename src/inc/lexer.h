@@ -25,6 +25,7 @@ struct lexer {
 	int in_pp_context; // indicate if we are in preprocessor context
 	int want_newline;
 	int want_quotation;
+	int in_expanding_macro;
 
 	struct hashtab *macro_tab;
 	struct dynarr *if_stack;

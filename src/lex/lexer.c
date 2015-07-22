@@ -220,7 +220,12 @@ union token lexer_next_token(struct lexer *lexer) {
 
 repeat:
 	if (has_more_expanded_token(lexer)) {
-		return obtain_next_expanded_token(lexer);
+		tok = obtain_next_expanded_token(lexer);
+		if (tok.tok_tag == TOK_IDENTIFIER && try_expand_macro(lexer, tok.id.s)) { // recursive expanding
+			free(tok.id.s);	
+			goto repeat;
+		}
+		return tok;
 	}
 
 	ch = lexer_next_char(lexer);
