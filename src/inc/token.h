@@ -48,6 +48,7 @@ void token_dump(union token token);
 void token_list_dump(struct dynarr *darr);
 const char *token_tag_str(int tok_tag);
 union token wrap_int_const_to_token(int val);
+union token *token_shallow_dup(union token *inp);
 union token *token_deep_dup(union token *inp);
 
 #ifdef __cplusplus

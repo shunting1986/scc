@@ -22,9 +22,15 @@ static int token_need_extra_mem[] = {
 	[TOK_TOTAL_NUM] = TOKEN_INVALID,
 };
 
+union token *token_shallow_dup(union token *inp) {
+	union token *out = mallocz(sizeof(*out));
+	*out = *inp;
+	return out;
+}
+
 union token *token_deep_dup(union token *inp) {
 	assert((unsigned) inp->tok_tag <= TOK_TOTAL_NUM && token_need_extra_mem[inp->tok_tag] != TOKEN_INVALID);
-	union token *out = malloc(sizeof(*out));
+	union token *out = mallocz(sizeof(*out));
 	*out = *inp;
 
 	if (token_need_extra_mem[inp->tok_tag] == TOKEN_EXTRA_MEM) {
