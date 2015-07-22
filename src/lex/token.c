@@ -85,16 +85,16 @@ void token_list_dump(struct dynarr *darr) {
 void token_dump(union token token) {
 	switch (token.tok_tag) {
 	case TOK_IDENTIFIER:
-		printf("[id]: %s\n", token.id.s);
+		fprintf(stderr, "[id]: %s\n", token.id.s);
 		break;
 	case TOK_STRING_LITERAL:
-		printf("[string_literal] %s\n", token.str.s);
+		fprintf(stderr, "[string_literal] %s\n", token.str.s);
 		break;
 	case TOK_CONSTANT_VALUE:
-		printf("[const_val] %d\n", token.const_val.ival);
+		fprintf(stderr, "[const_val] %d\n", token.const_val.ival);
 		break;
 	default:
-		printf("'%s'\n", token_tag_str(token.tok_tag));
+		fprintf(stderr, "'%s'\n", token_tag_str(token.tok_tag));
 		break;
 	}
 }

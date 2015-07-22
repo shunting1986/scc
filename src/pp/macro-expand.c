@@ -142,7 +142,7 @@ static void expand_func_macro(struct lexer *lexer, const char *name, struct macr
 	{
 		int i = 0;
 		DYNARR_FOREACH_BEGIN(arg_list, dynarr, each);
-			printf("arg %d:\n", ++i);
+			fprintf(stderr, "arg %d:\n", ++i);
 			token_list_dump(each);
 		DYNARR_FOREACH_END();
 	}
@@ -152,8 +152,16 @@ static void expand_func_macro(struct lexer *lexer, const char *name, struct macr
 	release_arg_list(arg_list);
 }
 
-static void merge_to_expanded_list(struct dynarr *expanded_list) {
-	panic("ni");
+static void merge_to_expanded_list(struct lexer *lexer, struct dynarr *expanded_list) {
+	// NOTE: we should copy the pointer directly
+	int i;
+	for (i = lexer->expanded_macro_pos; i < dynarr_size(lexer->expanded_macro); i++) {
+		union token *each = dynarr_get(lexer->expanded_macro, i);
+		dynarr_add(expanded_list, each);
+	}
+	dynarr_destroy(lexer->expanded_macro);
+	lexer->expanded_macro = expanded_list;
+	lexer->expanded_macro_pos = 0;
 }
 
 /*
@@ -177,8 +185,8 @@ bool try_expand_macro(struct lexer *lexer, const char *name) {
 	} else {
 		expand_func_macro(lexer, name, macro, expanded_list);
 	}
-	merge_to_expanded_list(expanded_list);
-	dynarr_destroy(expanded_list);
+	merge_to_expanded_list(lexer, expanded_list); // the caller will release expanded_list
+	// dynarr_destroy(expanded_list);
 
 	lexer->in_expanding_macro = 0;
 	return true;
