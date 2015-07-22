@@ -1,13 +1,9 @@
-  DONE: support object macro
-
 KEYLIST
-  1. support func macro 
-	   - support define func macro - DONE
-		 - support expand func macro - HERE
+	2. support skip mode <== IMP
+	   - add test case
+		 - pass the test
 
-	2. support skip mode
 	3. support struct
-
 
   TODO: support preprocessor <==
 	TODO: add test cases for #include "xx"
@@ -53,6 +49,11 @@ TODO: syntax
 ========== DONE
 - translate sample.c back to C
 - translate sample.c to asm (32 bit)
-- support for, while, if, (recursive) function call, && || short cut, global variable, one & multi dim array, one & multi dim pointer, automatically add trailing return statement, typedef, reference count mechanism for type structure, conditional expr
+- support 
+	+ for, while, if, (recursive) function call
+	+ && || short cut, global variable, one & multi dim array, 
+	+ one & multi dim pointer, automatically add trailing return statement, 
+	+ typedef, reference count mechanism for type structure, conditional expr
+	+ obj & func macro
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework
