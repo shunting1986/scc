@@ -27,10 +27,12 @@ struct eval_result wrap_eval_result(int isNan, int val) {
  * XXX always take care to order the predecence when adding new operator
  */
 static int pred_table[] = {
-	[TOK_SUB] = 4,
+	[TOK_SUB] = 8,
 
-	[TOK_GT] = 3,
-	[TOK_GE] = 3,
+	[TOK_GT] = 5,
+	[TOK_GE] = 5,
+
+	[TOK_EQ] = 3,
 
 	[TOK_LOGIC_AND] = 2,
 
@@ -140,6 +142,13 @@ static struct eval_result perform_op(int op, struct eval_result lhs, struct eval
 	switch (op) {
 	case TOK_GT:
 		val = lhs.val > rhs.val;
+		break;
+	case TOK_GE:
+		val = lhs.val >= rhs.val;
+		break;
+	case TOK_SUB:
+		val = lhs.val - rhs.val;
+		break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
 	}

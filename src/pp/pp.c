@@ -43,7 +43,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 			switch (tok.tok_tag) {
 			case PP_TOK_DEFINE: case PP_TOK_UNDEF:
 				break;
-			case PP_TOK_IF:
+			case PP_TOK_IF: case PP_TOK_IFDEF: case PP_TOK_IFNDEF:
 				nest_level++;
 				break;
 			case PP_TOK_ELIF:
