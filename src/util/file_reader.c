@@ -26,6 +26,20 @@ void file_reader_put_back(struct file_reader *fr, char putback) {
 	fr->putback = putback;
 }
 
+void file_reader_dump_remaining(struct file_reader *fr) {
+	char ch;
+	int cnt = 0;
+	printf("Following characters:\n");
+	printf("\033[31m");
+	while ((ch = file_reader_next_char(fr)) != EOF) {
+		printf("%c", ch);
+		if (++cnt >= 50) {
+			break;
+		}
+	}
+	printf("\033[0m\n");
+}
+
 int file_reader_next_char(struct file_reader *fr) {
 	if (fr->putback >= 0) {
 		char ch = fr->putback;

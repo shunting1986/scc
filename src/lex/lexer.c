@@ -287,6 +287,17 @@ repeat:
 	case '[': case ']': case ':': case '#':
 		tok.tok_tag = ch;
 		break;
+	case '\\':
+		// handle stray
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch == '\n') {
+			goto repeat;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			panic("Invalid '\\'");
+		}
+		break;
+
 	case '+':
 		tok.tok_tag = handle_tricase(lexer, '=', TOK_ADD_ASSIGN, '+', TOK_INC, TOK_ADD);
 		break;

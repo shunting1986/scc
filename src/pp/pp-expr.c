@@ -3,14 +3,36 @@
 #include <inc/lexer.h>
 #include <inc/dynarr.h>
 
-static int pp_unary_expr(struct lexer *lexer);
+/*
+ * When isNan is true, val is undefined
+ */
+struct eval_result{
+	bool isNan; // short cut case like:
+		// defined __STDC_VERSION__ && __STDC_VERSION__ >= 199409L 
+		// requires a NAN flag when __STDC_VERSION__ is not defined
+	int val;
+};
+
+static struct eval_result pp_unary_expr(struct lexer *lexer);
+static struct eval_result pp_expr_internal(struct lexer *lexer, bool until_newline);
+
+struct eval_result wrap_eval_result(int isNan, int val) {
+	struct eval_result res;
+	res.isNan = isNan;
+	res.val = val;
+	return res;
+}
 
 /*
  * XXX always take care to order the predecence when adding new operator
  */
 static int pred_table[] = {
-	[TOK_LOGIC_AND] = 1,
-	[TOK_GT] = 2,
+	[TOK_GT] = 3,
+	[TOK_GE] = 3,
+
+	[TOK_LOGIC_AND] = 2,
+
+	[TOK_LOGIC_OR] = 1,
 
 	[TOK_TOTAL_NUM] = 0,
 };
@@ -36,91 +58,166 @@ static int pp_defined(struct lexer *lexer) {
 	return result;
 }
 
-static int pp_eval_identifier(struct lexer *lexer, const char *name) {
+static struct eval_result pp_eval_identifier(struct lexer *lexer, const char *name) {
 	int old_no_expand_macro = lexer_push_config(lexer, no_expand_macro, 0);
 	if (!try_expand_macro(lexer, name)) {
-		panic("invalid identifier here: %s", name);
+		return wrap_eval_result(true, 0); // return Nan
 	}
 	lexer_pop_config(lexer, no_expand_macro, old_no_expand_macro);
 	return pp_unary_expr(lexer);
 }
 
-static int pp_unary_expr(struct lexer *lexer) {
+static struct eval_result pp_unary_expr(struct lexer *lexer) {
 	union token tok = lexer_next_token(lexer);
-	int ret;
+	struct eval_result result;
+
 	switch (tok.tok_tag) {
 	case TOK_EXCLAMATION:
-		return !pp_unary_expr(lexer);
+		result = pp_unary_expr(lexer);
+		result.val = !result.val;
+		return result;
 	case PP_TOK_DEFINED:
-		return pp_defined(lexer);
+		result.val = pp_defined(lexer);
+		result.isNan = false;
+		return result;
 	case TOK_IDENTIFIER:
-		ret = pp_eval_identifier(lexer, tok.id.s);
+		result = pp_eval_identifier(lexer, tok.id.s);
 		token_destroy(tok);
-		return ret;
+		return result; 
 	case TOK_CONSTANT_VALUE:
 		if (!(tok.const_val.flags & CONST_VAL_TOK_INTEGER)) {
 			panic("integer required");
 		}
-		return tok.const_val.ival;
+		result.val = tok.const_val.ival;
+		result.isNan = false;
+		return result;
 	case TOK_SUB:
-		return -pp_unary_expr(lexer);
+		result = pp_unary_expr(lexer);
+		result.val = -result.val;
+		return result;
+	case TOK_LPAREN:
+		return pp_expr_internal(lexer, false);
 	default:
+		file_reader_dump_remaining(lexer->cstream); 
 		token_dump(tok); 
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
 }
 
-static int perform_op(int op, int lhs, int rhs) {
+static struct eval_result perform_op(int op, struct eval_result lhs, struct eval_result rhs) {
+	struct eval_result result = wrap_eval_result(true, 0);
+
+	if (lhs.isNan) { // if lhs is invalid, the final result is always invalid
+		return result;
+	}
+
+	// first have special handling for && and ||
+	if (op == TOK_LOGIC_AND) {
+		if (!lhs.val) {
+			return wrap_eval_result(false, 0);
+		}
+		return rhs;
+	}
+	if (op == TOK_LOGIC_OR) {
+		if (lhs.val) {
+			return wrap_eval_result(false, 1);
+		}
+		return rhs;
+	}
+
+	// all other operator requires both operand to be valid
+	if (rhs.isNan) { 
+		return result;
+	}
+
+	int val;
 	switch (op) {
-	case TOK_LOGIC_AND:
-		return lhs && rhs;
 	case TOK_GT:
-		return lhs > rhs;
+		val = lhs.val > rhs.val;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
 	}
+	return wrap_eval_result(false, val);
 }
 
-static void drain_stk_below_pred(struct intstack *stk, int waterline_pred) {
+static void drain_stk_below_pred(struct intstack *stk, struct intstack *nanstk, int waterline_pred) {
 	assert(intstack_size(stk) > 0 && intstack_size(stk) % 2 == 1);
-	int v = intstack_pop(stk);
+	assert(intstack_size(nanstk) * 2 - 1 == intstack_size(stk));
+
+	struct eval_result v;
+	v.val = intstack_pop(stk);
+	v.isNan = intstack_pop(nanstk);
 
 	while (intstack_size(stk) > 0 && pp_get_op_pred(intstack_top(stk)) >= waterline_pred) {
 		int op = intstack_pop(stk);
-		int lhs = intstack_pop(stk);
+		struct eval_result lhs;
+		lhs.val = intstack_pop(stk);
+		lhs.isNan = intstack_pop(nanstk);
 		v = perform_op(op, lhs, v);
 	}
-	intstack_push(stk, v);
+	intstack_push(stk, v.val);
+	intstack_push(nanstk, v.isNan);
+}
+
+static struct eval_result pp_expr_internal(struct lexer *lexer, bool until_newline) {
+	union token tok;
+	// nanstk is parallel to the operand part (exclude the operator part) of stk
+	struct intstack *stk = intstack_init();
+	struct intstack *nanstk = intstack_init();
+	struct eval_result unary_res;
+
+	unary_res = pp_unary_expr(lexer);
+	intstack_push(stk, unary_res.val);
+	intstack_push(nanstk, unary_res.isNan);
+
+	tok = lexer_next_token(lexer);
+	while (tok.tok_tag != TOK_NEWLINE && tok.tok_tag != TOK_RPAREN) {
+		// token_dump(tok); // TODO
+		int pred = pp_get_op_pred(tok.tok_tag);
+		unary_res = pp_unary_expr(lexer);
+
+		// do the calculation
+		drain_stk_below_pred(stk, nanstk, pred);
+		
+		intstack_push(stk, tok.tok_tag);
+		intstack_push(stk, unary_res.val);
+		intstack_push(nanstk, unary_res.isNan);
+
+		tok = lexer_next_token(lexer);
+	}
+
+	if (!until_newline && tok.tok_tag == TOK_NEWLINE) {
+		panic("missing ')' in pp expression");
+	}
+
+	if (until_newline && tok.tok_tag == TOK_RPAREN) {
+		panic("unmatching ')' in pp expression");
+	}
+
+	drain_stk_below_pred(stk, nanstk, 0);
+	assert(intstack_size(stk) == 1);
+	assert(intstack_size(nanstk) == 1);
+
+	
+	struct eval_result result;
+	result.val = intstack_top(stk);
+	result.isNan = intstack_top(nanstk);
+
+	intstack_destroy(stk);
+	intstack_destroy(nanstk);
+
+	return result;
 }
 
 /*
  * The caller already set pp context
  */
-int pp_expr(struct lexer *lexer) {
-	union token tok;
-	struct intstack *stk = intstack_init();
-
-	intstack_push(stk, pp_unary_expr(lexer));
-
-	tok = lexer_next_token(lexer);
-	while (tok.tok_tag != TOK_NEWLINE) {
-		int pred = pp_get_op_pred(tok.tok_tag);
-		int v = pp_unary_expr(lexer);
-
-		// do the calculation
-		drain_stk_below_pred(stk, pred);
-		
-		intstack_push(stk, tok.tok_tag);
-		intstack_push(stk, v);
-
-		tok = lexer_next_token(lexer);
+int pp_expr(struct lexer *lexer, bool until_newline) {
+	struct eval_result result = pp_expr_internal(lexer, until_newline);
+	if (result.isNan) {
+		panic("Invalid pp expression");
 	}
-
-	drain_stk_below_pred(stk, 0);
-	assert(intstack_size(stk) == 1);
-	int result = intstack_top(stk);
-	intstack_destroy(stk);
-
-	fprintf(stderr, "pp_expr returns %d\n", result);
-	return result;
+	fprintf(stderr, "pp_expr returns %d\n", result.val);
+	return result.val;
 }
+

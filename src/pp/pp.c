@@ -41,7 +41,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 		tok = lexer_next_token(lexer);
 		if (follow_sharp) {
 			switch (tok.tok_tag) {
-			case PP_TOK_DEFINE:
+			case PP_TOK_DEFINE: case PP_TOK_UNDEF:
 				break;
 			case PP_TOK_IF:
 				nest_level++;
@@ -84,13 +84,14 @@ out:
 	lexer->want_sharp = 0;
 }
 
-static void pp_ifndef(struct lexer *lexer) {
+static void pp_ifxdef(struct lexer *lexer, bool need_def) {
 	union token tok = expect(lexer, TOK_IDENTIFIER);
 	union token nxtok = expect(lexer, TOK_NEWLINE);
 	(void) tok;
 	(void) nxtok;
 
-	if (!macro_defined(lexer, tok.id.s)) {
+	if ((need_def && macro_defined(lexer, tok.id.s))
+			|| (!need_def && !macro_defined(lexer, tok.id.s))) {
 		token_destroy(tok);	
 		lexer->if_nest_level++;
 		return;
@@ -100,8 +101,16 @@ static void pp_ifndef(struct lexer *lexer) {
 	pp_skip(lexer, SKIP_TO_ALTERNATIVE);
 }
 
+static void pp_ifdef(struct lexer *lexer) {
+	pp_ifxdef(lexer, true);
+}
+
+static void pp_ifndef(struct lexer *lexer) {
+	pp_ifxdef(lexer, false);
+}
+
 static void pp_if(struct lexer *lexer) {
-	int result = pp_expr(lexer);
+	int result = pp_expr(lexer, true);
 	if (result) {
 		lexer->if_nest_level++;
 		return;
@@ -137,6 +146,9 @@ void pp_entry(struct lexer *lexer) {
 		break;
 	case PP_TOK_IFNDEF:
 		pp_ifndef(lexer);
+		break;
+	case PP_TOK_IFDEF:
+		pp_ifdef(lexer);
 		break;
 	case PP_TOK_IF: 
 		pp_if(lexer);

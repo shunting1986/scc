@@ -1,16 +1,7 @@
-  NOTE: I've actually pass the cond-compiling test cases
-	NEED REVIEW THE CODE CAREFULLY AND THEN CHECK-IN.
+  TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST
-	2. support skip mode <== IMP
-	   - add test case <= DONE
-		 - pass the test <== HERE
-
-		 + add test case for nested conditional compiling ... (check pp_skip)
-
 	3. support struct
-
-  TODO: support preprocessor <==
 	TODO: add test cases for #include "xx"
 
 NOTE:
@@ -60,5 +51,6 @@ TODO: syntax
 	+ one & multi dim pointer, automatically add trailing return statement, 
 	+ typedef, reference count mechanism for type structure, conditional expr
 	+ obj & func macro
+	+ cond compiling
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework

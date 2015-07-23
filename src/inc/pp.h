@@ -50,7 +50,7 @@ void macro_destroy(void *_macro);
 void macro_dump(const char *name, struct macro *macro);
 
 // pp-expr.c
-int pp_expr(struct lexer *lexer);
+int pp_expr(struct lexer *lexer, bool until_newline);
 
 // pp-define.c
 void pp_define(struct lexer *lexer);
