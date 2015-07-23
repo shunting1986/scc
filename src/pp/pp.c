@@ -33,6 +33,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 
 	union token tok;
 	bool follow_sharp = false;
+	bool follow_newline = true; // this is true initiallly
 	int nest_level = 0;
 	(void) nest_level;
 
@@ -41,7 +42,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 		tok = lexer_next_token(lexer);
 		if (follow_sharp) {
 			switch (tok.tok_tag) {
-			case PP_TOK_DEFINE: case PP_TOK_UNDEF: 
+			case PP_TOK_DEFINE: case PP_TOK_UNDEF: case PP_TOK_ERROR:
 				break;
 			case PP_TOK_INCLUDE: // include need special handling since
 				// '.' in stdio.h can not be treat as token in the lexer
@@ -80,7 +81,11 @@ static void pp_skip(struct lexer *lexer, int mode) {
 				panic("not support in skip mode yet: %s", token_tag_str(tok.tok_tag));
 			}
 		}
-		follow_sharp = tok.tok_tag == TOK_SHARP;
+
+		// order of the following 2 lines is important
+		follow_sharp = follow_newline && tok.tok_tag == TOK_SHARP; // only count the sharp at the beginning of a line
+		follow_newline = tok.tok_tag == TOK_NEWLINE;
+
 		token_destroy(tok);
 	}
 out:

@@ -288,8 +288,11 @@ repeat:
 		goto repeat;
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '?': case '~':
-	case '[': case ']': case ':': case '#':
+	case '[': case ']': case ':': 
 		tok.tok_tag = ch;
+		break;
+	case '#':
+		tok.tok_tag = handle_bicase(lexer, '#', TOK_BISHARP, TOK_SHARP);
 		break;
 	case '\\':
 		// handle stray

@@ -14,6 +14,7 @@ static const char *keyword_str_list[] = {
 	[PP_TOK_ELIF] = "elif",
 	[PP_TOK_ELSE] = "else",
 	[PP_TOK_ENDIF] = "endif",
+	[PP_TOK_ERROR] = "error",
 	[TOK_TOTAL_NUM] = NULL,
 }; 
 
