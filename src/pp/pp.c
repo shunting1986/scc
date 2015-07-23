@@ -41,7 +41,11 @@ static void pp_skip(struct lexer *lexer, int mode) {
 		tok = lexer_next_token(lexer);
 		if (follow_sharp) {
 			switch (tok.tok_tag) {
-			case PP_TOK_DEFINE: case PP_TOK_UNDEF:
+			case PP_TOK_DEFINE: case PP_TOK_UNDEF: 
+				break;
+			case PP_TOK_INCLUDE: // include need special handling since
+				// '.' in stdio.h can not be treat as token in the lexer
+				pp_include(lexer, true);
 				break;
 			case PP_TOK_IF: case PP_TOK_IFDEF: case PP_TOK_IFNDEF:
 				nest_level++;
@@ -63,7 +67,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 					break;
 				}
 				// this is a if true case
-				lexer->if_nest_level++;
+				lexer->cstream->if_nest_level++;
 				goto out;
 			case PP_TOK_ENDIF:
 				if (nest_level > 0) {
@@ -93,7 +97,7 @@ static void pp_ifxdef(struct lexer *lexer, bool need_def) {
 	if ((need_def && macro_defined(lexer, tok.id.s))
 			|| (!need_def && !macro_defined(lexer, tok.id.s))) {
 		token_destroy(tok);	
-		lexer->if_nest_level++;
+		lexer->cstream->if_nest_level++;
 		return;
 	}
 
@@ -112,25 +116,25 @@ static void pp_ifndef(struct lexer *lexer) {
 static void pp_if(struct lexer *lexer) {
 	int result = pp_expr(lexer, true);
 	if (result) {
-		lexer->if_nest_level++;
+		lexer->cstream->if_nest_level++;
 		return;
 	}
 	pp_skip(lexer, SKIP_TO_ALTERNATIVE);
 }
 
 static void pp_else(struct lexer *lexer) {
-	if (lexer->if_nest_level == 0) {
+	if (lexer->cstream->if_nest_level == 0) {
 		panic("unmatched #else");
 	}
-	lexer->if_nest_level--;
+	lexer->cstream->if_nest_level--;
 	pp_skip(lexer, SKIP_TO_END);
 }
 
 static void pp_endif(struct lexer *lexer) {
-	if (lexer->if_nest_level == 0) {
+	if (lexer->cstream->if_nest_level == 0) {
 		panic("unmatched #endif");
 	}
-	lexer->if_nest_level--;
+	lexer->cstream->if_nest_level--;
 }
 
 void pp_entry(struct lexer *lexer) {
@@ -142,7 +146,7 @@ void pp_entry(struct lexer *lexer) {
 
 	switch (tok.tok_tag) {
 	case PP_TOK_INCLUDE:
-		pp_include(lexer);
+		pp_include(lexer, false);
 		break;
 	case PP_TOK_IFNDEF:
 		pp_ifndef(lexer);

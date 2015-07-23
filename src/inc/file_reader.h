@@ -15,6 +15,12 @@ struct file_reader {
 	int pos;
 	int len;
 
+	/*
+	 * The nesting level is associate with each file rather than lexer. So we put it
+	 * here
+	 */
+	int if_nest_level; 
+
 	struct file_reader *prev;
 };
 

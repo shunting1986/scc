@@ -23,7 +23,7 @@ int push_want_quotation(struct lexer *lexer, int newval);
 void pop_want_quotation(struct lexer *lexer, int oldval);
 
 // pp-include.c
-void pp_include(struct lexer *lexer);
+void pp_include(struct lexer *lexer, bool skip);
 
 // macro-symtab.c
 int macro_defined(struct lexer *lexer, const char *s);

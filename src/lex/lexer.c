@@ -11,7 +11,7 @@
 #include <inc/htab.h>
 
 #undef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 
 static char lexer_next_char(struct lexer *lexer);
 
@@ -115,9 +115,6 @@ void lexer_dump_remaining(struct lexer *lexer) {
 union token expect(struct lexer *lexer, int tok_tag) {
 	union token tok = lexer_next_token(lexer);
 	if (tok.tok_tag != tok_tag) {
-#if DEBUG
-		lexer_dump_remaining(lexer); 
-#endif
 		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
 	}
 	return tok;
@@ -180,10 +177,13 @@ static char lexer_next_char(struct lexer *lexer) {
 repeat:
 	ch = file_reader_next_char(lexer->cstream);	
 	if (ch == EOF) {
-		if (lexer->if_nest_level > 0) {
+		if (lexer->cstream->if_nest_level > 0) {
 			panic("#if not paired");
 		}
 		struct file_reader *cur = lexer->cstream;
+#if DEBUG
+		fprintf(stderr, "leave file %s\n", lexer->cstream->path); 
+#endif
 		if (cur->prev != NULL) {
 			lexer->cstream = cur->prev;
 			file_reader_destroy(cur);

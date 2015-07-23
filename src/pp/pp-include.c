@@ -31,7 +31,7 @@ void open_header_file(struct lexer *lexer, const char *incl_path, int incl_tok) 
 	panic("header file not found %s", incl_path);
 }
 
-void pp_include(struct lexer *lexer) {
+void pp_include(struct lexer *lexer, bool skip) {
 	int old_want_quotation = push_want_quotation(lexer, 1);
 	union token tok = lexer_next_token(lexer);
 	pop_want_quotation(lexer, old_want_quotation);
@@ -51,7 +51,9 @@ void pp_include(struct lexer *lexer) {
 	(void) incl_path;
 
 #if 1
-	open_header_file(lexer, incl_path, incl_tok);
+	if (!skip) {
+		open_header_file(lexer, incl_path, incl_tok);
+	}
 #else
 	fprintf(stderr, "\033[31m#include is disabled temporarily\033[0m\n");
 #endif
