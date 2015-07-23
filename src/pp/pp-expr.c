@@ -62,6 +62,8 @@ static int pp_unary_expr(struct lexer *lexer) {
 			panic("integer required");
 		}
 		return tok.const_val.ival;
+	case TOK_SUB:
+		return -pp_unary_expr(lexer);
 	default:
 		token_dump(tok); 
 		panic("ni %s", token_tag_str(tok.tok_tag));

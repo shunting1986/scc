@@ -44,7 +44,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 			case PP_TOK_DEFINE:
 				break;
 			case PP_TOK_IF:
-				panic("take care of nest_level");
+				nest_level++;
 				break;
 			case PP_TOK_ELIF:
 				if (nest_level > 0)  {
