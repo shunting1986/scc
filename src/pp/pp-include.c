@@ -3,6 +3,9 @@
 
 static const char *sys_inc_paths[] = {
 	"/usr/include",
+	// TODO remove this dependency
+	// stddef.h included (maybe indirectly) by stdio.h need this path
+	"/usr/lib/gcc/x86_64-linux-gnu/4.8/include", 
 	NULL,
 };
 

@@ -3,7 +3,7 @@
 #include <inc/lexer.h>
 
 #undef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 
 static void expand_obj_macro(struct lexer *lexer, const char *name, struct macro *macro, struct dynarr *out_list) {
 	// TODO we can optimize to avoid deep copy the token
@@ -140,9 +140,10 @@ static void expand_func_macro(struct lexer *lexer, const char *name, struct macr
 
 #if DEBUG
 	{
+		fprintf(stderr, "func macro %s arguments:\n", name);
 		int i = 0;
 		DYNARR_FOREACH_BEGIN(arg_list, dynarr, each);
-			fprintf(stderr, "arg %d:\n", ++i);
+			fprintf(stderr, "  arg %d:\n", ++i);
 			token_list_dump(each);
 		DYNARR_FOREACH_END();
 	}

@@ -31,6 +31,7 @@ static int pred_table[] = {
 
 	[TOK_GT] = 5,
 	[TOK_GE] = 5,
+	[TOK_LT] = 5,
 
 	[TOK_EQ] = 3,
 
@@ -66,7 +67,13 @@ static struct eval_result pp_eval_identifier(struct lexer *lexer, const char *na
 	int old_no_expand_macro = lexer_push_config(lexer, no_expand_macro, 0);
 	struct eval_result result;
 	if (!try_expand_macro(lexer, name)) {
+#if 0
 		result = wrap_eval_result(true, 0); // return Nan
+#else
+		// this is what GCC do
+		fprintf(stderr, "\033[31mpp_eval_identifier treat undefined id '%s' as 0\033[0m\n", name);
+		result = wrap_eval_result(false, 0);
+#endif
 		goto out;
 	}
 	result = pp_unary_expr(lexer);
@@ -140,15 +147,11 @@ static struct eval_result perform_op(int op, struct eval_result lhs, struct eval
 
 	int val;
 	switch (op) {
-	case TOK_GT:
-		val = lhs.val > rhs.val;
-		break;
-	case TOK_GE:
-		val = lhs.val >= rhs.val;
-		break;
-	case TOK_SUB:
-		val = lhs.val - rhs.val;
-		break;
+	case TOK_GT: val = lhs.val > rhs.val; break;
+	case TOK_LT: val = lhs.val < rhs.val; break;
+	case TOK_GE: val = lhs.val >= rhs.val; break;
+	case TOK_EQ: val = lhs.val == rhs.val; break;
+	case TOK_SUB: val = lhs.val - rhs.val; break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
 	}
@@ -229,6 +232,7 @@ static struct eval_result pp_expr_internal(struct lexer *lexer, bool until_newli
 int pp_expr(struct lexer *lexer, bool until_newline) {
 	struct eval_result result = pp_expr_internal(lexer, until_newline);
 	if (result.isNan) {
+		file_reader_dump_remaining(lexer->cstream); // TODO
 		panic("Invalid pp expression");
 	}
 	fprintf(stderr, "pp_expr returns %d\n", result.val);

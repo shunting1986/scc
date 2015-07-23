@@ -37,6 +37,9 @@ TODO: use stack to store temporary right now. Need implement advanced register a
 TODO: make the compiler support both 32 bit and 64 bit asm?
 TODO: floating point
 
+TODO: remove the dependency of the include file search path on GCC installation
+
+
 TODO: syntax
 - abstract declarator
 - avoid allocate space for typedef
