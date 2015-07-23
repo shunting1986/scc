@@ -11,10 +11,24 @@ int macro_defined(struct lexer *lexer, const char *s) {
 }
 
 void define_macro(struct lexer *lexer, const char *name, struct macro *macro) {
-	// check for token redefine
 	// TODO the two htab access actually can be merged to a single one
-	if (htab_query(lexer->macro_tab, name) != NULL) {
-		panic("redefine %s", name);
+
+	/*
+	 * GCC rule for macro redefinition is:
+	 * if the redefinition is the same as the previous one, then everything is fine;
+	 * otherwise, a warning (not error) shows up.
+	 *
+	 * Our rule can be simpler: just redefine the macro and always print a message for redefinition
+	 *
+	 * NOTE:
+   *   GCC treat the following two as different ones, so an warning (not error) will pop up 
+	 *   #define ZZ(c, b) c + b
+	 *   #define ZZ(a, b) a + b
+	 */
+	struct macro *old_macro;
+	if ((old_macro = htab_query(lexer->macro_tab, name)) != NULL) {
+		fprintf(stderr, "\033[31mredefine macro: %s\033[0m\n", name);
+		htab_delete(lexer->macro_tab, name); // delete the old one
 	}
 	htab_insert(lexer->macro_tab, name, macro);
 }

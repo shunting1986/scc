@@ -22,7 +22,7 @@ void open_header_file(struct lexer *lexer, const char *incl_path, int incl_tok) 
 	for (i = 0; (dir = sys_inc_paths[i]) != NULL; i++) {
 		snprintf(buf, sizeof(buf), "%s/%s", dir, incl_path);
 #ifdef DEBUG
-		fprintf(stderr, "try incl path %s\n", buf);
+		fprintf(stderr, "[%s] try incl path %s\n", lexer->cstream->path, buf);
 #endif
 
 		if ((fr = file_reader_init(buf)) != NULL) {
