@@ -206,6 +206,16 @@ static union token obtain_next_expanded_token(struct lexer *lexer) {
 	return ret;
 }
 
+/*
+ * Only return the tag to simplify memory manangement for id token etc.
+ */
+static int lexer_peek_token(struct lexer *lexer) {
+	union token tok = lexer_next_token(lexer);
+	int tag = tok.tok_tag;
+	lexer_put_back(lexer, tok);
+	return tag;
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	int ch;
 	union token tok;
@@ -257,10 +267,11 @@ repeat:
 		}
 
 		token_tag = check_keyword_token(s);
+		int peek_tok;
 		if (token_tag != TOK_UNDEF) {
 			tok.tok_tag = token_tag;
 			free(s);
-		} else if (!lexer->typedef_disabled && lexer_is_typedef(lexer, s)) {
+		} else if (lexer_is_typedef(lexer, s) && (peek_tok = lexer_peek_token(lexer)) != TOK_COMMA && peek_tok != TOK_SEMICOLON) {
 			tok.tok_tag = TOK_TYPE_NAME;
 			tok.id.s = s;
 		} else if (try_expand_macro(lexer, s)) {

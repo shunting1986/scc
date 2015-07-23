@@ -107,15 +107,11 @@ static struct dynarr *parse_specifier_qualifier_sc_internal(struct parser *parse
 	void *nd;
 	struct dynarr *darr = dynarr_init();
 
-	parser->lexer->typedef_disabled = 0;
-
 	while (1) { 
 		tok = lexer_next_token(parser->lexer);
 		if ((mask & INTERNAL_PARSE_SPECIFIER) && initiate_type_specifier(tok)) {
 			lexer_put_back(parser->lexer, tok);
 			nd = parse_type_specifier(parser);
-
-			parser->lexer->typedef_disabled = 1;
 		} else if ((mask & INTERNAL_PARSE_QUALIFIER) && initiate_type_qualifier(tok)) {
 			nd = type_qualifier_init(tok.tok_tag);
 		} else if ((mask & INTERNAL_PARSE_STORAGE_CLASS) && initiate_storage_class_specifier(tok)) {
@@ -367,7 +363,6 @@ int initiate_declaration(union token tok) {
 
 // assume no EOF found; 
 static struct external_declaration *parse_external_decl(struct parser *parser) {
-	parser->lexer->typedef_disabled = 0;
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
 	struct external_declaration *external_decl = external_declaration_init(decl_specifiers);
 	struct declarator *declarator = NULL;

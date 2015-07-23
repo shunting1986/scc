@@ -108,7 +108,6 @@ static void parse_sizeof(struct parser *parser, struct unary_expression *unary_e
 		lexer_put_back(parser->lexer, tok);
 		unary_expr->sizeof_expr = parse_unary_expression(parser);
 	} else {
-		parser->lexer->typedef_disabled = 0;
 		union token nxtok = lexer_next_token(parser->lexer);
 		if (initiate_type_specifier(nxtok) || initiate_type_qualifier(nxtok)) {
 			lexer_put_back(parser->lexer, nxtok);

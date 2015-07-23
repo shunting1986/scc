@@ -2,7 +2,7 @@
 #include <inc/pp.h>
 
 #undef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 
 static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 	struct dynarr *darr = dynarr_init();
@@ -26,6 +26,7 @@ static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 	define_macro(lexer, name, macro);
 
 #if DEBUG
+	// fprintf(stderr, "%s define the macro %s\n", lexer->cstream->path, name);
 	macro_dump(name, macro);
 #endif
 }

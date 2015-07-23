@@ -18,7 +18,9 @@ static const char *keyword_str_list[] = {
 	[TOK_ELSE] = "else",
 	[TOK_TYPEDEF] = "typedef",
 	[TOK_SIZEOF] = "sizeof",
+	[TOK_SIGNED] = "signed",
 	[TOK_UNSIGNED] = "unsigned",
+	[TOK_SHORT] = "short",
 	[TOK_TOTAL_NUM] = NULL,
 };
 

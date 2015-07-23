@@ -25,13 +25,14 @@ struct macro *obj_macro_init(struct dynarr *toklist) {
 }
 
 void macro_dump(const char *name, struct macro *macro) {
-	printf("macro %d %s\n", macro->type, name);
+	fprintf(stderr, "macro %d %s\n", macro->type, name);
 	if (macro->type == MACRO_FUNC) {
-		printf("-> param list\n");
+		fprintf(stderr, "-> param list\n");
 		DYNARR_FOREACH_PLAIN_BEGIN(macro->paramlist, const char *, each);
-			printf("  %s\n", each);
+			fprintf(stderr, "  %s\n", each);
 		DYNARR_FOREACH_END();
 	}
-	printf("-> tok list\n");
+	fprintf(stderr, "-> tok list\n");
 	token_list_dump(macro->toklist);
+	fprintf(stderr, "end macro dump\n");
 }

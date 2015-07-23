@@ -20,7 +20,15 @@ struct lexer {
 	int nputback;
 
 	struct typedef_tab *typedef_tab;
-	int typedef_disabled;
+	// The field initially is attended to avoid use typedefed var on typedef
+	// but actually this is a valid usage.
+	// The only special case is:
+	// typedef int a;
+	// { 
+	//   typedef int a;
+	// }
+	// which can be handled using a trick
+	// int typedef_disabled;
 
 	int in_pp_context; // indicate if we are in preprocessor context
 	int want_newline;
