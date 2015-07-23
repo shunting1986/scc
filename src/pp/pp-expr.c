@@ -235,7 +235,6 @@ int pp_expr(struct lexer *lexer, bool until_newline) {
 		file_reader_dump_remaining(lexer->cstream); // TODO
 		panic("Invalid pp expression");
 	}
-	fprintf(stderr, "pp_expr returns %d\n", result.val);
 	return result.val;
 }
 

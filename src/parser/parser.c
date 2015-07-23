@@ -50,12 +50,19 @@ int initiate_type_specifier(union token tok) {
 		TOK_UNDEF, // the last one
 	};
 	int i;
+	int ret = 0;
 	for (i = 0; type_tag_list[i] != TOK_UNDEF; i++) {
 		if (type_tag_list[i] == tok.tok_tag) {
-			return 1;
+			ret = 1;
+			goto out;
 		}
 	}
-	return 0;
+out:
+	/*
+	token_dump(tok); 
+	fprintf(stderr, "initiate_type_specifier, tok %s ret %d\n", token_tag_str(tok.tok_tag), ret); 
+	 */
+	return ret;
 }
 
 static int initiate_storage_class_specifier(union token tok) {
@@ -324,6 +331,8 @@ static struct init_declarator_list *parse_init_declarator_list_with_la(struct pa
 		} else if (tok.tok_tag == TOK_SEMICOLON) {
 			break;
 		} else {
+			file_reader_dump_remaining(parser->lexer->cstream);
+			token_dump(tok); 
 			panic("expect ',' or ';'");
 		}
 		init_declarator = parse_init_declarator(parser);

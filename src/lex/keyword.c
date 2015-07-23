@@ -9,6 +9,7 @@ static const char *keyword_str_list[] = {
 	[TOK_CONST] = "const",
 	[TOK_VOID] = "void",
 	[TOK_INT] = "int",
+	[TOK_LONG] = "long",
 	[TOK_RETURN] = "return",
 	[TOK_CHAR] = "char",
 	[TOK_WHILE] = "while",
@@ -17,6 +18,7 @@ static const char *keyword_str_list[] = {
 	[TOK_ELSE] = "else",
 	[TOK_TYPEDEF] = "typedef",
 	[TOK_SIZEOF] = "sizeof",
+	[TOK_UNSIGNED] = "unsigned",
 	[TOK_TOTAL_NUM] = NULL,
 };
 

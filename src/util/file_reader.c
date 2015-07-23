@@ -29,7 +29,7 @@ void file_reader_put_back(struct file_reader *fr, char putback) {
 void file_reader_dump_remaining(struct file_reader *fr) {
 	char ch;
 	int cnt = 0;
-	printf("Following characters:\n");
+	printf("Following characters in %s:\n", fr->path);
 	printf("\033[31m");
 	while ((ch = file_reader_next_char(fr)) != EOF) {
 		printf("%c", ch);
