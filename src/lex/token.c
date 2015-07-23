@@ -125,3 +125,9 @@ union token wrap_int_const_to_token(int val) {
 	return tok;
 }
 
+union token wrap_to_simple_token(int tag) {
+	union token tok;
+	tok.tok_tag = tag;
+	return tok;
+}
+

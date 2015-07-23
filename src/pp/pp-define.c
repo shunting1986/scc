@@ -61,7 +61,6 @@ static void pp_define_func_macro(struct lexer *lexer, const char *name) {
 }
 
 void pp_define(struct lexer *lexer) {
-	int old_no_expand_macro = lexer_push_config(lexer, no_expand_macro, 1);
 	// TODO: note this does not check for the skip mode yet
 	union token idtok = expect(lexer, TOK_IDENTIFIER);
 
@@ -77,7 +76,6 @@ void pp_define(struct lexer *lexer) {
 		pp_define_object_macro(lexer, idtok.id.s);
 	}
 	token_destroy(idtok);
-	lexer_pop_config(lexer, no_expand_macro, old_no_expand_macro);
 }
 
 void pp_undef(struct lexer *lexer) {

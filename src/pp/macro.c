@@ -5,7 +5,8 @@
  * XXX: For func macro, the string in paramlist should be freed as well
  */
 void macro_destroy(void *_macro) {
-	panic("ni");
+	fprintf(stderr, "\033[31mmacro_destroy not implemented yet\033[0m\n"); // TODO
+	// panic("ni");
 }
 
 struct macro *func_macro_init(struct dynarr *paramlist, struct dynarr *toklist) {

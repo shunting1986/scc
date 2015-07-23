@@ -24,8 +24,6 @@ struct lexer *lexer_init(struct file_reader *cstream) {
 	lexer->macro_tab = htab_init();
 	lexer->macro_tab->val_free_fn = macro_destroy;
 
-	lexer->if_stack = dynarr_init();
-
 	lexer->expanded_macro = dynarr_init();
 	return lexer;
 }
@@ -51,8 +49,6 @@ void lexer_destroy(struct lexer *lexer) {
 
 	// free macro tab
 	htab_destroy(lexer->macro_tab);
-
-	dynarr_destroy(lexer->if_stack);
 
 	assert(lexer->expanded_macro_pos == dynarr_size(lexer->expanded_macro));
 	normalize_expanded_token_list(lexer);
@@ -181,7 +177,7 @@ static char lexer_next_char(struct lexer *lexer) {
 repeat:
 	ch = file_reader_next_char(lexer->cstream);	
 	if (ch == EOF) {
-		if (dynarr_size(lexer->if_stack) > 0) {
+		if (lexer->if_nest_level > 0) {
 			panic("#if not paired");
 		}
 		struct file_reader *cur = lexer->cstream;
@@ -214,18 +210,19 @@ union token lexer_next_token(struct lexer *lexer) {
 	char *s;
 	int token_tag;
 
+repeat:
 	if (lexer->nputback > 0) {
-		return lexer->putback_stk[--lexer->nputback];
+		tok = lexer->putback_stk[--lexer->nputback];
+		goto out;
 	}
 
-repeat:
 	if (has_more_expanded_token(lexer)) {
 		tok = obtain_next_expanded_token(lexer);
 		if (tok.tok_tag == TOK_IDENTIFIER && try_expand_macro(lexer, tok.id.s)) { // recursive expanding
 			free(tok.id.s);	
 			goto repeat;
 		}
-		return tok;
+		goto out;
 	}
 
 	ch = lexer_next_char(lexer);
@@ -287,7 +284,7 @@ repeat:
 		goto repeat;
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '?': case '~':
-	case '[': case ']': case ':':
+	case '[': case ']': case ':': case '#':
 		tok.tok_tag = ch;
 		break;
 	case '+':
@@ -406,19 +403,18 @@ repeat:
 			panic("invalid '.'");
 		}
 		break;
-	case '#':
-		// lexer_discard_line(lexer); // ignore preprocess right now
-		pp_entry(lexer);
-		goto repeat; // XXX is always 'goto' suitable
 	default:
 		panic("lexer_next_token unexpected character '%c'", ch);
 	}
 
-	// check if we should skip the token
-	if (pp_in_skip_mode(lexer)) {
-		token_destroy(tok);
-		goto repeat;
+out:
+	// We need this special handling for sharp since we may put back sharp token
+	// to the lexer in pp
+	if (tok.tok_tag == TOK_SHARP && !lexer->want_sharp) {
+		pp_entry(lexer);
+		goto repeat; 
 	}
+
 	return tok;
 }
 

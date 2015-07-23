@@ -10,21 +10,6 @@ extern "C" {
 
 struct macro;
 
-
-/* This flag is set if the block is enclosed within a larger skip context or 
- * if this block is part of an if-elsif sequence whose true part already happen
- */
-#define IF_FLAG_ALWAYS_SKIP 0x40000000
-
-#define IF_FLAG_MASK 0xFF000000
-
-#define IF_ITEM_VALUE(v) ((v) & ~IF_FLAG_MASK)
-
-enum {
-	IF_TRUE = 0,
-	IF_FALSE,
-};
-
 // pp.c
 void pp_entry(struct lexer *lexer);
 
@@ -36,8 +21,6 @@ int push_want_newline(struct lexer *lexer, int newval);
 void pop_want_newline(struct lexer *lexer, int oldval);
 int push_want_quotation(struct lexer *lexer, int newval);
 void pop_want_quotation(struct lexer *lexer, int oldval);
-void pp_push_if_item(struct lexer *lexer, int item, int flag);
-int pp_in_skip_mode(struct lexer *lexer);
 
 // pp-include.c
 void pp_include(struct lexer *lexer);

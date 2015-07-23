@@ -1,7 +1,12 @@
+  NOTE: I've actually pass the cond-compiling test cases
+	NEED REVIEW THE CODE CAREFULLY AND THEN CHECK-IN.
+
 KEYLIST
 	2. support skip mode <== IMP
-	   - add test case
-		 - pass the test
+	   - add test case <= DONE
+		 - pass the test <== HERE
+
+		 + add test case for nested conditional compiling ... (check pp_skip)
 
 	3. support struct
 

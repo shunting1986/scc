@@ -11,6 +11,9 @@ static const char *keyword_str_list[] = {
 	[PP_TOK_DEFINED] = "defined",
 	[PP_TOK_DEFINE] = "define",
 	[PP_TOK_UNDEF] = "undef",
+	[PP_TOK_ELIF] = "elif",
+	[PP_TOK_ELSE] = "else",
+	[PP_TOK_ENDIF] = "endif",
 	[TOK_TOTAL_NUM] = NULL,
 }; 
 

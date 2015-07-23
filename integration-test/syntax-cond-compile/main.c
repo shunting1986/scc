@@ -41,7 +41,7 @@ main() {
 
 #undef MSG
 #define C 3
-#if defined(C)
+#if C > 2
 #define MSG "C is defined"
 #elif defined(B)
 #define MSG "B is defined"

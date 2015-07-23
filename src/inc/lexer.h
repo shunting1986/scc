@@ -25,11 +25,13 @@ struct lexer {
 	int in_pp_context; // indicate if we are in preprocessor context
 	int want_newline;
 	int want_quotation;
+	int want_sharp;
 	int no_expand_macro; // we should no expand macro when we are in the middle of 
 		// expanding another one or when we are defining macros etc.
 
+	int if_nest_level;
+
 	struct hashtab *macro_tab;
-	struct dynarr *if_stack;
 
 	struct dynarr *expanded_macro; // set the item to NULL when any elem is used
 		// the macro is fully expanded
