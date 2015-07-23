@@ -82,7 +82,10 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 		val = val * 10 + (ch - '0');
 		ch = file_reader_next_char(lexer->cstream);
 	}
-	file_reader_put_back(lexer->cstream, ch);
+
+	if (ch != 'L' && ch != 'l') { // ignore a single following L 
+		file_reader_put_back(lexer->cstream, ch);
+	}
 	ptok->tok_tag = TOK_CONSTANT_VALUE;
 	ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
 	ptok->const_val.ival = val;
@@ -230,6 +233,7 @@ repeat:
 	case '0' ... '9':
 		file_reader_put_back(lexer->cstream, ch);
 		parse_number(lexer, &tok);
+
 		break;
 	case 'a' ... 'z':
 	case 'A' ... 'Z':

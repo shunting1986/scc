@@ -27,6 +27,8 @@ struct eval_result wrap_eval_result(int isNan, int val) {
  * XXX always take care to order the predecence when adding new operator
  */
 static int pred_table[] = {
+	[TOK_SUB] = 4,
+
 	[TOK_GT] = 3,
 	[TOK_GE] = 3,
 
@@ -60,11 +62,15 @@ static int pp_defined(struct lexer *lexer) {
 
 static struct eval_result pp_eval_identifier(struct lexer *lexer, const char *name) {
 	int old_no_expand_macro = lexer_push_config(lexer, no_expand_macro, 0);
+	struct eval_result result;
 	if (!try_expand_macro(lexer, name)) {
-		return wrap_eval_result(true, 0); // return Nan
+		result = wrap_eval_result(true, 0); // return Nan
+		goto out;
 	}
+	result = pp_unary_expr(lexer);
+out:
 	lexer_pop_config(lexer, no_expand_macro, old_no_expand_macro);
-	return pp_unary_expr(lexer);
+	return result;
 }
 
 static struct eval_result pp_unary_expr(struct lexer *lexer) {
@@ -172,7 +178,6 @@ static struct eval_result pp_expr_internal(struct lexer *lexer, bool until_newli
 
 	tok = lexer_next_token(lexer);
 	while (tok.tok_tag != TOK_NEWLINE && tok.tok_tag != TOK_RPAREN) {
-		// token_dump(tok); // TODO
 		int pred = pp_get_op_pred(tok.tok_tag);
 		unary_res = pp_unary_expr(lexer);
 
