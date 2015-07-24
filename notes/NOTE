@@ -1,3 +1,7 @@
+	2. support struct  <==
+	== add test case
+	-= pass the test..
+ 
   TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST

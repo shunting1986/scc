@@ -100,6 +100,8 @@ void lexer_put_back(struct lexer *lexer, union token token) {
 void lexer_dump_remaining(struct lexer *lexer) {
 	union token tok;
 	int tot = 0;
+	// NOTE: the path may be suitable only for the beginning several tokens
+	fprintf(stderr, "[%s] dump remaining tokens\n", lexer->cstream->path);
 	while (1) {
 		tok = lexer_next_token(lexer);
 		if (tok.tok_tag == TOK_EOF) {
