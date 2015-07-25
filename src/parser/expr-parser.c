@@ -77,13 +77,23 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 			struct postfix_expression_suffix *suff = mallocz(sizeof(*suff));
 			suff->is_dec = 1;
 			dynarr_add(post_expr->suff_list, suff);
+		} else if (tok.tok_tag == TOK_DOT) {
+			struct postfix_expression_suffix *suff = mallocz(sizeof(*suff));
+			union token tok = expect(parser->lexer, TOK_IDENTIFIER);
+			suff->dot_id = tok.id.s;
+			dynarr_add(post_expr->suff_list, suff);
+		} else if (tok.tok_tag == TOK_PTR_OP) {
+			struct postfix_expression_suffix *suff = mallocz(sizeof(*suff));
+			union token tok = expect(parser->lexer, TOK_IDENTIFIER);
+			suff->ptr_id = tok.id.s;
+			dynarr_add(post_expr->suff_list, suff);
 		} else if (tok.tok_tag == TOK_LBRACKET) {
 			struct expression *expr = parse_expression(parser);	
 			struct postfix_expression_suffix *suff = mallocz(sizeof(*suff));
 			suff->ind = expr;
 			dynarr_add(post_expr->suff_list, suff);
 			expect(parser->lexer, TOK_RBRACKET);
-		} else { // TODO need handle more cases
+		} else { 
 			lexer_put_back(parser->lexer, tok);
 			break;
 		}

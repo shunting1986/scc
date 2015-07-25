@@ -431,7 +431,8 @@ repeat:
 			}
 		} else {
 			// TODO handle the .23 case
-			panic("invalid '.'");
+			file_reader_put_back(lexer->cstream, ch);
+			tok.tok_tag = TOK_DOT; // struct_obj.field case
 		}
 		break;
 	default:
