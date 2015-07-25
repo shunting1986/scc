@@ -30,7 +30,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 	struct expr_val *pval, retval;
 	int i;
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
-		pval = malloc(sizeof(*pval));
+		pval = mallocz(sizeof(*pval));
 		*pval = cgasm_assignment_expression(ctx, each);
 		dynarr_add(argu_val_list, pval);
 	DYNARR_FOREACH_END();

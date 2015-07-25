@@ -56,7 +56,7 @@ static void cgasm_get_lval_temp_asm_code(struct cgasm_context *ctx, struct temp_
 // we also use this method to get the asm code for temp var
 static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf) {
 	if (buf == NULL) {
-		buf = malloc(128); // caller should free it
+		buf = mallocz(128); // caller should free it
 	}
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:

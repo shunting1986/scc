@@ -43,8 +43,12 @@ struct symbol *symtab_lookup(struct symtab *stab, const char *id) {
 	return NULL;
 }
 
+void symtab_add_with_key(struct symtab *stab, const char *key, struct symbol *sym) {
+	htab_insert(stab->htab, key, sym);
+}
+
 void symtab_add(struct symtab *stab, struct symbol *sym) {
-	htab_insert(stab->htab, sym->name, sym);
+	symtab_add_with_key(stab, sym->name, sym);
 }
 
 struct symbol *symtab_new_param(char *name, int ind, struct type *ctype) {
@@ -68,6 +72,14 @@ struct symbol *symtab_new_local_var(char *name, int ind, struct type *ctype) {
 struct symbol *symtab_new_global_var(char *name, struct type *ctype) {
 	struct global_var_symbol *sym = mallocz(sizeof(*sym));
 	sym->type = SYMBOL_GLOBAL_VAR;
+	sym->ctype = type_get(ctype);
+	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
+	return (struct symbol *) sym;
+}
+
+struct symbol *symtab_new_struct_type(const char *name, struct type *ctype) {
+	struct struct_union_symbol *sym = mallocz(sizeof(*sym));
+	sym->type = SYMBOL_STRUCT_UNION;
 	sym->ctype = type_get(ctype);
 	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
 	return (struct symbol *) sym;

@@ -15,7 +15,7 @@ static struct init_declarator_list *parse_init_declarator_list_with_la(struct pa
 static int initiate_storage_class_specifier(union token tok);
 
 struct parser *parser_init(struct lexer *lexer) {
-	struct parser *parser = malloc(sizeof(*parser));
+	struct parser *parser = mallocz(sizeof(*parser));
 	parser->lexer = lexer;
 	return parser;
 }

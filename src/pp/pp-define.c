@@ -13,7 +13,7 @@ static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 			break;
 		}
 
-		union token *ptok = malloc(sizeof(*ptok));
+		union token *ptok = mallocz(sizeof(*ptok));
 		*ptok = tok;
 		dynarr_add(darr, ptok);
 	}

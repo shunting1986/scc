@@ -70,7 +70,13 @@ struct type *cgasm_get_union_type_by_name(struct cgasm_context *ctx, const char 
 }
 
 struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name, struct type *type) {
-	panic("ni");
+	char buf[256];
+	struct struct_union_symbol *ret;
+	get_struct_union_key(buf, name);
+	cgasm_check_sym_redef(ctx, buf);
+
+	symtab_add_with_key(ctx->top_stab, buf, ret = symtab_new_struct_type(name, type));
+	return ret;
 }
 
 struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <inc/cbuf.h>
+#include <inc/util.h>
 
 struct cbuf {
 	char *buf;
@@ -12,7 +13,7 @@ struct cbuf {
 
 struct cbuf *cbuf_init() {
 	struct cbuf *buf = calloc(1, sizeof(*buf));
-	buf->buf = malloc(8);
+	buf->buf = mallocz(8);
 	buf->capa = 8;
 	return buf;
 }
