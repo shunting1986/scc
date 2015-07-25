@@ -388,4 +388,6 @@ struct specifier_qualifier_list *specifier_qualifier_list_init(struct dynarr *da
 	return list;
 }
 	
-
+struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list) {
+	panic("ni");
+}

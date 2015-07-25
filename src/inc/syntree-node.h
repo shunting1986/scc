@@ -168,6 +168,13 @@ struct storage_class_specifier {
 
 struct storage_class_specifier *storage_class_specifier_init(int tok_tag);
 
+struct struct_declaration_list {
+	int nodeType;
+	struct dynarr *decl_list;
+};
+
+struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list);
+
 struct type_specifier {
 	int nodeType;
 	int tok_tag; // specify type

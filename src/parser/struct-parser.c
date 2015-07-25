@@ -2,8 +2,23 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
-static struct struct_declaration_list *parse_struct_declaration_list(struct parser *parser) {
+static struct struct_declaration *parse_struct_declaration(struct parser *parser) {
 	panic("ni");
+}
+
+static struct struct_declaration_list *parse_struct_declaration_list(struct parser *parser) {
+	union token tok;
+	struct dynarr *darr = dynarr_init();
+	while (true) {
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag == TOK_RBRACE) {
+			break;
+		}
+
+		lexer_put_back(parser->lexer, tok);
+		dynarr_add(darr, parse_struct_declaration(parser));
+	}
+	return struct_declaration_list_init(darr);
 }
 
 struct type_specifier *parse_struct_or_union_specifier(struct parser *parser) {

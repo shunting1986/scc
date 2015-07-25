@@ -19,7 +19,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	lex/typedef.c \
 	type/type.c \
 	parser/parser.c \
-	parser/type-parser.c \
+	parser/struct-parser.c \
 	parser/stmt-parser.c \
 	parser/expr-parser.c \
 	parser/syntree.c \
