@@ -22,6 +22,13 @@ enum {
 
 #define TYPE_FLAG_STATIC 1
 
+// also used for union
+struct struct_field {
+	char *name;
+	struct type *type;
+	// int width; // NOT SUPPORTED YET
+};
+
 struct type {
 	int tag; // T_INT etc.
 	int flags;
@@ -35,6 +42,7 @@ struct type {
 
 	union {
 		int dim; // for array
+		struct dynarr *field_list;
 	};
 };
 

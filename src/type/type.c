@@ -63,7 +63,7 @@ void type_destroy(struct type *type) {
 		type_put(type->subtype);
 		tofree = type;
 		break;
-	default:
+	default: // TODO for struct type, need free up the field list
 		panic("ni %p, %d", type, type->tag);
 	}
 
@@ -131,7 +131,11 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
-static struct type *get_noncomplete_struct_type() {
+static struct dynarr *parse_struct_field_list_by_decl_list(struct struct_declaration_list *decl_list, int *size_ret) {
+	panic("ni");
+}
+
+static struct type *create_noncomplete_struct_type() {
 	panic("ni");
 }
 
@@ -139,7 +143,11 @@ static struct type *get_noncomplete_struct_type() {
  * This method does not inc the reference count for type
  */
 static struct type *parse_struct_type_by_decl_list(struct struct_declaration_list *decl_list) {
-	panic("ni");
+	int size;
+	struct dynarr *field_list = parse_struct_field_list_by_decl_list(decl_list, &size);
+	struct type *type = alloc_type(T_STRUCT, size);
+	type->field_list = field_list;
+	return type;
 }
 
 static void complete_struct_definition(struct cgasm_context *ctx, struct type *struct_type, struct struct_declaration_list *decl_list) {
@@ -160,7 +168,7 @@ static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, co
 		// recursively retrieve the struct type
 		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, name, true); // XXX this method only cover the case for struct (not union)
 		if (struct_type == NULL) {
-			struct_type = get_noncomplete_struct_type();
+			struct_type = create_noncomplete_struct_type();
 			cgasm_add_struct_type(ctx, name, struct_type);
 		}
 		return struct_type;
