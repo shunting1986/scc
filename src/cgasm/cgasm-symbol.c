@@ -33,18 +33,40 @@ struct type *cgasm_get_type_from_type_name(struct cgasm_context *ctx, char *id) 
 	return sym->ctype;
 }
 
+// XXX buffer overflow is not treated correctly
+static char *get_struct_union_key(char *buf, const char *name) {
+	assert(buf != NULL);
+	sprintf(buf, "#T%s", name); // add '#T' prefix
+	return buf;
+}
+
 // return NULL if not found
-/*
-static struct type *cgasm_get_struct_union_type_by_name(struct cgasm_context *ctx, char *name, bool rec) {
-	panic("ni"); // TODO
-} */ // TODO uncomment this when needed
+static struct type *cgasm_get_struct_union_type_by_name(struct cgasm_context *ctx, const char *name, bool rec) {
+	char buf[256];
+	struct struct_union_symbol *symbol;
+	get_struct_union_key(buf, name);
+	if (rec) {
+		symbol = symtab_lookup(ctx->top_stab, buf);
+	} else {
+		symbol = symtab_lookup_norec(ctx->top_stab, buf);
+	}
+	return symbol == NULL ? NULL : symbol->ctype;
+} 
 
 struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, const char *name, bool rec) {
-	panic("ni"); // TODO
+	struct type *type = cgasm_get_struct_union_type_by_name(ctx, name, rec);
+	if (type != NULL && type->tag != T_STRUCT) {
+		panic("tag '%s' is declaration as a type other than struct", name);
+	}
+	return type;
 }
 
 struct type *cgasm_get_union_type_by_name(struct cgasm_context *ctx, const char *name, bool rec) {
-	panic("ni"); // TODO
+	struct type *type = cgasm_get_struct_union_type_by_name(ctx, name, rec);
+	if (type != NULL && type->tag != T_UNION) {
+		panic("tag '%s' is declaration as a type other than union", name);
+	}
+	return type;
 }
 
 struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name, struct type *type) {
