@@ -23,22 +23,21 @@ const char *node_type_str(unsigned int node_type) {
 // following are node constructor and destructor definitions
 
 struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr) {
-	struct declaration_specifiers *specs = malloc(sizeof(*specs));
+	struct declaration_specifiers *specs = mallocz(sizeof(*specs));
 	specs->nodeType = DECLARATION_SPECIFIERS;
 	specs->darr = darr;
 	return specs;
 }
 
 struct type_specifier *type_specifier_init(int tok_tag) {
-	struct type_specifier *sp = malloc(sizeof(*sp));
+	struct type_specifier *sp = mallocz(sizeof(*sp));
 	sp->nodeType = TYPE_SPECIFIER;
 	sp->tok_tag = tok_tag;
-	sp->extra = NULL;
 	return sp;
 }
 
 struct direct_declarator *direct_declarator_init() {
-	struct direct_declarator *dd = malloc(sizeof(*dd));
+	struct direct_declarator *dd = mallocz(sizeof(*dd));
 	dd->nodeType = DIRECT_DECLARATOR;
 	dd->suff_list = dynarr_init();
 	return dd;

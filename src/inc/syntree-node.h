@@ -171,9 +171,9 @@ struct storage_class_specifier *storage_class_specifier_init(int tok_tag);
 struct type_specifier {
 	int nodeType;
 	int tok_tag; // specify type
-	union syntreenode *extra;
 
-	char *type_name;
+	char *type_name;  // used for typedef, struct, union
+	struct struct_declaration_list *struct_decl_list; // used for struct or union
 };
 
 struct type_specifier *type_specifier_init(int tok_tag);

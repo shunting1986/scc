@@ -19,7 +19,11 @@ enum {
 	SYMBOL_GLOBAL_VAR,
 	SYMBOL_LOCAL_VAR,
 	SYMBOL_PARAM,
+
+	SYMBOL_STRUCT_UNION,
 };
+
+#define struct_union_symbol symbol
 
 struct symbol {
 	int type;

@@ -1,4 +1,6 @@
 	2. support struct  <==
+	= parse
+	= interpret
 	== add test case
 	-= pass the test..
  

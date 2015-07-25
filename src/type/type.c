@@ -53,7 +53,7 @@ void type_destroy(struct type *type) {
 	struct type *tofree = NULL;
 
 	switch (type->tag) {
-	case T_INT: // we should have a separate place to free the reused types
+	case T_INT: // no need to destroy
 		break;
 	case T_ARRAY:
 		type_put(type->subtype);

@@ -79,13 +79,15 @@ struct type_name *parse_type_name(struct parser *parser) {
 	return type_name_init(sqlist);
 }
 
-/* TODO handle TYPE_NAME
+/* 
  * We already know that a type_specifier is following
  */
 static struct type_specifier *parse_type_specifier(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
-	if (tok.tok_tag == TOK_STRUCT || tok.tok_tag == TOK_UNION || tok.tok_tag == TOK_ENUM) {
-		panic("struct, union, enum not supported yet");
+	if (tok.tok_tag == TOK_STRUCT || tok.tok_tag == TOK_UNION) {
+		return parse_struct_or_union_specifier(parser);
+	} else if (tok.tok_tag == TOK_ENUM) {
+		panic("enum not supported yet");
 	} else {
 		struct type_specifier *sp = type_specifier_init(tok.tok_tag);
 		if (tok.tok_tag == TOK_TYPE_NAME) {

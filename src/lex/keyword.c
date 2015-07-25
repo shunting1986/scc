@@ -21,7 +21,7 @@ static const char *keyword_str_list[] = {
 	[TOK_SIGNED] = "signed",
 	[TOK_UNSIGNED] = "unsigned",
 	[TOK_SHORT] = "short",
-	// [TOK_STRUCT] = "struct",
+	[TOK_STRUCT] = "struct",
 	[TOK_TOTAL_NUM] = NULL,
 };
 
