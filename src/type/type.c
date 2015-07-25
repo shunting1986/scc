@@ -63,7 +63,7 @@ void type_destroy(struct type *type) {
 		type_put(type->subtype);
 		tofree = type;
 		break;
-	default: // TODO for struct type, need free up the field list
+	default: // TODO for struct type, need free up the field list (also type_put for field type)
 		panic("ni %p, %d", type, type->tag);
 	}
 
@@ -131,8 +131,58 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
-static struct dynarr *parse_struct_field_list_by_decl_list(struct struct_declaration_list *decl_list, int *size_ret) {
-	panic("ni");
+struct struct_field *struct_field_init(const char *name, struct type *type, int offset) {
+	struct struct_field *field = mallocz(sizeof(*field));
+	field->name = name;
+	field->type = type_get(type);
+	field->offset = offset;
+	return field;
+}
+
+static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, struct struct_declaration *decl, struct dynarr *field_list, int offset) {
+	struct type *type = parse_type_from_specifier_qualifier_list(ctx, decl->sqlist);
+	int size = 0;
+	const char *id;
+	(void) type;
+	DYNARR_FOREACH_BEGIN(decl->declarator_list, struct_declarator, each);
+		if (each->declarator == NULL) {
+			panic("does not support struct declartion without declarator right now");
+		}
+
+		if ((id = each->declarator->direct_declarator->id) == NULL) {
+			panic("only support struct declaration with id right now");
+		}
+
+		if (each->const_expr != NULL) {
+			panic("does not support struct declartion with field width right now");
+		}
+
+		struct type *final_type = parse_type_from_declarator(type, each->declarator);
+		if (final_type->size < 0) {
+			panic("The size of symbol is undefined: %s", id);
+		}
+	
+		dynarr_add(field_list, struct_field_init(id, final_type, offset));
+		offset += final_type->size;
+		size += final_type->size;
+	DYNARR_FOREACH_END();
+	return size;
+}
+
+static struct dynarr *parse_struct_field_list_by_decl_list(struct cgasm_context *ctx, struct struct_declaration_list *decl_list, int *size_ret) {
+	int size = 0;
+	struct dynarr *field_list = dynarr_init();
+	int offset;
+
+	DYNARR_FOREACH_BEGIN(decl_list->decl_list, struct_declaration, each);
+		offset = size;
+		size += parse_struct_field_list_by_decl(ctx, each, field_list, offset);
+	DYNARR_FOREACH_END();
+
+	if (size_ret) {
+		*size_ret = size;
+	}
+	return field_list;
 }
 
 static struct type *create_noncomplete_struct_type() {
@@ -142,9 +192,9 @@ static struct type *create_noncomplete_struct_type() {
 /*
  * This method does not inc the reference count for type
  */
-static struct type *parse_struct_type_by_decl_list(struct struct_declaration_list *decl_list) {
+static struct type *parse_struct_type_by_decl_list(struct cgasm_context *ctx, struct struct_declaration_list *decl_list) {
 	int size;
-	struct dynarr *field_list = parse_struct_field_list_by_decl_list(decl_list, &size);
+	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, decl_list, &size);
 	struct type *type = alloc_type(T_STRUCT, size);
 	type->field_list = field_list;
 	return type;
@@ -162,7 +212,7 @@ static void complete_struct_definition(struct cgasm_context *ctx, struct type *s
 static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, const char *name, struct struct_declaration_list *decl_list) {
 	if (name == NULL) {
 		assert(decl_list != NULL);
-		return parse_struct_type_by_decl_list(decl_list);
+		return parse_struct_type_by_decl_list(ctx, decl_list);
 	}
 	if (decl_list == NULL) {
 		// recursively retrieve the struct type
@@ -176,7 +226,7 @@ static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, co
 		// get struct type from current scope
 		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, name, false);
 		if (struct_type == NULL) {
-			struct_type = parse_struct_type_by_decl_list(decl_list);
+			struct_type = parse_struct_type_by_decl_list(ctx, decl_list);
 			cgasm_add_struct_type(ctx, name, struct_type);
 		} else {
 			// We must reuse the same type object since the noncomplete type object may 

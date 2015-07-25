@@ -79,6 +79,9 @@ static void register_parameter(struct cgasm_context *ctx, struct parameter_decla
 	}
 
 	struct type *type = parse_type_from_declaration(ctx, decl->decl_specifiers, decl->declarator);
+	if (type->size < 0) {
+		panic("The size of symbol is undefined: %s", dd->id);
+	}
 	cgasm_add_param_sym(ctx, dd->id, type);
 }
 

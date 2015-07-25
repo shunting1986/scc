@@ -24,10 +24,13 @@ enum {
 
 // also used for union
 struct struct_field {
-	char *name;
+	const char *name;
 	struct type *type;
+	int offset;
 	// int width; // NOT SUPPORTED YET
 };
+
+struct struct_field *struct_field_init(const char *name, struct type *type, int offset);
 
 struct type {
 	int tag; // T_INT etc.

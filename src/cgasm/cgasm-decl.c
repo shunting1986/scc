@@ -2,8 +2,6 @@
 #include <inc/dynarr.h>
 #include <inc/util.h>
 
-static struct type *parse_type_from_declarator(struct type *base_type, struct declarator *declarator);
-
 /*
  * need ctx for typedef
  */
@@ -12,7 +10,7 @@ struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct decla
 	return parse_type_from_declarator(base_type, declarator);
 }
 
-static struct type *parse_type_from_declarator(struct type *base_type, struct declarator *declarator) {
+struct type *parse_type_from_declarator(struct type *base_type, struct declarator *declarator) {
 	struct direct_declarator *dd = declarator->direct_declarator;
 	struct type *final_type = base_type;
 
