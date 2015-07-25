@@ -33,6 +33,24 @@ struct type *cgasm_get_type_from_type_name(struct cgasm_context *ctx, char *id) 
 	return sym->ctype;
 }
 
+// return NULL if not found
+/*
+static struct type *cgasm_get_struct_union_type_by_name(struct cgasm_context *ctx, char *name, bool rec) {
+	panic("ni"); // TODO
+} */ // TODO uncomment this when needed
+
+struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, const char *name, bool rec) {
+	panic("ni"); // TODO
+}
+
+struct type *cgasm_get_union_type_by_name(struct cgasm_context *ctx, const char *name, bool rec) {
+	panic("ni"); // TODO
+}
+
+struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name, struct type *type) {
+	panic("ni");
+}
+
 struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
 	struct symbol *ret;

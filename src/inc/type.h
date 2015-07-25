@@ -16,6 +16,8 @@ enum {
 	T_NONE, // this means no type specified. Different to T_VOID
 	T_PTR,
 	T_VOID,
+	T_STRUCT,
+	T_UNION,
 };
 
 #define TYPE_FLAG_STATIC 1

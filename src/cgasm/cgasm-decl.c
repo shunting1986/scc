@@ -61,6 +61,9 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		final_type = parse_type_from_declarator(base_type, declarator);
+		if (final_type->size < 0) {
+			panic("The size of symbol is undefined: %s", id);
+		}
 
 		// register symbol id with type 'final_type'
 		// TODO: don't allocate space for typedef

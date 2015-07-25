@@ -23,6 +23,8 @@ enum {
 	SYMBOL_STRUCT_UNION,
 };
 
+// NOTE: for struct/union, the key is decorated from the struct name but the name
+// field is not 
 #define struct_union_symbol symbol
 
 struct symbol {

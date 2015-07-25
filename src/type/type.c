@@ -131,6 +131,54 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
+static struct type *get_noncomplete_struct_type() {
+	panic("ni");
+}
+
+/*
+ * This method does not inc the reference count for type
+ */
+static struct type *parse_struct_type_by_decl_list(struct struct_declaration_list *decl_list) {
+	panic("ni");
+}
+
+static void complete_struct_definition(struct cgasm_context *ctx, struct type *struct_type, struct struct_declaration_list *decl_list) {
+	panic("ni");
+}
+
+/*
+ * This method will retrieve the struct type and 
+ * 1. create one if not exist yet 
+ * 2. complete one if this is a definition and we have not defined the struct yet
+ */
+static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, const char *name, struct struct_declaration_list *decl_list) {
+	if (name == NULL) {
+		assert(decl_list != NULL);
+		return parse_struct_type_by_decl_list(decl_list);
+	}
+	if (decl_list == NULL) {
+		// recursively retrieve the struct type
+		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, name, true); // XXX this method only cover the case for struct (not union)
+		if (struct_type == NULL) {
+			struct_type = get_noncomplete_struct_type();
+			cgasm_add_struct_type(ctx, name, struct_type);
+		}
+		return struct_type;
+	} else {
+		// get struct type from current scope
+		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, name, false);
+		if (struct_type == NULL) {
+			struct_type = parse_struct_type_by_decl_list(decl_list);
+			cgasm_add_struct_type(ctx, name, struct_type);
+		} else {
+			// We must reuse the same type object since the noncomplete type object may 
+			// already being refered
+			complete_struct_definition(ctx, struct_type, decl_list);
+		}
+		return struct_type;
+	}
+}
+
 /*
  * darr is a list of type_specifier, type_qualifier, storage_class_specifier (maybe missing) for specifier_qualifier_list case)
  */ 
@@ -172,6 +220,12 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 				}
 				type = cgasm_get_type_from_type_name(ctx, type_specifier->type_name);
 				break;
+			case TOK_STRUCT: 
+				if (type != NULL) {
+					panic("type already set");
+				}
+				type = cgasm_get_register_struct_type(ctx, type_specifier->type_name, type_specifier->struct_decl_list); // TODO support union in this same function
+				break;
 			default:
 				panic("not supported %s", token_tag_str(type_specifier->tok_tag));
 			}
@@ -184,7 +238,7 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 
 	if (type != NULL) {
 		if (num_long > 0 || has_unsigned || basetype != T_NONE) {
-			panic("other type mixed with type name");
+			panic("other type mixed with type name/struct");
 		}
 		return type; // should inc the ref count
 	}
