@@ -3,7 +3,23 @@
 #include <inc/util.h>
 
 struct struct_declarator *parse_struct_declarator(struct parser *parser) {
-	panic("ni");
+	struct declarator *declarator = NULL;
+	struct constant_expression *const_expr = NULL;
+	union token tok = lexer_next_token(parser->lexer);
+
+	if (tok.tok_tag != TOK_COLON) {
+		lexer_put_back(parser->lexer, tok);
+		declarator = parse_declarator(parser);
+		tok = lexer_next_token(parser->lexer);
+	}
+	
+	if (tok.tok_tag == TOK_COLON) {
+		const_expr = parse_constant_expression(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+	}
+
+	return struct_declarator_init(declarator, const_expr);
 }
 
 static struct struct_declaration *parse_struct_declaration(struct parser *parser) {

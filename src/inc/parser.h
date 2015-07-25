@@ -21,6 +21,7 @@ struct type_name *parse_type_name(struct parser *parser);
 int initiate_type_qualifier(union token tok);
 int initiate_type_specifier(union token tok);
 struct specifier_qualifier_list *parse_specifier_qualifier_list(struct parser *parser);
+struct declarator *parse_declarator(struct parser *parser);
 
 // stmt
 struct syntreebasenode *parse_statement(struct parser *parser);

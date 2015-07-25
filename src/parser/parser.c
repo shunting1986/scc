@@ -12,7 +12,6 @@
 static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator);
-static struct declarator *parse_declarator(struct parser *parser);
 static int initiate_storage_class_specifier(union token tok);
 
 struct parser *parser_init(struct lexer *lexer) {
@@ -268,7 +267,7 @@ static struct dynarr *parse_pointer(struct parser *parser) {
 	return ptr_list;
 }
 
-static struct declarator *parse_declarator(struct parser *parser) {
+struct declarator *parse_declarator(struct parser *parser) {
 	struct dynarr *ptr_list = parse_pointer(parser);
 	struct direct_declarator *direct_declarator = parse_direct_declarator(parser);
 	struct declarator *declarator = declarator_init();

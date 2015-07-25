@@ -168,6 +168,16 @@ struct storage_class_specifier {
 
 struct storage_class_specifier *storage_class_specifier_init(int tok_tag);
 
+struct struct_declarator {
+	int nodeType;
+
+	// according to C gramar, either one but not both of the two can be NULL
+	struct declarator *declarator;
+	struct constant_expression *const_expr;
+};
+
+struct struct_declarator *struct_declarator_init(struct declarator *declarator, struct constant_expression *const_expr);
+
 struct struct_declaration {
 	int nodeType;
 	struct specifier_qualifier_list *sqlist;

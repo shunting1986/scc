@@ -395,3 +395,7 @@ struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl
 struct struct_declaration *struct_declaration_init(struct specifier_qualifier_list *sqlist, struct dynarr *declarator_list) {
 	panic("ni");
 }
+
+struct struct_declarator *struct_declarator_init(struct declarator *declarator, struct constant_expression *const_expr) {
+	panic("ni");
+}
