@@ -2,8 +2,25 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
-static struct struct_declaration *parse_struct_declaration(struct parser *parser) {
+struct struct_declarator *parse_struct_declarator(struct parser *parser) {
 	panic("ni");
+}
+
+static struct struct_declaration *parse_struct_declaration(struct parser *parser) {
+	struct specifier_qualifier_list *sqlist = parse_specifier_qualifier_list(parser);
+	struct dynarr *declarator_list = dynarr_init();
+	union token tok;
+
+	while (true) {
+		dynarr_add(declarator_list, parse_struct_declarator(parser));
+		tok = lexer_next_token(parser->lexer);
+
+		if (tok.tok_tag == TOK_SEMICOLON) {
+			break;
+		}
+		assume(tok, TOK_COMMA);
+	}
+	return struct_declaration_init(sqlist, declarator_list);
 }
 
 static struct struct_declaration_list *parse_struct_declaration_list(struct parser *parser) {

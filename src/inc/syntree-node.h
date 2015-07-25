@@ -168,9 +168,17 @@ struct storage_class_specifier {
 
 struct storage_class_specifier *storage_class_specifier_init(int tok_tag);
 
+struct struct_declaration {
+	int nodeType;
+	struct specifier_qualifier_list *sqlist;
+	struct dynarr *declarator_list;
+};
+
+struct struct_declaration *struct_declaration_init(struct specifier_qualifier_list *sqlist, struct dynarr *declarator_list);
+
 struct struct_declaration_list {
 	int nodeType;
-	struct dynarr *decl_list;
+	struct dynarr *decl_list; // list of struct_declaration
 };
 
 struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list);

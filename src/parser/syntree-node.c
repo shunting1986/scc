@@ -391,3 +391,7 @@ struct specifier_qualifier_list *specifier_qualifier_list_init(struct dynarr *da
 struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list) {
 	panic("ni");
 }
+
+struct struct_declaration *struct_declaration_init(struct specifier_qualifier_list *sqlist, struct dynarr *declarator_list) {
+	panic("ni");
+}
