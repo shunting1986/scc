@@ -389,13 +389,26 @@ struct specifier_qualifier_list *specifier_qualifier_list_init(struct dynarr *da
 }
 	
 struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list) {
-	panic("ni");
+	struct struct_declaration_list *struct_decl_list = mallocz(sizeof(*struct_decl_list));
+	struct_decl_list->nodeType = STRUCT_DECLARATION_LIST;
+	struct_decl_list->decl_list = decl_list;
+	return struct_decl_list;
 }
 
 struct struct_declaration *struct_declaration_init(struct specifier_qualifier_list *sqlist, struct dynarr *declarator_list) {
-	panic("ni");
+	struct struct_declaration *struct_decl = mallocz(sizeof(*struct_decl));
+	struct_decl->nodeType = STRUCT_DECLARATION;
+	struct_decl->sqlist = sqlist;
+	struct_decl->declarator_list = declarator_list;
+	return struct_decl;
 }
 
 struct struct_declarator *struct_declarator_init(struct declarator *declarator, struct constant_expression *const_expr) {
-	panic("ni");
+	struct struct_declarator *struct_declarator = mallocz(sizeof(*declarator));
+	struct_declarator->nodeType = STRUCT_DECLARATOR;
+	struct_declarator->declarator = declarator;
+	struct_declarator->const_expr = const_expr;
+	return struct_declarator;
 }
+
+
