@@ -1,5 +1,3 @@
-  next step is support union type.....
-	
 	TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST
@@ -54,6 +52,6 @@ TODO: syntax
 	+ typedef, reference count mechanism for type structure, conditional expr
 	+ obj & func macro
 	+ cond compiling
-	+ struct definition and dot, ptr operation
+	+ struct/union definition and dot, ptr operation
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework

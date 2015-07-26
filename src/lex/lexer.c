@@ -74,6 +74,69 @@ char *parse_string_literal(struct lexer *lexer, int term_tag) {
 	return ret;
 }
 
+// XXX right now we treat single quote as int constant	
+void parse_single_quote(struct lexer *lexer, union token *ptok) {
+	char buf[11]; // 10 should be enough
+	int size = 0;
+	char ch;
+	int val = 0;
+	int i;
+
+	while ((ch = file_reader_next_char(lexer->cstream)) != EOF && ch != '\'') {
+		if (size == 10) {
+			panic("Invalid single quotation: enclosing too many characters");
+		}
+		buf[size++] = ch;
+	}
+
+	if (ch == EOF) {
+		panic("Unterminated \"'\"");
+	}
+
+	buf[size] = '\0';
+
+	if (buf[0] == '\\') {
+		if (size == 1) {
+			panic("invalid usage of backslash");
+		}
+		if (buf[1] >= '0' && buf[1] <= '7') {
+			val = buf[1] - '0';
+			for (i = 2; i < size; i++) {
+				if (buf[i] >= '0' && buf[i] <= '7') {
+					val = val * 8 + (buf[i] - '0');
+				} else {
+					break;
+				}
+			}
+			if (i < size) {
+				panic("invalid usage of backslash");
+			}
+		} else if (buf[1] == 'x' || buf[1] == 'X') {
+			if (size == 2) {
+				panic("invalid single quotation: \\x should follow hexadecimal number");
+			}
+			for (i = 2; i < size; i++) {
+				if (is_hex_char(buf[i])) {
+					val = val * 16 + get_hex_value_from_char(buf[i]);
+				}
+			}
+			if (i < size) {
+				panic("invalid usage of backslash");
+			}
+		} else {
+			panic("unsupported/invalid single quotation %s", buf);
+		}
+	} else if (size == 1) {
+		val = (unsigned char) buf[0];
+	} else {
+		panic("unsupported/invalid single quotation");
+	}
+
+	ptok->tok_tag = TOK_CONSTANT_VALUE;
+	ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
+	ptok->const_val.ival = val;
+}
+
 // XXX: only handle decimal integer right now
 void parse_number(struct lexer *lexer, union token *ptok) {
 	char ch = file_reader_next_char(lexer->cstream);
@@ -425,6 +488,9 @@ repeat:
 			file_reader_put_back(lexer->cstream, ch);
 			tok.tok_tag = TOK_GT;
 		}
+		break;
+	case '\'':
+		parse_single_quote(lexer, &tok);
 		break;
 	case '"':
 		if (lexer->want_quotation) { // in pp context, return " directly so the processing is similar to < include

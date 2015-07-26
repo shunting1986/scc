@@ -30,6 +30,21 @@ typedef int bool;
 #define false 0
 #endif
 
+static inline int is_hex_char(char ch) {
+	return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
+}
+
+static inline int get_hex_value_from_char(char ch) {
+	assert(is_hex_char(ch));
+	if (ch >= '0' && ch <= '9') {
+		return ch - '0'; 
+	} else if (ch >= 'A' && ch <= 'F') {
+		return ch - 'A' + 10;
+	} else {
+		return ch - 'a' + 10;
+	}
+}
+
 #ifdef __cplusplus
 }
 #endif
