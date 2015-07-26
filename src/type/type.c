@@ -166,8 +166,8 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
-static struct type *create_struct_type(int size, struct dynarr *field_list) {
-	struct type *ret = alloc_type(T_STRUCT, size);
+static struct type *create_struct_type(bool is_struct, int size, struct dynarr *field_list) {
+	struct type *ret = alloc_type(is_struct ? T_STRUCT : T_UNION, size);
 	ret->field_list = field_list;
 	return ret;
 }
@@ -177,7 +177,7 @@ static struct type *create_struct_type(int size, struct dynarr *field_list) {
  * TODO handle union
  */
 struct struct_field *get_struct_field(struct type *type, const char *name) {
-	assert(type != NULL && type->tag == T_STRUCT && type->field_list != NULL);
+	assert(type != NULL && (type->tag == T_STRUCT || type->tag == T_UNION) && type->field_list != NULL);
 	assert(name != NULL);
 	CHECK_MAGIC(type);
 	DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
@@ -228,11 +228,15 @@ struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *na
 	return field;
 }
 
-static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, struct struct_declaration *decl, struct dynarr *field_list, int offset) {
+static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_struct, struct struct_declaration *decl, struct dynarr *field_list, int offset) {
 	struct type *type = parse_type_from_specifier_qualifier_list(ctx, decl->sqlist);
 	int size = 0;
 	const char *id;
 	(void) type;
+
+	if (!is_struct) {
+		assert(offset == 0);
+	}
 	DYNARR_FOREACH_BEGIN(decl->declarator_list, struct_declarator, each);
 		if (each->declarator == NULL) {
 			panic("does not support struct declartion without declarator right now");
@@ -250,22 +254,33 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, struct str
 		if (final_type->size < 0) {
 			panic("The size of symbol is undefined: %s", id);
 		}
-	
+
 		dynarr_add(field_list, struct_field_init(ctx, id, final_type, offset));
-		offset += final_type->size;
-		size += final_type->size;
+
+		if (is_struct) {
+			offset += final_type->size;
+			size += final_type->size;
+		} else {
+			size = max(size, final_type->size);
+		}
 	DYNARR_FOREACH_END();
 	return size;
 }
 
-static struct dynarr *parse_struct_field_list_by_decl_list(struct cgasm_context *ctx, struct struct_declaration_list *decl_list, int *size_ret) {
+static struct dynarr *parse_struct_field_list_by_decl_list(struct cgasm_context *ctx, bool is_struct, struct struct_declaration_list *decl_list, int *size_ret) {
 	int size = 0;
 	struct dynarr *field_list = dynarr_init();
 	int offset;
+	int delta;
 
 	DYNARR_FOREACH_BEGIN(decl_list->decl_list, struct_declaration, each);
-		offset = size;
-		size += parse_struct_field_list_by_decl(ctx, each, field_list, offset);
+		offset = is_struct ? size : 0;
+		delta = parse_struct_field_list_by_decl(ctx, is_struct, each, field_list, offset);
+		if (is_struct) {
+			size += delta;
+		} else {
+			size = max(size, delta);
+		}
 	DYNARR_FOREACH_END();
 
 	if (size_ret) {
@@ -274,24 +289,24 @@ static struct dynarr *parse_struct_field_list_by_decl_list(struct cgasm_context 
 	return field_list;
 }
 
-static struct type *create_noncomplete_struct_type() {
-	return create_struct_type(-1, NULL);
+static struct type *create_noncomplete_struct_type(bool is_struct) {
+	return create_struct_type(is_struct, -1, NULL);
 }
 
 /*
  * This method does not inc the reference count for type
  */
-static struct type *parse_struct_type_by_decl_list(struct cgasm_context *ctx, struct struct_declaration_list *decl_list) {
+static struct type *parse_struct_type_by_decl_list(struct cgasm_context *ctx, bool is_struct, struct struct_declaration_list *decl_list) {
 	int size;
-	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, decl_list, &size);
-	return create_struct_type(size, field_list);
+	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, is_struct, decl_list, &size);
+	return create_struct_type(is_struct, size, field_list);
 }
 
 static void complete_struct_definition(struct cgasm_context *ctx, struct type *struct_type, struct struct_declaration_list *decl_list) {
 	CHECK_MAGIC(struct_type);
-	assert(struct_type->tag == T_STRUCT && struct_type->size < 0 && struct_type->field_list == NULL);
+	assert((struct_type->tag == T_STRUCT || struct_type->tag == T_UNION) && struct_type->size < 0 && struct_type->field_list == NULL);
 	int size;
-	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, decl_list, &size);
+	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, struct_type->tag == T_STRUCT, decl_list, &size);
 	struct_type->size = size;
 	struct_type->field_list = field_list;
 }
@@ -301,24 +316,24 @@ static void complete_struct_definition(struct cgasm_context *ctx, struct type *s
  * 1. create one if not exist yet 
  * 2. complete one if this is a definition and we have not defined the struct yet
  */
-static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, const char *name, struct struct_declaration_list *decl_list) {
+static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, bool is_struct, const char *name, struct struct_declaration_list *decl_list) {
 	if (name == NULL) {
 		assert(decl_list != NULL);
-		return parse_struct_type_by_decl_list(ctx, decl_list);
+		return parse_struct_type_by_decl_list(ctx, is_struct, decl_list);
 	}
 	if (decl_list == NULL) {
 		// recursively retrieve the struct type
-		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, name, true); // XXX this method only cover the case for struct (not union)
+		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, is_struct, name, true);
 		if (struct_type == NULL) {
-			struct_type = create_noncomplete_struct_type();
-			cgasm_add_struct_type(ctx, name, struct_type);
+			struct_type = create_noncomplete_struct_type(is_struct);
+			cgasm_add_struct_type(ctx, name, struct_type); // this method is independent on the value of is_struct
 		}
 		return struct_type;
 	} else {
 		// get struct type from current scope
-		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, name, false);
+		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, is_struct, name, false);
 		if (struct_type == NULL) {
-			struct_type = parse_struct_type_by_decl_list(ctx, decl_list);
+			struct_type = parse_struct_type_by_decl_list(ctx, is_struct, decl_list);
 			cgasm_add_struct_type(ctx, name, struct_type);
 		} else {
 			// We must reuse the same type object since the noncomplete type object may 
@@ -370,11 +385,11 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 				}
 				type = cgasm_get_type_from_type_name(ctx, type_specifier->type_name);
 				break;
-			case TOK_STRUCT: 
+			case TOK_STRUCT: case TOK_UNION:
 				if (type != NULL) {
 					panic("type already set");
 				}
-				type = cgasm_get_register_struct_type(ctx, type_specifier->type_name, type_specifier->struct_decl_list); // TODO support union in this same function
+				type = cgasm_get_register_struct_type(ctx, type_specifier->tok_tag == TOK_STRUCT, type_specifier->type_name, type_specifier->struct_decl_list); 
 				break;
 			default:
 				panic("not supported %s", token_tag_str(type_specifier->tok_tag));

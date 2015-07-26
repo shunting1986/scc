@@ -53,10 +53,14 @@ static struct type *cgasm_get_struct_union_type_by_name(struct cgasm_context *ct
 	return symbol == NULL ? NULL : symbol->ctype;
 } 
 
-struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, const char *name, bool rec) {
+struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, bool is_struct, const char *name, bool rec) {
 	struct type *type = cgasm_get_struct_union_type_by_name(ctx, name, rec);
-	if (type != NULL && type->tag != T_STRUCT) {
-		panic("tag '%s' is declaration as a type other than struct", name);
+	if (type != NULL) {
+		if (is_struct && type->tag != T_STRUCT) {
+			panic("tag '%s' should be a struct", name);
+		} else if (!is_struct && type->tag != T_UNION) {
+			panic("tag '%s' should be a union", name);
+		}
 	}
 	return type;
 }

@@ -559,13 +559,14 @@ struct expr_val cgasm_handle_ptr_op(struct cgasm_context *ctx, struct expr_val s
 		panic("struct pointer required");
 	}
 	struct type *st_type = stptr_type->subtype;
-	assert(st_type != NULL && st_type->tag == T_STRUCT); // TODO handle union
+	assert(st_type != NULL && (st_type->tag == T_STRUCT || st_type->tag == T_UNION)); 
 	struct struct_field *field = get_struct_field(st_type, name);
 	if (field == NULL) {
 		panic("invalid struct field %s", name);
 	}
 	assert(field->offset >= 0);
 
+	// TODO can be optimized for union
 	int ptr_reg = REG_EAX;
 	cgasm_load_val_to_reg(ctx, stptr, ptr_reg);
 	cgasm_println(ctx, "addl $%d, %%%s", field->offset, get_reg_str_code(ptr_reg));

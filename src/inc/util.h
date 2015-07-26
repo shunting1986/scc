@@ -12,6 +12,9 @@
 extern "C" {
 #endif
 
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 /*
 void _panic(const char *fname, int line, char *fmt, ...);
 #define panic(str, ...) _panic(__FILE__, __LINE__, str, __VA_ARGS__) 

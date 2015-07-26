@@ -65,9 +65,9 @@ void cgasm_push_symtab(struct cgasm_context *ctx);
 void cgasm_pop_symtab(struct cgasm_context *ctx);
 void cgasm_dump_global_vars(struct cgasm_context *ctx);
 struct type *cgasm_get_type_from_type_name(struct cgasm_context *ctx, char *id);
-struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, const char *name, bool rec);
 struct type *cgasm_get_union_type_by_name(struct cgasm_context *ctx, const char *name, bool rec);
 struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name, struct type *type);
+struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, bool is_struct, const char *name, bool rec);
 
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
