@@ -108,7 +108,8 @@ void lexer_dump_remaining(struct lexer *lexer) {
 			break;
 		}
 		token_dump(tok);
-		if (++tot >= 20) { // dump the first 20
+		// if (++tot >= 20) { // dump the first 20
+		if (++tot >= 10) { // dump the first 20
 			break;
 		}
 	}
@@ -450,6 +451,9 @@ repeat:
 		}
 		break;
 	default:
+#if DEBUG
+		file_reader_dump_remaining(lexer->cstream); 
+#endif
 		panic("lexer_next_token unexpected character '%c'", ch);
 	}
 

@@ -1,4 +1,6 @@
-  TARGET: fully support sum/main.c first (stdio.h)
+  next step is support union type.....
+	
+	TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST
 	TODO: add test cases for #include "xx"
