@@ -1,3 +1,5 @@
+  TODO: support enum ...	
+	
 	TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST
@@ -15,6 +17,7 @@ NOTE:
 	TODO: support struct initializer
 	TODO: array + struct
 
+TODO: support va args
 - NOTE: the only external resource I refer is the grammar of C language
 - TODO: let the make file support dependency on header file
 NOTE: we can try to compile mongoose/memcached/ITSELF!! with my compiler :)

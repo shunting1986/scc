@@ -71,7 +71,7 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	./scc integration-test/syntax-union/main.c
+	./scc integration-test/syntax-enum/main.c
 	@#./scc integration-test/sum/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
