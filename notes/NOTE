@@ -1,9 +1,10 @@
-	2. support struct  <==
-	= parse
-	= interpret
-	== add test case
-	-= pass the test..
- 
+  DONE: support struct define and dot operation
+
+	TODO: struct ptr operation ....
+	test case for linked-list
+	1. add test case
+	2. pass the test
+
   TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST
