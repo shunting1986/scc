@@ -294,6 +294,9 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 		panic("'&' can only be applied to lval 0x%x", operand.type);
 	}
 	operand.type = EXPR_VAL_SYMBOL_ADDR;
+	struct type *basetype = operand.ctype;
+	operand.ctype = type_get(get_ptr_type(basetype));
+	type_put(basetype); // this is important
 	return operand;
 }
 
@@ -540,7 +543,24 @@ struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_
 	return temp_var;
 }
 
+/**************************/
+/* handle ptr op          */
+/**************************/
+struct expr_val cgasm_handle_ptr_op(struct expr_val stptr, const char *name) {
+	struct type *stptr_type = expr_val_get_type(stptr);
+	if (stptr_type->tag != T_PTR) {
+		panic("struct pointer required");
+	}
+	struct type *st_type = stptr_type->subtype;
+	assert(st_type != NULL && st_type->tag == T_STRUCT); // TODO handle union
+	int offset = get_struct_field_offset(st_type, name);
+	if (offset < 0) {
+		panic("invalid struct field %s", name);
+	}
 
+	// TODO
+	panic("ni");
+}
 
 
 

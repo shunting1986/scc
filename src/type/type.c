@@ -131,6 +131,11 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
+int get_struct_field_offset(struct type *type, const char *name) {
+	// TODO handle union
+	panic("ni");
+}
+
 struct struct_field *struct_field_init(const char *name, struct type *type, int offset) {
 	struct struct_field *field = mallocz(sizeof(*field));
 	field->name = name;

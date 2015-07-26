@@ -66,6 +66,8 @@ void register_type_ref(struct cgasm_context *ctx, struct type *type);
 void free_type_ref_in_list(struct cgasm_context *ctx);
 void verify_type_memory_release();
 
+int get_struct_field_offset(struct type *type, const char *name);
+
 #ifdef __cplusplus
 }
 #endif
