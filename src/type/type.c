@@ -30,6 +30,8 @@ static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 	.const_required = 1,
 };
 
+static void struct_field_destroy(struct struct_field *field);
+
 void register_type_ref(struct cgasm_context *ctx, struct type *type) {
 	dynarr_add(ctx->type_ref_list, type_get(type));
 }
@@ -48,8 +50,23 @@ void verify_type_memory_release() {
 	assert(type_allocated == type_freed);
 }
 
+// for struct type, need free up the field list (also type_put for field type)
+// the type itself is freed in caller
+static void destroy_struct_union_type_nofree_itself(struct type *type) {
+	assert(type->tag == T_STRUCT || type->tag == T_UNION);
+	assert(type->subtype == NULL);
+
+	assert(type->field_list != NULL);
+	DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
+		struct_field_destroy(each);
+	DYNARR_FOREACH_END();
+
+	dynarr_destroy(type->field_list);
+}
+
 void type_destroy(struct type *type) {
 	CHECK_MAGIC(type);
+	assert(type->ref_cnt == 0);
 	struct type *tofree = NULL;
 
 	switch (type->tag) {
@@ -63,7 +80,11 @@ void type_destroy(struct type *type) {
 		type_put(type->subtype);
 		tofree = type;
 		break;
-	default: // TODO for struct type, need free up the field list (also type_put for field type)
+	case T_STRUCT: case T_UNION:
+		destroy_struct_union_type_nofree_itself(type);
+		tofree = type;
+		break;
+	default: 
 		panic("ni %p, %d", type, type->tag);
 	}
 
@@ -86,12 +107,26 @@ struct type *type_get(struct type *type) {
 	return type;
 }
 
+void type_dump(struct type *type) {
+	fprintf(stderr, "\033[31m");
+	fprintf(stderr, "Type dump:\n");
+	fprintf(stderr, "  tag %d, ref_cnt %d, size %d\n", type->tag, type->ref_cnt, type->size);
+	fprintf(stderr, "\033[0m");
+}
+
 void type_put(struct type *type) {
 	CHECK_MAGIC(type);
 	// no reference count handling for static allocated type object
 	if (type->flags & TYPE_FLAG_STATIC) {
 		return;
 	}
+
+#if TYPE_DEBUG
+	if (type->ref_cnt <= 0) {
+		type_dump(type);
+	}
+#endif
+
 	assert(type->ref_cnt > 0);
 	if (--type->ref_cnt == 0) {
 		type_destroy(type);
@@ -131,9 +166,26 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
-int get_struct_field_offset(struct type *type, const char *name) {
-	// TODO handle union
-	panic("ni");
+/* 
+ * XXX: Use linear scan since the list suppose to be relatively short
+ * TODO handle union
+ */
+struct struct_field *get_struct_field(struct type *type, const char *name) {
+	assert(type != NULL && type->tag == T_STRUCT && type->field_list != NULL);
+	assert(name != NULL);
+	CHECK_MAGIC(type);
+	DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
+		if (strcmp(name, each->name) == 0) {
+			return each;
+		}
+	DYNARR_FOREACH_END();
+	return NULL;
+}
+
+// this method will free the field itself
+static void struct_field_destroy(struct struct_field *field) {
+	type_put(field->type);
+	free(field);
 }
 
 struct struct_field *struct_field_init(const char *name, struct type *type, int offset) {

@@ -24,7 +24,8 @@ enum {
 
 // also used for union
 struct struct_field {
-	const char *name;
+	const char *name; // no need to free name when destroying this struct, since the name
+		// will finally get released when we destroy the syntax tree
 	struct type *type;
 	int offset;
 	// int width; // NOT SUPPORTED YET
@@ -45,7 +46,7 @@ struct type {
 
 	union {
 		int dim; // for array
-		struct dynarr *field_list;
+		struct dynarr *field_list; // be null for everything except struct/union
 	};
 };
 
@@ -66,7 +67,7 @@ void register_type_ref(struct cgasm_context *ctx, struct type *type);
 void free_type_ref_in_list(struct cgasm_context *ctx);
 void verify_type_memory_release();
 
-int get_struct_field_offset(struct type *type, const char *name);
+struct struct_field *get_struct_field(struct type *type, const char *name);
 
 #ifdef __cplusplus
 }

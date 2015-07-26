@@ -72,6 +72,7 @@ all: handy
 
 handy: rebuild-$(PROG_NAME)
 	./scc integration-test/cross-prod/main.c
+	@#./scc integration-test/sum/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

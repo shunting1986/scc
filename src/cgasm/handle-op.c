@@ -295,8 +295,9 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 	}
 	operand.type = EXPR_VAL_SYMBOL_ADDR;
 	struct type *basetype = operand.ctype;
-	operand.ctype = type_get(get_ptr_type(basetype));
-	type_put(basetype); // this is important
+	operand.ctype = get_ptr_type(basetype);
+	register_type_ref(ctx, operand.ctype);
+	// type_put(basetype); // this is not needed
 	return operand;
 }
 
@@ -546,20 +547,30 @@ struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_
 /**************************/
 /* handle ptr op          */
 /**************************/
-struct expr_val cgasm_handle_ptr_op(struct expr_val stptr, const char *name) {
+struct expr_val cgasm_handle_ptr_op(struct cgasm_context *ctx, struct expr_val stptr, const char *name) {
 	struct type *stptr_type = expr_val_get_type(stptr);
 	if (stptr_type->tag != T_PTR) {
 		panic("struct pointer required");
 	}
 	struct type *st_type = stptr_type->subtype;
 	assert(st_type != NULL && st_type->tag == T_STRUCT); // TODO handle union
-	int offset = get_struct_field_offset(st_type, name);
-	if (offset < 0) {
+	struct struct_field *field = get_struct_field(st_type, name);
+	if (field == NULL) {
 		panic("invalid struct field %s", name);
 	}
+	assert(field->offset >= 0);
 
-	// TODO
-	panic("ni");
+	int ptr_reg = REG_EAX;
+	cgasm_load_val_to_reg(ctx, stptr, ptr_reg);
+	cgasm_println(ctx, "addl $%d, %%%s", field->offset, get_reg_str_code(ptr_reg));
+	struct expr_val temp_var = cgasm_alloc_temp_var(ctx);
+	cgasm_store_reg_to_mem(ctx, ptr_reg, temp_var);
+
+	struct type *field_ptr_type = get_ptr_type(field->type);
+	register_type_ref(ctx, field_ptr_type);
+
+	temp_var.ctype = field_ptr_type;
+	return expr_val_add_deref_flag(temp_var);
 }
 
 

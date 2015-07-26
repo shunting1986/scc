@@ -104,7 +104,7 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 
 struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_val cond, struct dynarr *inner_expr_list, int inner_expr_ind, struct dynarr *or_expr_list, int or_expr_ind, struct expr_val temp_var);
 
-struct expr_val cgasm_handle_ptr_op(struct expr_val stptr, const char *name);
+struct expr_val cgasm_handle_ptr_op(struct cgasm_context *ctx, struct expr_val stptr, const char *name);
 struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_val operand);
 
 // cgasm-decl.c

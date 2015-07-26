@@ -108,8 +108,14 @@ void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, struct type *type)
 
 static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
 	struct cgasm_context *ctx = _ctx;
+	struct symbol *general_sym = _val;
+	
+	if (general_sym->type == SYMBOL_STRUCT_UNION) {
+		return;
+	}
+
+	assert(general_sym->type == SYMBOL_GLOBAL_VAR);
 	struct global_var_symbol *sym = _val;
-	assert(sym->type == SYMBOL_GLOBAL_VAR);
 	(void) ctx;
 
 	// TODO does not consider initializer yet

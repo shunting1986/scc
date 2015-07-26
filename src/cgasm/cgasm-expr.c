@@ -96,9 +96,9 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 			result_val = cgasm_handle_index_op(ctx, result_val, ind_val);
 		} else if (each->dot_id) {
 			result_val = cgasm_handle_ampersand(ctx, result_val);
-			result_val = cgasm_handle_ptr_op(result_val, each->dot_id);
+			result_val = cgasm_handle_ptr_op(ctx, result_val, each->dot_id);
 		} else if (each->ptr_id) {
-			result_val = cgasm_handle_ptr_op(result_val, each->ptr_id);
+			result_val = cgasm_handle_ptr_op(ctx, result_val, each->ptr_id);
 		} else {
 			panic("ni");
 		}
