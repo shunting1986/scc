@@ -1,19 +1,9 @@
-  DONE: support struct define and dot operation
-
-	TODO: struct ptr operation ....
-	test case for linked-list
-	1. add test case
-	2. pass the test
-
   TARGET: fully support sum/main.c first (stdio.h)
 
 KEYLIST
-	3. support struct
 	TODO: add test cases for #include "xx"
 
 NOTE:
-	TODO: struct <===, first we should learn the scope rule for struct
-
   the scope of struct/union/enum/typedef/func is similar to variable. When we exit a brace, these definitions are gone as well.
 	struct union, enum share a name space; typedef, func, var share one. 
 	func is special. 1. it can have multiple declaration in one scope; 2. inner scope can not have different specification to outer one
@@ -62,5 +52,6 @@ TODO: syntax
 	+ typedef, reference count mechanism for type structure, conditional expr
 	+ obj & func macro
 	+ cond compiling
+	+ struct definition and dot, ptr operation
 - support insertion sort, bubble sort, nqueen
 - a simple integration test framework
