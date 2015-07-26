@@ -64,7 +64,7 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 
 	cgasm_pop_symtab(ctx);
 
-	free_type_ref_in_list(ctx);
+	// free_type_ref_in_list(ctx);
 }
 
 static void register_parameter(struct cgasm_context *ctx, struct parameter_declaration *decl) {

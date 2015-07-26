@@ -3,6 +3,7 @@
 #include <inc/syntree.h>
 #include <inc/dynarr.h>
 #include <inc/cgasm.h>
+#include <inc/symtab.h>
 
 #define DEBUG 1
 
@@ -33,14 +34,13 @@ static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 static void struct_field_destroy(struct struct_field *field);
 
 void register_type_ref(struct cgasm_context *ctx, struct type *type) {
-	dynarr_add(ctx->type_ref_list, type_get(type));
+	dynarr_add(ctx->top_stab->type_ref_list, type_get(type));
 }
 
-void free_type_ref_in_list(struct cgasm_context *ctx) {
-	DYNARR_FOREACH_BEGIN(ctx->type_ref_list, type, each);
+void free_type_ref_in_list(struct symtab *stab) {
+	DYNARR_FOREACH_BEGIN(stab->type_ref_list, type, each);
 		type_put(each);
 	DYNARR_FOREACH_END();
-	dynarr_clear(ctx->type_ref_list);
 }
 
 void verify_type_memory_release() {
@@ -190,15 +190,41 @@ struct struct_field *get_struct_field(struct type *type, const char *name) {
 
 // this method will free the field itself
 static void struct_field_destroy(struct struct_field *field) {
-	type_put(field->type);
+	// type_put(field->type); // refer to the comments in struct_field_init
 	free(field);
 }
 
-struct struct_field *struct_field_init(const char *name, struct type *type, int offset) {
+/* 
+ * We can not use struct field to refer to the field type! Consider the following
+ * mutually referring case:
+ *   struct Tree {
+ *     struct Node *root;
+ *   };
+ *
+ *   struct Node {
+ *     struct Tree *tree;
+ *     struct Node *left, *right;
+ *   };
+ *
+ * If we let struct field refer to field type, then neither of the types can be freed.
+ *
+ * Another simpler example is:
+ *   struct Node {
+ *     struct Node *next;
+ *   };
+ *
+ * We break the mutual dependency by a trick:
+ *   Instead of let struct field maintain the reference count, we put the field type
+ *   to symtab.type_ref_list
+ */
+struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *name, struct type *type, int offset) {
 	struct struct_field *field = mallocz(sizeof(*field));
 	field->name = name;
-	field->type = type_get(type);
+	// field->type = type_get(type);
+	field->type = type;
+	register_type_ref(ctx, type);
 	field->offset = offset;
+
 	return field;
 }
 
@@ -225,7 +251,7 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, struct str
 			panic("The size of symbol is undefined: %s", id);
 		}
 	
-		dynarr_add(field_list, struct_field_init(id, final_type, offset));
+		dynarr_add(field_list, struct_field_init(ctx, id, final_type, offset));
 		offset += final_type->size;
 		size += final_type->size;
 	DYNARR_FOREACH_END();

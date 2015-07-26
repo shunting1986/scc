@@ -22,6 +22,9 @@ enum {
 
 #define TYPE_FLAG_STATIC 1
 
+struct cgasm_context;
+struct symtab;
+
 // also used for union
 struct struct_field {
 	const char *name; // no need to free name when destroying this struct, since the name
@@ -31,7 +34,7 @@ struct struct_field {
 	// int width; // NOT SUPPORTED YET
 };
 
-struct struct_field *struct_field_init(const char *name, struct type *type, int offset);
+struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *name, struct type *type, int offset);
 
 struct type {
 	int tag; // T_INT etc.
@@ -65,7 +68,7 @@ int type_get_tag(struct type *type);
 struct type *type_get(struct type *type);
 void type_put(struct type *type);
 void register_type_ref(struct cgasm_context *ctx, struct type *type);
-void free_type_ref_in_list(struct cgasm_context *ctx);
+void free_type_ref_in_list(struct symtab *stab);
 void verify_type_memory_release();
 
 struct struct_field *get_struct_field(struct type *type, const char *name);

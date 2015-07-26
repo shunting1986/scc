@@ -1,11 +1,13 @@
 #include <inc/symtab.h>
 #include <inc/util.h>
+#include <inc/type.h>
 
 struct symtab *symtab_init(struct symtab *enclosing) {
 	struct symtab *tab = (struct symtab *) mallocz(sizeof(*tab));
 	tab->enclosing = enclosing;
 	tab->htab = htab_init();
 	tab->htab->val_free_fn = symbol_destroy;
+	tab->type_ref_list = dynarr_init();
 	return tab;
 }
 
@@ -22,6 +24,8 @@ void symtab_iter(struct symtab *symtab, void *ctx, htab_iter_fn_type *func) {
 
 void symtab_destroy(struct symtab *stab) {
 	htab_destroy(stab->htab);
+	free_type_ref_in_list(stab);
+	dynarr_destroy(stab->type_ref_list);
 	free(stab);
 }
 

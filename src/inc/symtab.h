@@ -13,6 +13,8 @@ extern "C" {
 struct symtab {
 	struct symtab *enclosing;
 	struct hashtab *htab;
+
+	struct dynarr *type_ref_list; // this is a list of type ref that need to release when finish parsing each scope. We move it from cgasm_context since each scope should has it's own list
 };
 
 enum {
