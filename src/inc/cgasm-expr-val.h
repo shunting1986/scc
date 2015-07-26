@@ -54,7 +54,7 @@ struct expr_val {
 };
 
 struct condcode {
-	int op; // TOK_EQ, TOK_NE, TOK_LE, TOK_GE, TOK_GT, TOK_LT, TOK_LOGIC_AND ...
+	int op; // TOK_EQ, TOK_NE, TOK_LE, TOK_GE, TOK_GT, TOK_LT, TOK_LOGIC_AND, TOK_EXCLAMATION ...
 	struct expr_val lhs, rhs;
 	struct syntreebasenode *rhs_lazy;
 };

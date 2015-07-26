@@ -152,6 +152,10 @@ static void cgasm_load_cc_to_reg(struct cgasm_context *ctx, struct condcode *cc,
 	int out_label = cgasm_new_label_no(ctx);
 	char buf[128];
 
+	if (cc->op == TOK_EXCLAMATION) {
+		panic("'!' not supported yet");
+	}
+
 	cgasm_goto_ifcond_cc(ctx, cc, set1_label, 0);
 	cgasm_println(ctx, "movl $0, %%%s", get_reg_str_code(reg));
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
@@ -333,6 +337,8 @@ struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, st
 		return cgasm_handle_negate(ctx, operand);
 	case TOK_STAR:
 		return cgasm_handle_deref(ctx, operand);
+	case TOK_EXCLAMATION:	// optimized for some cases like 'if(!x) { }'
+		return condcode_expr(TOK_EXCLAMATION, operand, void_expr_val(), NULL);
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
 	}

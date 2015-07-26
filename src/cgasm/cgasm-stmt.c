@@ -71,6 +71,11 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 	free(ccexpr); // free condcode after evaluation
 	ccexpr = NULL;
 
+	if (op == TOK_EXCLAMATION) {
+		cgasm_goto_ifcond(ctx, lhs, goto_label, 1 - reverse);
+		return;
+	}
+
 	if (op == TOK_LOGIC_AND || op == TOK_LOGIC_OR) {
 		cgasm_goto_ifcond_logic(ctx, op, lhs, rhs_lazy, goto_label, reverse);
 		return;
@@ -130,6 +135,11 @@ void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int g
 	switch (condval.type) {
 	case EXPR_VAL_CC:
 		cgasm_goto_ifcond_cc(ctx, condval.cc, goto_label, inverse);
+		break;
+	case EXPR_VAL_SYMBOL:
+		cgasm_goto_ifcond_cc(ctx, 
+			condcode_expr(TOK_NE, condval, int_const_expr_val(0), NULL).cc,
+			goto_label, inverse);
 		break;
 	default:
 		panic("ni %d", condval.type);

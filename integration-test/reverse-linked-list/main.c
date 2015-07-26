@@ -9,6 +9,10 @@ typedef int bool;
 #define NULL 0
 #endif
 
+#ifndef EOF
+#define EOF -1
+#endif
+
 struct linked_list {
 	struct list_item *head, *tail;
 };
