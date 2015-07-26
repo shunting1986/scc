@@ -36,6 +36,9 @@ static int is_func_decl_declarator(struct declarator *declarator) {
  * check if the init_declarator_list is for a function declaration
  */
 int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarator_list) {
+	if (init_declarator_list == NULL) { // struct declaration belongs to this case
+		return 0;
+	}
 	struct dynarr *darr = init_declarator_list->darr;
 	if (dynarr_size(darr) != 1) {
 		return 0;

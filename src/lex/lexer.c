@@ -150,6 +150,20 @@ static int handle_tricase(struct lexer *lexer, int folone, int compone, int folt
 	}
 }
 
+static int handle_quacase(struct lexer *lexer, int folone, int tokone, int foltwo, int toktwo, int folthree, int tokthree, int simple_tok) {
+	int ch = file_reader_next_char(lexer->cstream);
+	if (ch == folone) {
+		return tokone;
+	} else if (ch == foltwo) {
+		return toktwo;
+	} else if (ch == folthree) {
+		return tokthree;
+	} else {
+		file_reader_put_back(lexer->cstream, ch);
+		return simple_tok;
+	}
+}
+
 void lexer_discard_line(struct lexer *lexer) {
 	char ch;
 	while ((ch = file_reader_next_char(lexer->cstream)) != '\n') {
@@ -322,7 +336,7 @@ repeat:
 		tok.tok_tag = handle_tricase(lexer, '=', TOK_ADD_ASSIGN, '+', TOK_INC, TOK_ADD);
 		break;
 	case '-':
-		tok.tok_tag = handle_tricase(lexer, '=', TOK_SUB_ASSIGN, '-', TOK_DEC, TOK_SUB);
+		tok.tok_tag = handle_quacase(lexer, '=', TOK_SUB_ASSIGN, '-', TOK_DEC, '>', TOK_PTR_OP, TOK_SUB);
 		break;
 	case '%':
 		tok.tok_tag = handle_bicase(lexer, '=', TOK_MOD_ASSIGN, TOK_MOD);
