@@ -166,6 +166,12 @@ static struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
+static struct type *create_struct_type(int size, struct dynarr *field_list) {
+	struct type *ret = alloc_type(T_STRUCT, size);
+	ret->field_list = field_list;
+	return ret;
+}
+
 /* 
  * XXX: Use linear scan since the list suppose to be relatively short
  * TODO handle union
@@ -243,7 +249,7 @@ static struct dynarr *parse_struct_field_list_by_decl_list(struct cgasm_context 
 }
 
 static struct type *create_noncomplete_struct_type() {
-	panic("ni");
+	return create_struct_type(-1, NULL);
 }
 
 /*
@@ -252,13 +258,16 @@ static struct type *create_noncomplete_struct_type() {
 static struct type *parse_struct_type_by_decl_list(struct cgasm_context *ctx, struct struct_declaration_list *decl_list) {
 	int size;
 	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, decl_list, &size);
-	struct type *type = alloc_type(T_STRUCT, size);
-	type->field_list = field_list;
-	return type;
+	return create_struct_type(size, field_list);
 }
 
 static void complete_struct_definition(struct cgasm_context *ctx, struct type *struct_type, struct struct_declaration_list *decl_list) {
-	panic("ni");
+	CHECK_MAGIC(struct_type);
+	assert(struct_type->tag == T_STRUCT && struct_type->size < 0 && struct_type->field_list == NULL);
+	int size;
+	struct dynarr *field_list = parse_struct_field_list_by_decl_list(ctx, decl_list, &size);
+	struct_type->size = size;
+	struct_type->field_list = field_list;
 }
 
 /*

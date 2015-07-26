@@ -46,7 +46,8 @@ struct type {
 
 	union {
 		int dim; // for array
-		struct dynarr *field_list; // be null for everything except struct/union
+		struct dynarr *field_list; // be null for everything except struct/union. 
+			// be null for noncomplete struct type as well
 	};
 };
 

@@ -5,6 +5,10 @@ typedef int bool;
 #define true 1
 #define false 0
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 struct linked_list {
 	struct list_item *head, *tail;
 };

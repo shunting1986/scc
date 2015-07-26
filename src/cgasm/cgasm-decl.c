@@ -50,6 +50,11 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 #else
 	struct type *base_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
 	struct type *final_type = NULL;
+
+	if (init_declarator_list == NULL) {
+		return; // the sideeffect is parse_type_from_decl_specifiers may
+			// register struct type
+	}
 	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
 		struct declarator *declarator = each->declarator;
 		struct direct_declarator *dd = declarator->direct_declarator;
