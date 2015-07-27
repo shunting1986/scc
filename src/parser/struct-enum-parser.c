@@ -122,7 +122,16 @@ static struct struct_declaration_list *parse_struct_declaration_list(struct pars
 
 struct type_specifier *parse_struct_or_union_specifier(struct parser *parser) {
 	union token struct_union_tok = lexer_next_token(parser->lexer);
+
+	/*
+	 * disable typedef is important here for the following case:
+	 * typedef struct st st;
+	 * struct st v; // we should not treat this st as TYPE_NAME
+	 */
+	int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 1);
 	union token tok = lexer_next_token(parser->lexer);
+	lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
+
 	char *name = NULL;
 	struct struct_declaration_list *struct_decl_list = NULL;
 

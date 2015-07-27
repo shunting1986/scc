@@ -39,6 +39,9 @@ struct typedef_tab *typedef_tab_init(struct typedef_tab *enclosing) {
 }
 
 int lexer_is_typedef(struct lexer *lexer, const char *s) {
+	if (lexer->disable_typedef) {
+		return false;
+	}
 	void *ret;
 	struct typedef_tab *tab = lexer->typedef_tab;
 	while (tab) {
