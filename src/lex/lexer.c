@@ -137,12 +137,25 @@ void parse_single_quote(struct lexer *lexer, union token *ptok) {
 	ptok->const_val.ival = val;
 }
 
-// XXX: only handle decimal integer right now
+// XXX: only handle decimal & hexadecima integer right now
 void parse_number(struct lexer *lexer, union token *ptok) {
 	char ch = file_reader_next_char(lexer->cstream);
+	int base = 10;
+	assert(ch >= '0' && ch <= '9');
+	char peek = file_reader_next_char(lexer->cstream);
+	if (peek == 'x' || peek == 'X') {
+		ch = file_reader_next_char(lexer->cstream);
+		if (!is_hex_char(ch)) {
+			panic("Invalid hexadecimal number");
+		}
+		base = 16;
+	} else {
+		file_reader_put_back(lexer->cstream, peek);
+	}
+
 	int val = 0;
-	while (ch >= '0' && ch <= '9') {
-		val = val * 10 + (ch - '0');
+	while ((ch >= '0' && ch <= '9') || (base == 16 && is_hex_char(ch))) {
+		val = val * 16 + get_hex_value_from_char(ch);
 		ch = file_reader_next_char(lexer->cstream);
 	}
 
