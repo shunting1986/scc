@@ -411,4 +411,9 @@ struct struct_declarator *struct_declarator_init(struct declarator *declarator, 
 	return struct_declarator;
 }
 
-
+struct enumerator_list *enumerator_list_init(struct dynarr *enum_list) {
+	struct enumerator_list *node = mallocz(sizeof(*node));
+	node->nodeType = ENUMERATOR_LIST;
+	node->enum_list = enum_list;
+	return node;
+}

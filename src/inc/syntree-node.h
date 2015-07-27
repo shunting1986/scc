@@ -193,12 +193,20 @@ struct struct_declaration_list {
 
 struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list);
 
+struct enumerator_list {
+	int nodeType;
+	struct dynarr *enum_list;
+};
+
+struct enumerator_list *enumerator_list_init(struct dynarr *enum_list);
+
 struct type_specifier {
 	int nodeType;
 	int tok_tag; // specify type
 
-	char *type_name;  // used for typedef, struct, union
+	char *type_name;  // used for typedef, struct, union, enum
 	struct struct_declaration_list *struct_decl_list; // used for struct or union
+	struct enumerator_list *enumerator_list;
 };
 
 struct type_specifier *type_specifier_init(int tok_tag);

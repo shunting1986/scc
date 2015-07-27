@@ -2,8 +2,61 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
-struct type_specifier *parse_enum_specifier(struct parser *parser) {
+static struct enumerator *parse_enumerator(struct parser *parser) {
 	panic("ni");
+}
+
+static struct enumerator_list *parse_enumerator_list(struct parser *parser) {
+	union token tok;
+	struct dynarr *darr = dynarr_init();
+
+	tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag != TOK_RBRACE) {
+		lexer_put_back(parser->lexer, tok);
+		while (true) {
+			dynarr_add(darr, parse_enumerator(parser));
+			tok = lexer_next_token(parser->lexer);
+			if (tok.tok_tag == TOK_RBRACE) {
+				break;
+			}
+			assume(tok, TOK_COMMA);
+
+			// check for TOK_RBRACE again since enum definition can have an extra last comma
+			tok = lexer_next_token(parser->lexer);
+			if (tok.tok_tag == TOK_RBRACE) {
+				break;
+			}
+			lexer_put_back(parser->lexer, tok);
+		}
+	}
+
+	return enumerator_list_init(darr);
+}
+
+struct type_specifier *parse_enum_specifier(struct parser *parser) {
+	char *name = NULL;
+	union token tok = lexer_next_token(parser->lexer);
+	struct enumerator_list *enumerator_list = NULL;
+
+	if (tok.tok_tag == TOK_IDENTIFIER) {
+		name = tok.id.s;
+		tok = lexer_next_token(parser->lexer);
+	}
+
+	if (name == NULL && tok.tok_tag != TOK_LBRACE) {
+		panic("enum should be followed by a name or '{'");
+	}
+
+	if (tok.tok_tag == TOK_LBRACE) {
+		enumerator_list = parse_enumerator_list(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+	}
+
+	struct type_specifier *ret = type_specifier_init(TOK_ENUM);
+	ret->type_name = name;
+	ret->enumerator_list = enumerator_list;
+	return ret;
 }
 
 struct struct_declarator *parse_struct_declarator(struct parser *parser) {
