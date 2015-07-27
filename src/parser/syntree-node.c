@@ -374,10 +374,11 @@ struct initializer *initializer_init() {
 	return initializer;
 }
 
-struct type_name *type_name_init(struct specifier_qualifier_list *sqlist) {
+struct type_name *type_name_init(struct specifier_qualifier_list *sqlist, struct declarator *declarator) {
 	struct type_name *tn = mallocz(sizeof(*tn));
 	tn->nodeType = TYPE_NAME;
 	tn->sqlist = sqlist;
+	tn->declarator = declarator;
 	return tn;
 }
 

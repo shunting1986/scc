@@ -72,10 +72,22 @@ static int initiate_storage_class_specifier(union token tok) {
 		|| tok.tok_tag == TOK_REGISTER;
 }
 
+static bool initiate_abstract_declarator(union token tok) {
+	panic("ni");
+}
+
 struct type_name *parse_type_name(struct parser *parser) {
 	struct specifier_qualifier_list *sqlist = parse_specifier_qualifier_list(parser);
-	// TODO abstract declarator is not handled yet
-	return type_name_init(sqlist);
+	union token tok = lexer_next_token(parser->lexer);
+	struct declarator *declarator = NULL;
+	lexer_put_back(parser->lexer, tok);
+	if (initiate_abstract_declarator(tok)) {
+		struct declarator *declarator = parse_declarator(parser);
+		if (!is_abstract_declarator(declarator)) {
+			panic("require abstract declarator");
+		}
+	} 
+	return type_name_init(sqlist, declarator);
 }
 
 /* 

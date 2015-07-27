@@ -143,6 +143,7 @@ struct type_qualifier_list {
 
 struct type_qualifier_list *type_qualifier_list_init(void);
 
+// This can either be a declarator or abstract_declarator (depends on if direct_declarator eventually contains an ID)
 struct declarator {
 	int nodeType;
 
@@ -369,9 +370,10 @@ struct postfix_expression *postfix_expression_init(struct primary_expression *pr
 struct type_name {
 	int nodeType;
 	struct specifier_qualifier_list *sqlist;
+	struct declarator *declarator; // this is an abstract declarator
 };
 
-struct type_name *type_name_init(struct specifier_qualifier_list *sqlist);
+struct type_name *type_name_init(struct specifier_qualifier_list *sqlist, struct declarator *declarator);
 
 struct unary_expression {
 	int nodeType;

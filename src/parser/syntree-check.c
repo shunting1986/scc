@@ -1,6 +1,10 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
+bool is_abstract_declarator(struct declarator *declarator) {
+	panic("ni");
+}
+
 static int is_return_stmt(struct syntreebasenode *stmt) {
 	struct jump_statement *ret_stmt;
 	return stmt->nodeType == JUMP_STATEMENT && (ret_stmt = (struct jump_statement *) stmt)->init_tok_tag == TOK_RETURN;
