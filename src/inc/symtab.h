@@ -23,6 +23,7 @@ enum {
 	SYMBOL_PARAM,
 
 	SYMBOL_STRUCT_UNION,
+	SYMBOL_ENUMERATOR,
 };
 
 // NOTE: for struct/union, the key is decorated from the struct name but the name
@@ -33,6 +34,13 @@ struct symbol {
 	int type;
 	char name[SYMBOL_MAX_LEN];
 	struct type *ctype;
+};
+
+struct enumerator_symbol {
+	int type;
+	char name[SYMBOL_MAX_LEN];
+	struct type *ctype;
+	int val;
 };
 
 struct global_var_symbol {
@@ -62,6 +70,7 @@ struct symbol *symtab_new_param(char *name, int ind, struct type *ctype);
 struct symbol *symtab_new_local_var(char *name, int ind, struct type *ctype);
 struct symbol *symtab_new_global_var(char *name, struct type *ctype);
 struct symbol *symtab_new_struct_type(const char *name, struct type *ctype);
+struct symbol *symtab_new_enumerator(const char *name, int val);
 void symtab_add(struct symtab *stab, struct symbol *sym);
 void symtab_add_with_key(struct symtab *stab, const char *key, struct symbol *sym);
 struct symbol *symtab_lookup(struct symtab *stab, const char *id);

@@ -10,7 +10,7 @@ static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, s
 static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr);
 
 int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr) {
-	assert(ctx->const_required);
+	// assert(ctx->const_required); // this not so necessary
 	struct expr_val val = cgasm_constant_expression(ctx, expr);
 
 	if (val.type != EXPR_VAL_CONST_VAL) {

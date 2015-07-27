@@ -149,7 +149,7 @@ static struct type *alloc_type(int tag, int size) {
  * XXX We may pre-created all the singletons for base type.
  * XXX think how to reclaim memory for types
  */
-static struct type *get_int_type() {
+struct type *get_int_type() {
 	return &int_type;
 }
 
@@ -344,6 +344,32 @@ static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, bo
 	}
 }
 
+static int cgasm_register_enum(struct cgasm_context *ctx, struct enumerator *enumerator, int next_ord) {
+	const char *name = enumerator->name;
+	if (enumerator->expr != NULL) {
+		next_ord = cgasm_interpret_const_expr(ctx, enumerator->expr);
+	}
+
+	cgasm_add_enumerator(ctx, name, next_ord);
+	return next_ord + 1;
+}
+
+/*
+ * XXX: current implementation just register all the enum and return int type.
+ */
+static struct type *cgasm_get_register_enum_type(struct cgasm_context *ctx, const char *name, struct enumerator_list *enum_list) {
+	assert(name != NULL || enum_list != NULL);
+	int next_ord = 0;
+
+	if (enum_list != NULL) {
+		DYNARR_FOREACH_BEGIN(enum_list->enum_list, enumerator, each);
+			next_ord = cgasm_register_enum(ctx, each, next_ord);
+		DYNARR_FOREACH_END();
+	}
+
+	return get_int_type();
+}
+
 /*
  * darr is a list of type_specifier, type_qualifier, storage_class_specifier (maybe missing) for specifier_qualifier_list case)
  */ 
@@ -390,6 +416,12 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 					panic("type already set");
 				}
 				type = cgasm_get_register_struct_type(ctx, type_specifier->tok_tag == TOK_STRUCT, type_specifier->type_name, type_specifier->struct_decl_list); 
+				break;
+			case TOK_ENUM:
+				if (type != NULL) {
+					panic("type already set");
+				}
+				type = cgasm_get_register_enum_type(ctx, type_specifier->type_name, type_specifier->enumerator_list);
 				break;
 			default:
 				panic("not supported %s", token_tag_str(type_specifier->tok_tag));

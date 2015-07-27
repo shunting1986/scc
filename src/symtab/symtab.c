@@ -55,6 +55,15 @@ void symtab_add(struct symtab *stab, struct symbol *sym) {
 	symtab_add_with_key(stab, sym->name, sym);
 }
 
+struct symbol *symtab_new_enumerator(const char *name, int val) {
+	struct enumerator_symbol *sym = mallocz(sizeof(*sym));
+	sym->type = SYMBOL_ENUMERATOR;
+	sym->ctype = get_int_type(); // XXX: give enumerator int type right now
+	strncpy(sym->name, name, SYMBOL_MAX_LEN - 1);
+	sym->val = val;
+	return (struct symbol *) sym;
+}
+
 struct symbol *symtab_new_param(char *name, int ind, struct type *ctype) {
 	struct param_symbol *sym = mallocz(sizeof(*sym));
 	sym->type = SYMBOL_PARAM;

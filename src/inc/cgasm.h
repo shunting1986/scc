@@ -68,6 +68,7 @@ struct type *cgasm_get_type_from_type_name(struct cgasm_context *ctx, char *id);
 struct type *cgasm_get_union_type_by_name(struct cgasm_context *ctx, const char *name, bool rec);
 struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name, struct type *type);
 struct type *cgasm_get_struct_type_by_name(struct cgasm_context *ctx, bool is_struct, const char *name, bool rec);
+struct symbol *cgasm_add_enumerator(struct cgasm_context *ctx, const char *name, int val);
 
 // cgasm-expr.c
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);

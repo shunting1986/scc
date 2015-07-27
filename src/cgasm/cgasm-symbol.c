@@ -73,6 +73,12 @@ struct type *cgasm_get_union_type_by_name(struct cgasm_context *ctx, const char 
 	return type;
 }
 
+struct symbol *cgasm_add_enumerator(struct cgasm_context *ctx, const char *name, int val) {
+	struct symbol *ret = symtab_new_enumerator(name, val);
+	symtab_add(ctx->top_stab, ret);
+	return ret;
+}
+
 struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name, struct type *type) {
 	char buf[256];
 	struct struct_union_symbol *ret;
