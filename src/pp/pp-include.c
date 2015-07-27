@@ -54,7 +54,7 @@ void pp_include(struct lexer *lexer, bool skip) {
 	const char *incl_path = parse_string_literal(lexer, term_tok);
 	(void) incl_path;
 
-#if 1
+#if 0
 	if (!skip) {
 		open_header_file(lexer, incl_path, incl_tok);
 	}

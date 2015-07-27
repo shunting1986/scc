@@ -155,7 +155,7 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 
 	int val = 0;
 	while ((ch >= '0' && ch <= '9') || (base == 16 && is_hex_char(ch))) {
-		val = val * 16 + get_hex_value_from_char(ch);
+		val = val * base + get_hex_value_from_char(ch);
 		ch = file_reader_next_char(lexer->cstream);
 	}
 
@@ -194,6 +194,7 @@ void lexer_dump_remaining(struct lexer *lexer) {
 union token expect(struct lexer *lexer, int tok_tag) {
 	union token tok = lexer_next_token(lexer);
 	if (tok.tok_tag != tok_tag) {
+		file_reader_dump_remaining(lexer->cstream); // TODO
 		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
 	}
 	return tok;
