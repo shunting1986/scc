@@ -120,7 +120,7 @@ static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
 	struct cgasm_context *ctx = _ctx;
 	struct symbol *general_sym = _val;
 	
-	if (general_sym->type == SYMBOL_STRUCT_UNION) {
+	if (general_sym->type == SYMBOL_STRUCT_UNION || general_sym->type == SYMBOL_ENUMERATOR) {
 		return;
 	}
 

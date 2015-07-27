@@ -3,6 +3,8 @@
 #include <inc/lexer.h>
 #include <inc/symtab.h>
 
+static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token const_val, int reg);
+
 /**
  * handle unary op, binary op, push op, load op, store op etc.
  */
@@ -104,6 +106,9 @@ static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym,
 		break;
 	case SYMBOL_GLOBAL_VAR:
 		cgasm_load_global_var_to_reg(ctx, (struct global_var_symbol *) sym, reg);
+		break;
+	case SYMBOL_ENUMERATOR:
+		cgasm_load_const_val_to_reg(ctx, wrap_int_const_to_token(((struct enumerator_symbol *) sym)->val), reg);
 		break;
 	default:
 		panic("ni %d %s", sym->type, sym->name);
