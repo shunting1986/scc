@@ -39,12 +39,6 @@ static struct type void_type = {
 	.size = -1,
 };
 
-// TODO make expression parsing completely independent of cgasm module
-/*
-static struct cgasm_context CONST_REQUIRED_CONTEXT = {
-	.const_required = 1,
-}; */
-
 static void struct_field_destroy(struct struct_field *field);
 
 void register_type_ref(struct cgasm_context *ctx, struct type *type) {
