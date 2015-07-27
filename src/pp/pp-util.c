@@ -26,4 +26,17 @@ void pop_want_newline(struct lexer *lexer, int oldval) {
 	lexer->want_newline = oldval;
 }
 
-
+int perform_int_bin_op(int lhs, int rhs, int op) {
+	int val;
+	switch (op) {
+	case TOK_GT: val = lhs > rhs; break;
+	case TOK_LT: val = lhs < rhs; break;
+	case TOK_GE: val = lhs >= rhs; break;
+	case TOK_EQ: val = lhs == rhs; break;
+	case TOK_SUB: val = lhs - rhs; break;
+	case TOK_STAR: val = lhs * rhs; break;
+	default:
+		panic("unsupported op %s", token_tag_str(op));
+	}
+	return val;
+}

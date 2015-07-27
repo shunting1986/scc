@@ -21,6 +21,7 @@ int push_want_newline(struct lexer *lexer, int newval);
 void pop_want_newline(struct lexer *lexer, int oldval);
 int push_want_quotation(struct lexer *lexer, int newval);
 void pop_want_quotation(struct lexer *lexer, int oldval);
+int perform_int_bin_op(int lhs, int rhs, int op);
 
 // pp-include.c
 void pp_include(struct lexer *lexer, bool skip);

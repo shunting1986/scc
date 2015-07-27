@@ -26,6 +26,13 @@ static struct type int_type = {
 	.size = 4,
 };
 
+static struct type void_type = {
+	.tag = T_VOID,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	INIT_MAGIC
+	.size = -1,
+};
+
 // TODO make expression parsing completely independent of cgasm module
 static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 	.const_required = 1,
@@ -151,6 +158,10 @@ static struct type *alloc_type(int tag, int size) {
  */
 struct type *get_int_type() {
 	return &int_type;
+}
+
+struct type *get_void_type() {
+	return &void_type;
 }
 
 struct type *get_ptr_type(struct type *elem_type) {
@@ -405,6 +416,12 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 				}
 				basetype = T_INT;
 				break;
+			case TOK_VOID:
+				if (basetype != T_NONE) {
+					panic("multi type specified");
+				}
+				basetype = T_VOID;
+				break;
 			case TOK_TYPE_NAME:
 				if (type != NULL) {
 					panic("type already set");
@@ -450,6 +467,9 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 	switch (basetype) {
 	case T_INT:
 		type = get_int_type();
+		break;
+	case T_VOID:
+		type = get_void_type();
 		break;
 	default:
 		panic("not supported");

@@ -42,6 +42,7 @@ void cgasm_enter_function(struct cgasm_context *ctx, char *fname) {
  	cgasm_println_noind(ctx, "%s:", fname);
 
 	ctx->func_ctx = func_context_init();
+	assert(ctx->func_ctx != NULL);
 	cgasm_push_symtab(ctx);
 }
 

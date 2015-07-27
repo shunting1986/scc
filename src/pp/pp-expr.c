@@ -145,16 +145,7 @@ static struct eval_result perform_op(int op, struct eval_result lhs, struct eval
 		return result;
 	}
 
-	int val;
-	switch (op) {
-	case TOK_GT: val = lhs.val > rhs.val; break;
-	case TOK_LT: val = lhs.val < rhs.val; break;
-	case TOK_GE: val = lhs.val >= rhs.val; break;
-	case TOK_EQ: val = lhs.val == rhs.val; break;
-	case TOK_SUB: val = lhs.val - rhs.val; break;
-	default:
-		panic("unsupported op %s", token_tag_str(op));
-	}
+	int val = perform_int_bin_op(lhs.val, rhs.val, op);
 	return wrap_eval_result(false, val);
 }
 

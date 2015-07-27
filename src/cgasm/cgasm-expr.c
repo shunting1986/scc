@@ -117,9 +117,11 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 		struct expr_val val = cgasm_unary_expression(ctx, expr->sizeof_expr);
 		return int_const_expr_val(type_get_size(val.ctype));
 	} else if (expr->sizeof_type) {
-		// TODO: abstract declarator is not handled yet
 		struct type *type = parse_type_from_specifier_qualifier_list(ctx, expr->sizeof_type->sqlist);
-		panic("ni"); // TODO
+		if (expr->sizeof_type->declarator != NULL) {
+			type = parse_type_from_declarator(type, expr->sizeof_type->declarator);
+		}
+		fprintf(stderr, "\033[31mNeed handle freeing of the type\033[0m\n"); // TODO
 		return int_const_expr_val(type_get_size(type));
 	} else if (expr->inc_unary) {
 		struct expr_val val = cgasm_unary_expression(ctx, expr->inc_unary);

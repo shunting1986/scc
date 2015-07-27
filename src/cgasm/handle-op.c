@@ -2,6 +2,7 @@
 #include <inc/util.h>
 #include <inc/lexer.h>
 #include <inc/symtab.h>
+#include <inc/pp.h>
 
 static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token const_val, int reg);
 
@@ -358,6 +359,14 @@ struct expr_val cgasm_handle_binary_op_lazy(struct cgasm_context *ctx, int tok_t
 	return condcode_expr(tok_tag, lhs, void_expr_val(), rhs);
 }
 
+// XXX: not support floating point right now
+static struct expr_val cgasm_handle_binary_op_const(int tok_op, struct expr_val lhs, struct expr_val rhs) {
+	assert(is_int_const(lhs));
+	assert(is_int_const(rhs));
+	int val = perform_int_bin_op(lhs.const_val.const_val.ival, rhs.const_val.const_val.ival, tok_op);
+	return int_const_expr_val(val);
+}
+
 struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	int lhs_reg = REG_EAX; // REVISE MUL if we change this register
 	int rhs_reg = REG_ECX;
@@ -372,6 +381,10 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	res = cgasm_alloc_temp_var(ctx); \
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
+
+	if (lhs.type == EXPR_VAL_CONST_VAL && rhs.type == EXPR_VAL_CONST_VAL) {
+		return cgasm_handle_binary_op_const(tok_tag, lhs, rhs);
+	}
 
 	switch (tok_tag) {
 	case TOK_ADD: 

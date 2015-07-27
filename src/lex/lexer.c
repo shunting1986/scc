@@ -194,6 +194,7 @@ void lexer_dump_remaining(struct lexer *lexer) {
 union token expect(struct lexer *lexer, int tok_tag) {
 	union token tok = lexer_next_token(lexer);
 	if (tok.tok_tag != tok_tag) {
+		assert(false); // TODO
 		file_reader_dump_remaining(lexer->cstream); // TODO
 		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
 	}

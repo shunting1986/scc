@@ -2,7 +2,15 @@
 #include <inc/util.h>
 
 bool is_abstract_declarator(struct declarator *declarator) {
-	panic("ni");
+	struct direct_declarator *dd = declarator->direct_declarator;
+	assert(dd->id == NULL || dd->declarator == NULL);
+	if (dd->id == NULL && dd->declarator == NULL) {
+		return true;
+	}
+	if (dd->id != NULL) {
+		return false;
+	}
+	return is_abstract_declarator(dd->declarator);
 }
 
 static int is_return_stmt(struct syntreebasenode *stmt) {

@@ -73,7 +73,20 @@ static int initiate_storage_class_specifier(union token tok) {
 }
 
 static bool initiate_abstract_declarator(union token tok) {
-	panic("ni");
+	return tok.tok_tag == TOK_STAR
+		|| tok.tok_tag == TOK_LPAREN
+		|| tok.tok_tag == TOK_LBRACKET;
+}
+
+/*
+ * Checks if the token initiates a declaration (or statement). Used by parse_compound_statement
+ */
+int initiate_declaration(union token tok) {
+	return initiate_type_specifier(tok) || initiate_type_qualifier(tok) || initiate_storage_class_specifier(tok);
+}
+
+int initiate_declaration_specifiers(union token tok) {
+	return initiate_type_specifier(tok) || initiate_type_qualifier(tok) || initiate_storage_class_specifier(tok);
 }
 
 struct type_name *parse_type_name(struct parser *parser) {
@@ -206,13 +219,21 @@ static struct direct_declarator *parse_direct_declarator(struct parser *parser) 
 	union token tok = lexer_next_token(parser->lexer);
 	if (tok.tok_tag == TOK_IDENTIFIER) {
 		dd->id = tok.id.s;	
-	} else if (tok.tok_tag == TOK_LPAREN) {
+	} else if (tok.tok_tag == TOK_LPAREN) { 
+		union token nxtok = lexer_next_token(parser->lexer);
+		if (nxtok.tok_tag == TOK_RPAREN || initiate_declaration_specifiers(nxtok)) {
+			lexer_put_back(parser->lexer, nxtok);
+			lexer_put_back(parser->lexer, tok);
+			goto parse_suffix;
+		}
 		dd->declarator = parse_declarator(parser);
 		expect(parser->lexer, TOK_RPAREN);
 	} else {
-		panic("unexpected token %s\n", token_tag_str(tok.tok_tag));
+		// pass thru
+		lexer_put_back(parser->lexer, tok);
 	}
-	
+
+parse_suffix:
 	while (1) {
 		tok = lexer_next_token(parser->lexer);
 		if (tok.tok_tag == TOK_LBRACKET) {
@@ -279,6 +300,9 @@ static struct dynarr *parse_pointer(struct parser *parser) {
 	return ptr_list;
 }
 
+/*
+ * Parse either declarator or abstract declarator
+ */
 struct declarator *parse_declarator(struct parser *parser) {
 	struct dynarr *ptr_list = parse_pointer(parser);
 	struct direct_declarator *direct_declarator = parse_direct_declarator(parser);
@@ -366,13 +390,6 @@ struct declaration *parse_declaration(struct parser *parser) {
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
 	register_potential_typedefs(parser, decl_specifiers, init_declarator_list);
 	return declaration_init(decl_specifiers, init_declarator_list);
-}
-
-/*
- * Checks if the token initiates a declaration (or statement). Used by parse_compound_statement
- */
-int initiate_declaration(union token tok) {
-	return initiate_type_specifier(tok) || initiate_type_qualifier(tok) || initiate_storage_class_specifier(tok);
 }
 
 // assume no EOF found; 

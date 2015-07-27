@@ -29,6 +29,7 @@ struct compound_statement *parse_compound_statement(struct parser *parser);
 
 // decl
 int initiate_declaration(union token tok);
+int initiate_declaration_specifiers(union token tok);
 struct declaration *parse_declaration(struct parser *parser);
 int initiate_type_name(union token tok);
 

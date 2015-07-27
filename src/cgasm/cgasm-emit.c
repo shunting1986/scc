@@ -29,7 +29,12 @@ void cgasm_println_noind(struct cgasm_context *ctx, const char *fmt, ...) {
 }
 
 static void cgasm_vprintln(struct cgasm_context *ctx, int ind, const char *fmt, va_list va) {
+	if (ctx->const_required) {
+		assert(0);
+		panic("In context requiring constant value, no code should be emitted");
+	}
 	if (ctx->func_ctx == NULL) {
+		assert(ctx->fp != NULL);
 		if (ind) {
 			fprintf(ctx->fp, "  ");
 		}

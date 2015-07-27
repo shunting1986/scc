@@ -11,13 +11,16 @@ extern "C" {
 #define TYPE_MAGIC 0x55565758
 
 enum {
+	// basic type
 	T_INT,
-	T_ARRAY,
-	T_NONE, // this means no type specified. Different to T_VOID
-	T_PTR,
 	T_VOID,
+
+	T_ARRAY,
+	T_PTR,
 	T_STRUCT,
 	T_UNION,
+
+	T_NONE, // this means no type specified. Different to T_VOID
 };
 
 #define TYPE_FLAG_STATIC 1

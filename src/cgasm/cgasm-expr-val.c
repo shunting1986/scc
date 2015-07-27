@@ -47,6 +47,10 @@ struct expr_val const_expr_val(union token tok) {
 	return ret;
 }
 
+bool is_int_const(struct expr_val val) {
+	return val.type == EXPR_VAL_CONST_VAL && (val.const_val.const_val.flags & CONST_VAL_TOK_INTEGER);
+}
+
 struct expr_val void_expr_val() {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_VOID;
