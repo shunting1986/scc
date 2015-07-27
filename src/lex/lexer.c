@@ -319,18 +319,24 @@ union token lexer_next_token(struct lexer *lexer) {
 	int token_tag;
 
 repeat:
+	tok.tok_tag = TOK_UNDEF;
 	if (lexer->nputback > 0) {
 		tok = lexer->putback_stk[--lexer->nputback];
-		goto out;
 	}
 
-	if (has_more_expanded_token(lexer)) {
+	// Take care one special case. We define a macro, this macro contains an id. Later 
+	// the id is defined as a typename. We we expand the macro, the id should be return
+	// as type name rather than id!
+	if (tok.tok_tag == TOK_UNDEF && has_more_expanded_token(lexer)) {
 		tok = obtain_next_expanded_token(lexer);
-		if (tok.tok_tag == TOK_IDENTIFIER && try_expand_macro(lexer, tok.id.s)) { // recursive expanding
-			free(tok.id.s);	
-			goto repeat;
+	}
+
+	if (tok.tok_tag != TOK_UNDEF) {
+		if (tok.tok_tag != TOK_IDENTIFIER) {
+			goto out;
+		} else {
+			goto check_id_token; // handle typedef or recursive expanding macro
 		}
-		goto out;
 	}
 
 	ch = lexer_next_char(lexer);
@@ -366,18 +372,21 @@ repeat:
 		if (token_tag != TOK_UNDEF) {
 			tok.tok_tag = token_tag;
 			free(s);
-		} else if (lexer_is_typedef(lexer, s) && (peek_tok = lexer_peek_token(lexer)) != TOK_COMMA && peek_tok != TOK_SEMICOLON) {
+			break;
+		} 
+		tok.tok_tag = TOK_IDENTIFIER;
+		tok.id.s = s;
+
+check_id_token:
+		// below check_id_token, use tok.id.s instead of s since s is not always valid
+		// from all the paths
+		if (lexer_is_typedef(lexer, tok.id.s) && (peek_tok = lexer_peek_token(lexer)) != TOK_COMMA && peek_tok != TOK_SEMICOLON) {
 			tok.tok_tag = TOK_TYPE_NAME;
-			tok.id.s = s;
-		} else if (try_expand_macro(lexer, s)) {
+		} else if (try_expand_macro(lexer, tok.id.s)) {
 			// this is a macro
-			free(s);
+			free(tok.id.s);
 			goto repeat;
-		} else {
-			// this is an identifier
-			tok.tok_tag = TOK_IDENTIFIER;
-			tok.id.s = s;
-		}
+		} 
 		break;
 	case EOF:
 		tok.tok_tag = TOK_EOF;

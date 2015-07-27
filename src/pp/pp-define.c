@@ -2,7 +2,7 @@
 #include <inc/pp.h>
 
 #undef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 
 static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 	struct dynarr *darr = dynarr_init();

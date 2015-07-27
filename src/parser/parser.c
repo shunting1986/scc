@@ -159,6 +159,8 @@ static struct dynarr *parse_specifier_qualifier_sc_internal(struct parser *parse
 	if (dynarr_size(darr) == 0) {
 		// lexer_dump_remaining(parser->lexer); 
 		file_reader_dump_remaining(parser->lexer->cstream);
+		tok = lexer_next_token(parser->lexer); // this is putback
+		token_dump(tok);
 	}
 #endif
 
