@@ -33,6 +33,7 @@ static int pred_table[] = {
 	[TOK_GT] = 5,
 	[TOK_GE] = 5,
 	[TOK_LT] = 5,
+	[TOK_LE] = 5,
 
 	[TOK_EQ] = 3,
 

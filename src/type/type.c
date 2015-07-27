@@ -25,11 +25,32 @@
 
 static int type_allocated, type_freed;
 
+static struct type char_type = {
+	.tag = T_CHAR,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	INIT_MAGIC
+	.size = 1,
+};
+
 static struct type int_type = {
 	.tag = T_INT,
 	.flags = TYPE_FLAG_STATIC, // statically allocated
 	INIT_MAGIC
 	.size = 4,
+};
+
+static struct type long_long_type = {
+	.tag = T_LONG_LONG,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	INIT_MAGIC
+	.size = 8,
+};
+
+static struct type short_type = {
+	.tag = T_SHORT,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	INIT_MAGIC
+	.size = 2,
 };
 
 static struct type void_type = {
@@ -159,6 +180,18 @@ static struct type *alloc_type(int tag, int size) {
  */
 struct type *get_int_type() {
 	return &int_type;
+}
+
+struct type *get_long_long_type() {
+	return &long_long_type;
+}
+
+struct type *get_short_type() {
+	return &short_type;
+}
+
+struct type *get_char_type() {
+	return &char_type;
 }
 
 struct type *get_void_type() {
@@ -387,6 +420,7 @@ static struct type *cgasm_get_register_enum_type(struct cgasm_context *ctx, cons
  */ 
 static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, struct dynarr *darr) {
 	int has_unsigned = 0;
+	int has_signed = 0;
 	int num_long = 0;
 	int basetype = T_NONE;
 	struct type_specifier *type_specifier;
@@ -411,11 +445,33 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 				}
 				has_unsigned = true;
 				break;
+			case TOK_SIGNED:
+				if (has_signed) {
+					panic("multiple 'signed' not allowed");
+				}
+				has_signed = true;
+				break;
 			case TOK_INT:
-				if (basetype != T_NONE) {
+				if (basetype == T_SHORT) {
+					break; // do nothing
+				} else if (basetype != T_NONE) {
 					panic("multi type specified");
 				}
 				basetype = T_INT;
+				break;
+			case TOK_SHORT:
+				if (basetype == T_INT) {
+					// fall thru
+				} else if (basetype != T_NONE) {
+					panic("multi type specified");
+				}
+				basetype = T_SHORT;
+				break;
+			case TOK_CHAR:
+				if (basetype != T_NONE) {
+					panic("multi type specified");
+				}
+				basetype = T_CHAR;
 				break;
 			case TOK_VOID:
 				if (basetype != T_NONE) {
@@ -458,11 +514,35 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 		return type; // should inc the ref count
 	}
 
-	if (num_long > 0) {
-		panic("'long' not support yet");
+	if (basetype == T_SHORT && num_long > 0) {
+		panic("short and long can not be used at the same time");
 	}
+
+	// XXX ignore long if num_long == 1
+	if (num_long >= 1) {
+		if (num_long == 1) {
+			fprintf(stderr, "\033[31m'long' is ignored right now\033[0m\n");
+		} else if (num_long == 2) {
+			if (basetype == T_NONE || basetype == T_INT) {
+				basetype = T_LONG_LONG;
+			} else {
+				panic("invalid usage of long long");
+			}
+		} else {
+			panic("more that 3 longs");
+		}
+	}
+	if (has_signed && has_unsigned) {
+		panic("signed and unsigned can not be used at the same time");
+	}
+
+	if (has_signed) {
+		fprintf(stderr, "\033[31m'signed' is ignored right now\033[0m\n");
+	}
+
 	if (has_unsigned) {
-		panic("'unsigned' not support yet");
+		// panic("'unsigned' not support yet");
+		fprintf(stderr, "\033[31m'unsigned' is ignored right now\033[0m\n");
 	}
 
 	switch (basetype) {
@@ -472,6 +552,15 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 	case T_VOID:
 		type = get_void_type();
 		break;
+	case T_CHAR:
+		type = get_char_type();
+		break;
+	case T_SHORT:
+		type = get_short_type();
+		break;
+	case T_LONG_LONG:
+		type = get_long_long_type();
+		break; 
 	default:
 		panic("not supported");
 	}

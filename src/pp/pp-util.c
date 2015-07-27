@@ -31,6 +31,7 @@ int perform_int_bin_op(int lhs, int rhs, int op) {
 	switch (op) {
 	case TOK_GT: val = lhs > rhs; break;
 	case TOK_LT: val = lhs < rhs; break;
+	case TOK_LE: val = lhs <= rhs; break;
 	case TOK_GE: val = lhs >= rhs; break;
 	case TOK_EQ: val = lhs == rhs; break;
 	case TOK_SUB: val = lhs - rhs; break;

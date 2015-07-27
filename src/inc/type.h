@@ -12,7 +12,10 @@ extern "C" {
 
 enum {
 	// basic type
+	T_CHAR,
+	T_SHORT,
 	T_INT,
+	T_LONG_LONG,
 	T_VOID,
 
 	T_ARRAY,
@@ -68,6 +71,9 @@ struct type *type_get_elem_type(struct type *parent_type);
 struct type *type_deref(struct type *type);
 struct type *get_ptr_type(struct type *elem_type);
 struct type *get_int_type();
+struct type *get_char_type();
+struct type *get_short_type();
+struct type *get_long_long_type();
 int type_get_tag(struct type *type);
 struct type *type_get(struct type *type);
 void type_put(struct type *type);
