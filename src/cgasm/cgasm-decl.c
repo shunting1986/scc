@@ -7,10 +7,13 @@
  */
 struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator) {
 	struct type *base_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
-	return parse_type_from_declarator(base_type, declarator);
+	return parse_type_from_declarator(ctx, base_type, declarator);
 }
 
-struct type *parse_type_from_declarator(struct type *base_type, struct declarator *declarator) {
+/*
+ * Need pass in ctx, since array dimension may refer to variables in sizeof
+ */
+struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator) {
 	struct direct_declarator *dd = declarator->direct_declarator;
 	struct type *final_type = base_type;
 
@@ -27,7 +30,7 @@ struct type *parse_type_from_declarator(struct type *base_type, struct declarato
 	if (dynarr_size(dd->suff_list) > 0) {
 		struct direct_declarator_suffix *suff = dynarr_get(dd->suff_list, 0);
 		if (suff->empty_bracket || suff->const_expr) {
-			final_type = parse_array_type(base_type, dd->suff_list);
+			final_type = parse_array_type(ctx, base_type, dd->suff_list);
 		} else {
 			panic("case not handled yet");
 		}
@@ -63,7 +66,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 			panic("only support declarator with direct id right now");
 		}
 
-		final_type = parse_type_from_declarator(base_type, declarator);
+		final_type = parse_type_from_declarator(ctx, base_type, declarator);
 		if (final_type->size < 0) {
 			panic("The size of symbol is undefined: %s", id);
 		}

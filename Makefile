@@ -71,8 +71,8 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	@#./scc integration-test/syntax-typedef/main.c
-	./scc integration-test/sizeof-ptr/main.c
+	./scc integration-test/syntax-typedef/main.c
+	@#./scc integration-test/sizeof-ptr/main.c
 	@#./scc integration-test/sum/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)

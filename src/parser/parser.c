@@ -95,7 +95,7 @@ struct type_name *parse_type_name(struct parser *parser) {
 	struct declarator *declarator = NULL;
 	lexer_put_back(parser->lexer, tok);
 	if (initiate_abstract_declarator(tok)) {
-		struct declarator *declarator = parse_declarator(parser);
+		declarator = parse_declarator(parser);
 		if (!is_abstract_declarator(declarator)) {
 			panic("require abstract declarator");
 		}

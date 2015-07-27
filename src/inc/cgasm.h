@@ -27,7 +27,7 @@ struct cgasm_context {
 	int state_reg[8];
 
 	int nasm_label;
-	int const_required;
+	// int const_required;
 
 	struct dynarr *type_ref_list; // this is a list of type ref that need to release when finish parsing each function
 };
@@ -110,7 +110,7 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 
 // cgasm-decl.c
 struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
-struct type *parse_type_from_declarator(struct type *base_type, struct declarator *declarator);
+struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator);
 
 #ifdef __cplusplus
 }

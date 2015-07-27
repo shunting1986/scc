@@ -62,7 +62,7 @@ struct cgasm_context;
 void type_destroy(struct type *type);
 struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers);
 struct type *parse_type_from_specifier_qualifier_list(struct cgasm_context *ctx, struct specifier_qualifier_list *list);
-struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist);
+struct type *parse_array_type(struct cgasm_context *ctx, struct type *base_type, struct dynarr *sufflist);
 int type_get_size(struct type *type);
 struct type *type_get_elem_type(struct type *parent_type);
 struct type *type_deref(struct type *type);
@@ -74,6 +74,7 @@ void type_put(struct type *type);
 void register_type_ref(struct cgasm_context *ctx, struct type *type);
 void free_type_ref_in_list(struct symtab *stab);
 void verify_type_memory_release();
+void type_dump(struct type *type);
 
 struct struct_field *get_struct_field(struct type *type, const char *name);
 

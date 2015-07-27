@@ -118,15 +118,19 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 		return int_const_expr_val(type_get_size(val.ctype));
 	} else if (expr->sizeof_type) {
 		struct type *type = parse_type_from_specifier_qualifier_list(ctx, expr->sizeof_type->sqlist);
+		int type_size;
 		if (expr->sizeof_type->declarator != NULL) {
-			type = parse_type_from_declarator(type, expr->sizeof_type->declarator);
+			type = parse_type_from_declarator(ctx, type, expr->sizeof_type->declarator);
 		}
-		fprintf(stderr, "\033[31mNeed handle freeing of the type\033[0m\n"); // TODO
-		return int_const_expr_val(type_get_size(type));
+		register_type_ref(ctx, type);
+		type_size = type_get_size(type);
+		if (type_size < 0) {
+			panic("sizeof returns negative size type");
+		}
+		return int_const_expr_val(type_size);
 	} else if (expr->inc_unary) {
 		struct expr_val val = cgasm_unary_expression(ctx, expr->inc_unary);
 		struct expr_val ret = cgasm_handle_pre_inc(ctx, val);
-		type_put(val.ctype);
 		return ret;
 	} else if (expr->dec_unary) {
 		struct expr_val val = cgasm_unary_expression(ctx, expr->dec_unary);

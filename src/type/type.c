@@ -5,6 +5,12 @@
 #include <inc/cgasm.h>
 #include <inc/symtab.h>
 
+/*
+ * When we parse the array dimension, we still need symtab, because there may
+ * by item like
+ *    sizeof(var), sizeof(type)
+ */
+
 #define DEBUG 1
 
 #if TYPE_DEBUG
@@ -34,9 +40,10 @@ static struct type void_type = {
 };
 
 // TODO make expression parsing completely independent of cgasm module
+/*
 static struct cgasm_context CONST_REQUIRED_CONTEXT = {
 	.const_required = 1,
-};
+}; */
 
 static void struct_field_destroy(struct struct_field *field);
 
@@ -261,7 +268,7 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 			panic("does not support struct declartion with field width right now");
 		}
 
-		struct type *final_type = parse_type_from_declarator(type, each->declarator);
+		struct type *final_type = parse_type_from_declarator(ctx, type, each->declarator);
 		if (final_type->size < 0) {
 			panic("The size of symbol is undefined: %s", id);
 		}
@@ -492,8 +499,11 @@ struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct d
 /*
  * the sufflist is the list of direct_declarator_suffix. This method will assum
  * that each element in the list is one dimension of the array
+ *
+ * XXX pass in cgasm_context since we may need the symtab to parse
+ *   sizeof(var) or sizeof(type)
  */
-struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist) {
+struct type *parse_array_type(struct cgasm_context *ctx, struct type *base_type, struct dynarr *sufflist) {
 	assert(dynarr_size(sufflist) > 0);
 	struct type *final_type = base_type;
 	int i;
@@ -504,7 +514,7 @@ struct type *parse_array_type(struct type *base_type, struct dynarr *sufflist) {
 		if (suff->empty_bracket) {
 			dim = -1;
 		} else if (suff->const_expr) {
-			dim = cgasm_interpret_const_expr(&CONST_REQUIRED_CONTEXT, suff->const_expr);
+			dim = cgasm_interpret_const_expr(ctx, suff->const_expr);
 		} else {
 			panic("require array dimension");
 		}
