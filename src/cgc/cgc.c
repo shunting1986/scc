@@ -19,10 +19,10 @@ static void cgc_expression(struct cgc_context *ctx, struct expression *expr);
 static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit);
 static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl);
 static void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
-static void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers);
 static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier);
 static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual);
+static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_specifier *sc);
 static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator);
 static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declarator *direct_declarator);
 static void cgc_compound_statement(struct cgc_context *ctx, struct compound_statement *compound_stmt);
@@ -380,7 +380,7 @@ static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declara
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
+void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
 	cgc_indent(ctx);
 	cgc_declaration_specifiers(ctx, decl_specifiers);
 	cgc_print(ctx, " ");
@@ -418,10 +418,20 @@ static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declarati
 		case TYPE_QUALIFIER:
 			cgc_type_qualifier(ctx, (struct type_qualifier *) each);
 			break;
+		case STORAGE_CLASS_SPECIFIER:
+			cgc_storage_class_specifier(ctx, (struct storage_class_specifier *) each);
+			break;
 		default:
-			panic("ni %d");
+			panic("ni %s", node_type_str(each->nodeType));
 		}
 	DYNARR_FOREACH_END();
+}
+
+static void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_specifier) {
+	if (type_specifier->struct_decl_list != NULL) {
+		panic("not support struct decl list yet");
+	}
+	cgc_print(ctx, "struct %s", type_specifier->type_name);
 }
 
 static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier) {
@@ -432,8 +442,21 @@ static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *t
 	case TOK_CHAR:
 		cgc_print(ctx, "char");
 		break;
+	case TOK_STRUCT:
+		cgc_struct(ctx, type_specifier);
+		break;
 	default:
 		panic("ni %s", token_tag_str(type_specifier->tok_tag));
+	}
+}
+
+static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_specifier *sc) {
+	switch (sc->tok_tag) {
+	case TOK_TYPEDEF:
+		cgc_print(ctx, "typedef");
+		break;
+	default:
+		panic("ni %s", token_tag_str(sc->tok_tag));
 	}
 }
 

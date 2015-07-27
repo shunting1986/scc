@@ -387,6 +387,7 @@ check_id_token:
 			free(tok.id.s);
 			goto repeat;
 		} 
+
 		break;
 	case EOF:
 		tok.tok_tag = TOK_EOF;

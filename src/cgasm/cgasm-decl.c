@@ -1,6 +1,7 @@
 #include <inc/cgasm.h>
 #include <inc/dynarr.h>
 #include <inc/util.h>
+#include <inc/cgc.h>
 
 /*
  * need ctx for typedef
@@ -67,7 +68,10 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		final_type = parse_type_from_declarator(ctx, base_type, declarator);
-		if (final_type->size < 0) {
+
+		// typedef struct _IO_FILE FILE; is allowed even if we do not have the 
+		// definition of struct _IO_FILE
+		if (final_type->size < 0 && !has_typedef(decl_specifiers)) {
 			panic("The size of symbol is undefined: %s", id);
 		}
 
