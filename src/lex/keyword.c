@@ -23,6 +23,7 @@ static const char *keyword_str_list[] = {
 	[TOK_SHORT] = "short",
 	[TOK_STRUCT] = "struct",
 	[TOK_UNION] = "union",
+	[TOK_ENUM] = "enum",
 	[TOK_TOTAL_NUM] = NULL,
 };
 

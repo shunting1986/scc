@@ -2,6 +2,10 @@
 #include <inc/syntree.h>
 #include <inc/util.h>
 
+struct type_specifier *parse_enum_specifier(struct parser *parser) {
+	panic("ni");
+}
+
 struct struct_declarator *parse_struct_declarator(struct parser *parser) {
 	struct declarator *declarator = NULL;
 	struct constant_expression *const_expr = NULL;

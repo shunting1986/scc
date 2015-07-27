@@ -38,8 +38,9 @@ struct conditional_expression *parse_conditional_expression(struct parser *parse
 #define parse_constant_expression parse_conditional_expression
 struct assignment_expression *parse_assignment_expression(struct parser *parser);
 
-// type-parser
+// struct-enum-parser
 struct type_specifier *parse_struct_or_union_specifier(struct parser *parser);
+struct type_specifier *parse_enum_specifier(struct parser *parser);
 
 #ifdef __cplusplus
 }

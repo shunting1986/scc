@@ -87,7 +87,7 @@ static struct type_specifier *parse_type_specifier(struct parser *parser) {
 		lexer_put_back(parser->lexer, tok);
 		return parse_struct_or_union_specifier(parser);
 	} else if (tok.tok_tag == TOK_ENUM) {
-		panic("enum not supported yet");
+		return parse_enum_specifier(parser);
 	} else {
 		struct type_specifier *sp = type_specifier_init(tok.tok_tag);
 		if (tok.tok_tag == TOK_TYPE_NAME) {
