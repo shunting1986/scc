@@ -1,4 +1,5 @@
 	TARGET: fully support sum/main.c first (stdio.h)
+	- next step is /usr/include/stdio.h L right before 390 vsnprintf
 
 KEYLIST
 	TODO: add test cases for #include "xx"

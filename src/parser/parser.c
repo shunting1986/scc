@@ -362,7 +362,7 @@ static struct init_declarator_list *parse_init_declarator_list(struct parser *pa
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator) {
 	assert(declarator != NULL); 
 	struct dynarr *darr = dynarr_init();
-	struct init_declarator *init_declarator = parse_init_declarator_with_la(parser, declarator);;
+	struct init_declarator *init_declarator = parse_init_declarator_with_la(parser, declarator);
 	union token tok;
 
 	while (1) {
