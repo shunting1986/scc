@@ -120,7 +120,10 @@ static void expand_func_macro(struct lexer *lexer, const char *name, struct macr
 			}
 	
 			arg = dynarr_init();
-			dynarr_add(arg, token_shallow_dup(&tok));
+
+			// NOTE: in some special cases like __attribute__((...)),
+			// tok itself is TOK_LPAREN, we should not consume it but must put it back
+			lexer_put_back(lexer, tok);
 			end_with_paren = add_token_until_comma_or_paren(lexer, arg);
 			dynarr_add(arg_list, arg);
 			if (end_with_paren) {
