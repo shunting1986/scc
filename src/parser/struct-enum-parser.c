@@ -3,7 +3,16 @@
 #include <inc/util.h>
 
 static struct enumerator *parse_enumerator(struct parser *parser) {
-	panic("ni");
+	union token id_tok = expect(parser->lexer, TOK_IDENTIFIER);
+	union token tok = lexer_next_token(parser->lexer);
+	struct constant_expression *expr = NULL;
+
+	if (tok.tok_tag == TOK_ASSIGN) {
+		expr = parse_constant_expression(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+	}
+	return enumerator_init(id_tok.id.s, expr);
 }
 
 static struct enumerator_list *parse_enumerator_list(struct parser *parser) {

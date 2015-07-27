@@ -193,6 +193,14 @@ struct struct_declaration_list {
 
 struct struct_declaration_list *struct_declaration_list_init(struct dynarr *decl_list);
 
+struct enumerator {
+	int nodeType;
+	char *name;
+	struct constant_expression *expr;
+};
+
+struct enumerator *enumerator_init(char *name, struct constant_expression *expr);
+
 struct enumerator_list {
 	int nodeType;
 	struct dynarr *enum_list;

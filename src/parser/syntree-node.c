@@ -417,3 +417,13 @@ struct enumerator_list *enumerator_list_init(struct dynarr *enum_list) {
 	node->enum_list = enum_list;
 	return node;
 }
+
+struct enumerator *enumerator_init(char *name, struct constant_expression *expr) {
+	struct enumerator *enumerator = mallocz(sizeof(*enumerator));
+	enumerator->nodeType = ENUMERATOR;
+	enumerator->name = name;
+	enumerator->expr = expr;
+	return enumerator;
+}
+
+
