@@ -134,6 +134,8 @@ struct type_specifier *parse_struct_or_union_specifier(struct parser *parser) {
 	}
 
 	if (name == NULL && tok.tok_tag != TOK_LBRACE) {
+		file_reader_dump_remaining(parser->lexer->cstream);
+		token_dump(tok);
 		panic("struct/union should be followed by a name or '{'");
 	}
 

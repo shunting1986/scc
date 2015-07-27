@@ -5,6 +5,7 @@
 #include <inc/dynarr.h>
 #include <inc/util.h>
 #include <inc/dynarr.h>
+#include <inc/pp.h>
 
 #undef DEBUG
 #define DEBUG 1
@@ -28,6 +29,10 @@ struct syntree *parse(struct parser *parser) {
 	struct translation_unit *tu = translation_unit_init();
 	struct external_declaration *external_decl;
 	union token tok;
+
+	// define the builtin macros
+	open_header_file(parser->lexer, "scc-builtin.h", TOK_LT);
+
 	while ((tok = lexer_next_token(parser->lexer)).tok_tag != TOK_EOF) {
 		lexer_put_back(parser->lexer, tok);
 		external_decl = parse_external_decl(parser);
@@ -152,7 +157,8 @@ static struct dynarr *parse_specifier_qualifier_sc_internal(struct parser *parse
 
 #if DEBUG
 	if (dynarr_size(darr) == 0) {
-		lexer_dump_remaining(parser->lexer); 
+		// lexer_dump_remaining(parser->lexer); 
+		file_reader_dump_remaining(parser->lexer->cstream);
 	}
 #endif
 

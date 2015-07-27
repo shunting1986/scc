@@ -2,7 +2,7 @@
 #include <inc/util.h>
 
 static const char *sys_inc_paths[] = {
-	"/media/shunting/disk/compiler/std-headers", // put this first so we can override the system provided header file
+	"/media/shunting/disk/compiler/std-headers", // put this first so we can override the system provided header file, or provider builtin macros
 	"/usr/include",
 	// TODO remove this dependency
 	// stddef.h included (maybe indirectly) by stdio.h need this path
@@ -54,7 +54,7 @@ void pp_include(struct lexer *lexer, bool skip) {
 	const char *incl_path = parse_string_literal(lexer, term_tok);
 	(void) incl_path;
 
-#if 0
+#if 1
 	if (!skip) {
 		open_header_file(lexer, incl_path, incl_tok);
 	}

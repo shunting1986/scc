@@ -25,6 +25,7 @@ int perform_int_bin_op(int lhs, int rhs, int op);
 
 // pp-include.c
 void pp_include(struct lexer *lexer, bool skip);
+void open_header_file(struct lexer *lexer, const char *incl_path, int incl_tok);
 
 // macro-symtab.c
 int macro_defined(struct lexer *lexer, const char *s);

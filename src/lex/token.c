@@ -84,7 +84,10 @@ void token_list_dump(struct dynarr *darr) {
 
 void token_dump(union token token) {
 	switch (token.tok_tag) {
-	case TOK_IDENTIFIER:
+	case TOK_TYPE_NAME:
+		fprintf(stderr, "[TYPE_NAME]: %s\n", token.id.s);
+		break;
+	case TOK_IDENTIFIER: 
 		fprintf(stderr, "[id]: %s\n", token.id.s);
 		break;
 	case TOK_STRING_LITERAL:

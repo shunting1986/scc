@@ -27,6 +27,7 @@ struct eval_result wrap_eval_result(int isNan, int val) {
  * XXX always take care to order the predecence when adding new operator
  */
 static int pred_table[] = {
+	[TOK_ADD] = 8,
 	[TOK_SUB] = 8,
 
 	[TOK_GT] = 5,

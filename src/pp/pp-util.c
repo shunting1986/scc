@@ -34,6 +34,7 @@ int perform_int_bin_op(int lhs, int rhs, int op) {
 	case TOK_GE: val = lhs >= rhs; break;
 	case TOK_EQ: val = lhs == rhs; break;
 	case TOK_SUB: val = lhs - rhs; break;
+	case TOK_ADD: val = lhs + rhs; break;
 	case TOK_STAR: val = lhs * rhs; break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
