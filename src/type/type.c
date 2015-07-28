@@ -4,6 +4,7 @@
 #include <inc/dynarr.h>
 #include <inc/cgasm.h>
 #include <inc/symtab.h>
+#include <inc/cgc.h>
 
 /*
  * When we parse the array dimension, we still need symtab, because there may
@@ -283,6 +284,15 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 	if (!is_struct) {
 		assert(offset == 0);
 	}
+	/* TODO handle the special case like:
+	 * struct st {
+	 *   int a;
+	 *   union {
+	 *     int b;
+	 *     int c;
+	 *   };
+	 * };
+	 */
 	DYNARR_FOREACH_BEGIN(decl->declarator_list, struct_declarator, each);
 		struct type *final_type;
 

@@ -15,24 +15,6 @@ struct cgc_context {
 
 #define cgc_constant_expression cgc_conditional_expression
 
-static void cgc_expression(struct cgc_context *ctx, struct expression *expr);
-static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit);
-static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl);
-static void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
-static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers);
-static void cgc_specifier_qualifier_list(struct cgc_context *ctx, struct specifier_qualifier_list *list);
-static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier);
-static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual);
-static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_specifier *sc);
-static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator);
-static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declarator *direct_declarator);
-static void cgc_compound_statement(struct cgc_context *ctx, struct compound_statement *compound_stmt);
-static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt);
-static void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_list *init_declarator_list);
-static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator);
-static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr);
-static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment_expression *expr);
-
 #define CGC_BINARY_OP_EXPR(ctx, container_expr, subexpr_list, subexpr_type, oplist, single_op) do { \
 	cgc_ ## subexpr_type(ctx, dynarr_get(subexpr_list, 0)); \
 	int i; \
@@ -71,13 +53,13 @@ void cgc_tree(struct cgc_context *ctx, struct syntree *tree) {
 	cgc_translation_unit(ctx, tree->trans_unit);
 }
 
-static void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit) {
+void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit) {
 	DYNARR_FOREACH_BEGIN(trans_unit->external_decl_list, external_declaration, each);
 		cgc_external_declaration(ctx, each);
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl) {
+void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl) {
 	if (external_decl->func_def_declarator != NULL) {
 		cgc_function_definition(ctx, external_decl->decl_specifiers, external_decl->func_def_declarator, external_decl->compound_stmt);
 	} else {
@@ -85,7 +67,7 @@ static void cgc_external_declaration(struct cgc_context *ctx, struct external_de
 	}
 }
 
-static void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers* decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {
+void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers* decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {
 	cgc_indent(ctx);
 	cgc_declaration_specifiers(ctx, decl_specifiers);
 	cgc_print(ctx, " ");
@@ -94,7 +76,7 @@ static void cgc_function_definition(struct cgc_context *ctx, struct declaration_
 	cgc_compound_statement(ctx, compound_stmt);
 }
 
-static void cgc_compound_statement(struct cgc_context *ctx, struct compound_statement *compound_stmt) {
+void cgc_compound_statement(struct cgc_context *ctx, struct compound_statement *compound_stmt) {
 	cgc_indent(ctx); cgc_print(ctx, "{\n");
 
 	ctx->indent += ctx->step;
@@ -110,7 +92,7 @@ static void cgc_compound_statement(struct cgc_context *ctx, struct compound_stat
 	cgc_indent(ctx); cgc_print(ctx, "}\n");
 }
 
-static void cgc_constant_value(struct cgc_context *ctx, union token tok) {
+void cgc_constant_value(struct cgc_context *ctx, union token tok) {
 	int flags = tok.const_val.flags;
 	if (flags & CONST_VAL_TOK_INTEGER) {
 		cgc_print(ctx, "%d", tok.const_val.ival);
@@ -123,7 +105,7 @@ static void cgc_constant_value(struct cgc_context *ctx, union token tok) {
 	}
 }
 
-static void cgc_primary_expression(struct cgc_context *ctx, struct primary_expression *expr) {
+void cgc_primary_expression(struct cgc_context *ctx, struct primary_expression *expr) {
 	if (expr->id != NULL) {
 		cgc_print(ctx, "%s", expr->id);
 	} else if (expr->str) {
@@ -137,7 +119,7 @@ static void cgc_primary_expression(struct cgc_context *ctx, struct primary_expre
 	}
 }
 
-static void cgc_argument_expression_list(struct cgc_context *ctx, struct argument_expression_list *arg_list) {
+void cgc_argument_expression_list(struct cgc_context *ctx, struct argument_expression_list *arg_list) {
 	struct dynarr *assign_expr_list = arg_list->list;
 	int first = 1;
 	DYNARR_FOREACH_BEGIN(assign_expr_list, assignment_expression, each);
@@ -149,7 +131,7 @@ static void cgc_argument_expression_list(struct cgc_context *ctx, struct argumen
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_postfix_expression_suffix(struct cgc_context *ctx, struct postfix_expression_suffix *suff) {
+void cgc_postfix_expression_suffix(struct cgc_context *ctx, struct postfix_expression_suffix *suff) {
 	if (suff->ind != NULL) {
 		cgc_print(ctx, "[");
 		cgc_expression(ctx, suff->ind);
@@ -171,14 +153,14 @@ static void cgc_postfix_expression_suffix(struct cgc_context *ctx, struct postfi
 	}
 }
 
-static void cgc_postfix_expression(struct cgc_context *ctx, struct postfix_expression *expr) {
+void cgc_postfix_expression(struct cgc_context *ctx, struct postfix_expression *expr) {
 	cgc_primary_expression(ctx, expr->prim_expr);
 	DYNARR_FOREACH_BEGIN(expr->suff_list, postfix_expression_suffix, each);
 		cgc_postfix_expression_suffix(ctx, each);
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_type_name(struct cgc_context *ctx, struct type_name *type_name) {
+void cgc_type_name(struct cgc_context *ctx, struct type_name *type_name) {
 	cgc_specifier_qualifier_list(ctx, type_name->sqlist);
 	if (type_name->declarator != NULL) {
 		cgc_print(ctx, " ");
@@ -186,7 +168,7 @@ static void cgc_type_name(struct cgc_context *ctx, struct type_name *type_name) 
 	}
 }
 
-static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
+void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
 	assert(unary_expr->nodeType == UNARY_EXPRESSION);
 	if (unary_expr->inc_unary != NULL) {
 		cgc_print(ctx, "%s", cgc_get_op_str(TOK_INC));
@@ -210,7 +192,7 @@ static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expressio
 	}
 }
 
-static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr) {
+void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr) {
 	assert(expr->nodeType == CAST_EXPRESSION);
 	if (expr->unary_expr != NULL) {
 		cgc_unary_expression(ctx, expr->unary_expr);
@@ -222,51 +204,51 @@ static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression 
 	}
 }
 
-static void cgc_multiplicative_expression(struct cgc_context *ctx, struct multiplicative_expression *expr) {
+void cgc_multiplicative_expression(struct cgc_context *ctx, struct multiplicative_expression *expr) {
 	assert(expr->nodeType == MULTIPLICATIVE_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->cast_expr_list, cast_expression, expr->oplist, TOK_UNDEF);
 }
 
-static void cgc_additive_expression(struct cgc_context *ctx, struct additive_expression *expr) {
+void cgc_additive_expression(struct cgc_context *ctx, struct additive_expression *expr) {
 	assert(expr->nodeType == ADDITIVE_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->mul_expr_list, multiplicative_expression, expr->oplist, TOK_UNDEF);
 }
 
-static void cgc_shift_expression(struct cgc_context *ctx, struct shift_expression *expr) {
+void cgc_shift_expression(struct cgc_context *ctx, struct shift_expression *expr) {
 	assert(expr->nodeType == SHIFT_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->add_expr_list, additive_expression, expr->oplist, TOK_UNDEF);
 }
 
-static void cgc_relational_expression(struct cgc_context *ctx, struct relational_expression *expr) {
+void cgc_relational_expression(struct cgc_context *ctx, struct relational_expression *expr) {
 	assert(expr->nodeType == RELATIONAL_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->shift_expr_list, shift_expression, expr->oplist, TOK_UNDEF);
 }
 
-static void cgc_equality_expression(struct cgc_context *ctx, struct equality_expression *expr) {
+void cgc_equality_expression(struct cgc_context *ctx, struct equality_expression *expr) {
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->rel_expr_list, relational_expression, expr->oplist, TOK_UNDEF);
 }
 
-static void cgc_and_expression(struct cgc_context *ctx, struct and_expression *expr) {
+void cgc_and_expression(struct cgc_context *ctx, struct and_expression *expr) {
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->eq_expr_list, equality_expression, NULL, TOK_AMPERSAND);
 }
 
-static void cgc_exclusive_or_expression(struct cgc_context *ctx, struct exclusive_or_expression *expr) {
+void cgc_exclusive_or_expression(struct cgc_context *ctx, struct exclusive_or_expression *expr) {
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->and_expr_list, and_expression, NULL, TOK_XOR);
 }
 
-static void cgc_inclusive_or_expression(struct cgc_context *ctx, struct inclusive_or_expression *expr) {
+void cgc_inclusive_or_expression(struct cgc_context *ctx, struct inclusive_or_expression *expr) {
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->xor_expr_list, exclusive_or_expression, NULL, TOK_VERT_BAR);
 }
 
-static void cgc_logical_and_expression(struct cgc_context *ctx, struct logical_and_expression *expr) {
+void cgc_logical_and_expression(struct cgc_context *ctx, struct logical_and_expression *expr) {
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->or_expr_list, inclusive_or_expression, NULL, TOK_LOGIC_AND);
 }
 
-static void cgc_logical_or_expression(struct cgc_context *ctx, struct logical_or_expression *expr) {
+void cgc_logical_or_expression(struct cgc_context *ctx, struct logical_or_expression *expr) {
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->and_expr_list, logical_and_expression, NULL, TOK_LOGIC_OR);
 }
 
-static void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr) {
+void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr) {
 	int i;
 	cgc_logical_or_expression(ctx, dynarr_get(cond_expr->or_expr_list, 0));
 
@@ -281,7 +263,7 @@ static void cgc_conditional_expression(struct cgc_context *ctx, struct condition
 	}
 }
 
-static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment_expression *expr) {
+void cgc_assignment_expression(struct cgc_context *ctx, struct assignment_expression *expr) {
 	int i;
 	for (i = 0; i < dynarr_size(expr->unary_expr_list); i++) {
 		struct unary_expression *unary_expr = dynarr_get(expr->unary_expr_list, i);
@@ -292,7 +274,7 @@ static void cgc_assignment_expression(struct cgc_context *ctx, struct assignment
 	cgc_conditional_expression(ctx, expr->cond_expr);
 }
 
-static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
+void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
 	int first = 1;
 	DYNARR_FOREACH_BEGIN(expr->darr, assignment_expression, each);
 		if (!first) {
@@ -303,7 +285,7 @@ static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt, bool with_indent) {
+void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt, bool with_indent) {
 	if (with_indent) {
 		cgc_indent(ctx); 
 	}
@@ -315,7 +297,7 @@ static void cgc_expression_statement(struct cgc_context *ctx, struct expression_
 	}
 }
 
-static void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *stmt) {
+void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *stmt) {
 	cgc_indent(ctx);
 	if (stmt->init_tok_tag == TOK_GOTO) {
 		cgc_print(ctx, "goto %s", stmt->goto_label);
@@ -333,7 +315,7 @@ static void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *s
 	cgc_print(ctx, ";\n");
 }
 
-static void cgc_indent_statement(struct cgc_context *ctx, struct statement *stmt) {
+void cgc_indent_statement(struct cgc_context *ctx, struct statement *stmt) {
 	if (stmt->nodeType != COMPOUND_STATEMENT) {
 		ctx->indent += ctx->step;
 		cgc_statement(ctx, stmt);
@@ -343,7 +325,7 @@ static void cgc_indent_statement(struct cgc_context *ctx, struct statement *stmt
 	}
 }
 
-static void cgc_while_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
+void cgc_while_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
 	cgc_indent(ctx);
 	cgc_print(ctx, "while (");
 	cgc_expression(ctx, expr);
@@ -351,7 +333,7 @@ static void cgc_while_statement(struct cgc_context *ctx, struct expression *expr
 	cgc_indent_statement(ctx, stmt);
 }
 
-static void cgc_for_statement(struct cgc_context *ctx, struct expression_statement *expr_stmt_1, struct expression_statement *expr_stmt_2, struct expression *expr, struct statement *stmt) {
+void cgc_for_statement(struct cgc_context *ctx, struct expression_statement *expr_stmt_1, struct expression_statement *expr_stmt_2, struct expression *expr, struct statement *stmt) {
 	cgc_indent(ctx);
 	cgc_print(ctx, "for (");
 	cgc_expression_statement(ctx, expr_stmt_1, false);
@@ -365,7 +347,7 @@ static void cgc_for_statement(struct cgc_context *ctx, struct expression_stateme
 	cgc_indent_statement(ctx, stmt);
 }
 
-static void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_statement *stmt) {
+void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_statement *stmt) {
 	switch (stmt->iterType) {
 	case ITER_TYPE_WHILE:
 		cgc_while_statement(ctx, stmt->while_stmt.expr, stmt->while_stmt.stmt);
@@ -380,7 +362,7 @@ static void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_st
 	}
 }
 
-static void cgc_if_statement(struct cgc_context *ctx, struct expression *expr, struct statement *truestmt, struct statement *falsestmt) {
+void cgc_if_statement(struct cgc_context *ctx, struct expression *expr, struct statement *truestmt, struct statement *falsestmt) {
 	cgc_indent(ctx);
 	cgc_print(ctx, "if (");
 	cgc_expression(ctx, expr);
@@ -394,11 +376,11 @@ static void cgc_if_statement(struct cgc_context *ctx, struct expression *expr, s
 	}
 }
 
-static void cgc_switch_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
+void cgc_switch_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
 	panic("ni");
 }
 
-static void cgc_selection_statement(struct cgc_context *ctx, struct selection_statement *stmt) {
+void cgc_selection_statement(struct cgc_context *ctx, struct selection_statement *stmt) {
 	switch (stmt->selType) {
 	case SEL_TYPE_IF:
 		cgc_if_statement(ctx, stmt->if_stmt.expr, stmt->if_stmt.truestmt, stmt->if_stmt.falsestmt);
@@ -411,7 +393,7 @@ static void cgc_selection_statement(struct cgc_context *ctx, struct selection_st
 	}
 }
 
-static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
+void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
 		cgc_expression_statement(ctx, (struct expression_statement *) stmt, true);
@@ -430,7 +412,7 @@ static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt)
 	}
 }
 
-static void cgc_pointer(struct cgc_context *ctx, struct dynarr *ptr_list) {
+void cgc_pointer(struct cgc_context *ctx, struct dynarr *ptr_list) {
 	DYNARR_FOREACH_BEGIN(ptr_list, type_qualifier_list, each);
 		cgc_print(ctx, "*");
 		int j;
@@ -442,12 +424,12 @@ static void cgc_pointer(struct cgc_context *ctx, struct dynarr *ptr_list) {
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator) {
+void cgc_declarator(struct cgc_context *ctx, struct declarator *declarator) {
 	cgc_pointer(ctx, declarator->ptr_list);
 	cgc_direct_declarator(ctx, declarator->direct_declarator);
 }
 
-static void cgc_parameter_declaration(struct cgc_context *ctx, struct parameter_declaration *decl) {
+void cgc_parameter_declaration(struct cgc_context *ctx, struct parameter_declaration *decl) {
 	cgc_declaration_specifiers(ctx, decl->decl_specifiers);	
 	if (decl->declarator) {
 		cgc_print(ctx, " ");
@@ -455,7 +437,7 @@ static void cgc_parameter_declaration(struct cgc_context *ctx, struct parameter_
 	}
 }
 
-static void cgc_parameter_type_list(struct cgc_context *ctx, struct parameter_type_list *list) {
+void cgc_parameter_type_list(struct cgc_context *ctx, struct parameter_type_list *list) {
 	int first = 1;
 	DYNARR_FOREACH_BEGIN(list->param_decl_list, parameter_declaration, each);
 		if (!first) {
@@ -469,7 +451,7 @@ static void cgc_parameter_type_list(struct cgc_context *ctx, struct parameter_ty
 	}
 }
 
-static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declarator *direct_declarator) {
+void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declarator *direct_declarator) {
 	if (direct_declarator->id != NULL) {
 		cgc_print(ctx, "%s", direct_declarator->id);
 	} else if (direct_declarator->declarator != NULL) {
@@ -510,7 +492,7 @@ void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *dec
 	cgc_print(ctx, ";\n");
 }
 
-static void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_list *init_declarator_list) {
+void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_list *init_declarator_list) {
 	int is_first = 1;
 	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
 		if (!is_first) {
@@ -521,12 +503,12 @@ static void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declar
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator) {
+void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator) {
 	cgc_declarator(ctx, init_declarator->declarator);
 	assert(init_declarator->initializer == NULL); // not supported yet
 }
 
-static void cgc_type_specifier_qualifier_sc(struct cgc_context *ctx, struct dynarr *darr) {
+void cgc_type_specifier_qualifier_sc(struct cgc_context *ctx, struct dynarr *darr) {
 	int first = 1;
 	DYNARR_FOREACH_BEGIN(darr, syntreebasenode, each);
 		if (!first) {
@@ -549,15 +531,15 @@ static void cgc_type_specifier_qualifier_sc(struct cgc_context *ctx, struct dyna
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers) {
+void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers) {
 	cgc_type_specifier_qualifier_sc(ctx, decl_specifiers->darr);
 }
 
-static void cgc_specifier_qualifier_list(struct cgc_context *ctx, struct specifier_qualifier_list *list) {
+void cgc_specifier_qualifier_list(struct cgc_context *ctx, struct specifier_qualifier_list *list) {
 	cgc_type_specifier_qualifier_sc(ctx, list->darr);
 }
 
-static void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *struct_declarator_list) {
+void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *struct_declarator_list) {
 	int is_first = 1;
 	DYNARR_FOREACH_BEGIN(struct_declarator_list, struct_declarator, each);
 		if (!is_first) {
@@ -575,7 +557,7 @@ static void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *s
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declaration *field) {
+void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declaration *field) {
 	cgc_indent(ctx);
 	cgc_specifier_qualifier_list(ctx, field->sqlist);
 	cgc_print(ctx, " ");
@@ -584,7 +566,7 @@ static void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declar
 }
 
 /* support both struct and union */
-static void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_specifier) {
+void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_specifier) {
 	cgc_print(ctx, type_specifier->tok_tag == TOK_STRUCT ? "struct" : "union");
 	if (type_specifier->type_name != NULL) {
 		cgc_print(ctx, " %s", type_specifier->type_name);
@@ -600,7 +582,7 @@ static void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_spec
 	}
 }
 
-static void cgc_enumerator(struct cgc_context *ctx, struct enumerator *enumerator) {
+void cgc_enumerator(struct cgc_context *ctx, struct enumerator *enumerator) {
 	cgc_indent(ctx);
 	cgc_print(ctx, "%s", enumerator->name);
 	if (enumerator->expr) {
@@ -610,7 +592,7 @@ static void cgc_enumerator(struct cgc_context *ctx, struct enumerator *enumerato
 	cgc_print(ctx, ",\n");
 }
 
-static void cgc_enum(struct cgc_context *ctx, struct type_specifier *enum_specifier) {
+void cgc_enum(struct cgc_context *ctx, struct type_specifier *enum_specifier) {
 	cgc_print(ctx, "enum");
 	if (enum_specifier->type_name != NULL) {
 		cgc_print(ctx, " %s", enum_specifier->type_name);
@@ -626,7 +608,7 @@ static void cgc_enum(struct cgc_context *ctx, struct type_specifier *enum_specif
 	}
 }
 
-static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier) {
+void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier) {
 	switch (type_specifier->tok_tag) {
 	case TOK_INT: cgc_print(ctx, "int"); break;
 	case TOK_CHAR: cgc_print(ctx, "char"); break;
@@ -652,7 +634,7 @@ static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *t
 	}
 }
 
-static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_specifier *sc) {
+void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_specifier *sc) {
 	switch (sc->tok_tag) {
 	case TOK_TYPEDEF:
 		cgc_print(ctx, "typedef");
@@ -668,7 +650,7 @@ static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_
 	}
 }
 
-static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual) {
+void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual) {
 	switch (qual->tok_tag) {
 	case TOK_CONST:
 		cgc_print(ctx, "const");

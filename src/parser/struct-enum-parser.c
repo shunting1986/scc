@@ -93,14 +93,20 @@ static struct struct_declaration *parse_struct_declaration(struct parser *parser
 	struct dynarr *declarator_list = dynarr_init();
 	union token tok;
 
-	while (true) {
-		dynarr_add(declarator_list, parse_struct_declarator(parser));
-		tok = lexer_next_token(parser->lexer);
+	// the specifier_qualifier_list may follows by ';' directly for the anonymouse 
+	// union declared insdie struct
+	tok = lexer_next_token(parser->lexer);
+	if (tok.tok_tag != TOK_SEMICOLON) {
+		lexer_put_back(parser->lexer, tok);
+		while (true) {
+			dynarr_add(declarator_list, parse_struct_declarator(parser));
+			tok = lexer_next_token(parser->lexer);
 
-		if (tok.tok_tag == TOK_SEMICOLON) {
-			break;
+			if (tok.tok_tag == TOK_SEMICOLON) {
+				break;
+			}
+			assume(tok, TOK_COMMA);
 		}
-		assume(tok, TOK_COMMA);
 	}
 	return struct_declaration_init(sqlist, declarator_list);
 }
