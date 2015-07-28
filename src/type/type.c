@@ -284,24 +284,28 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 		assert(offset == 0);
 	}
 	DYNARR_FOREACH_BEGIN(decl->declarator_list, struct_declarator, each);
+		struct type *final_type;
+
 		if (each->declarator == NULL) {
-			panic("does not support struct declartion without declarator right now");
-		}
+			id = NULL;
+			final_type = type;
+		} else {
+			if ((id = each->declarator->direct_declarator->id) == NULL) {
+				panic("only support struct declaration with id right now");
+			}
 
-		if ((id = each->declarator->direct_declarator->id) == NULL) {
-			panic("only support struct declaration with id right now");
+			final_type = parse_type_from_declarator(ctx, type, each->declarator);
 		}
-
-		if (each->const_expr != NULL) {
-			panic("does not support struct declartion with field width right now");
-		}
-
-		struct type *final_type = parse_type_from_declarator(ctx, type, each->declarator);
 		if (final_type->size < 0) {
 			panic("The size of symbol is undefined: %s", id);
 		}
 
-		dynarr_add(field_list, struct_field_init(ctx, id, final_type, offset));
+		struct struct_field *field = struct_field_init(ctx, id, final_type, offset);
+		dynarr_add(field_list, field);
+
+		if (each->const_expr != NULL) { 
+			field->width = cgasm_interpret_const_expr(ctx, each->const_expr);
+		}
 
 		if (is_struct) {
 			offset += final_type->size;

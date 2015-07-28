@@ -602,6 +602,10 @@ struct expr_val cgasm_handle_ptr_op(struct cgasm_context *ctx, struct expr_val s
 	}
 	assert(field->offset >= 0);
 
+	if (field->width > 0) {
+		panic("access struct field with width is not supported yet");
+	}
+
 	// TODO can be optimized for union
 	int ptr_reg = REG_EAX;
 	cgasm_load_val_to_reg(ctx, stptr, ptr_reg);

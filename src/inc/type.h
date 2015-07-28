@@ -37,7 +37,7 @@ struct struct_field {
 		// will finally get released when we destroy the syntax tree
 	struct type *type;
 	int offset;
-	// int width; // NOT SUPPORTED YET
+	int width; 
 };
 
 struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *name, struct type *type, int offset);
