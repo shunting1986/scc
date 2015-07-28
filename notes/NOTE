@@ -26,6 +26,8 @@ NOTE: we can try to compile mongoose/memcached/ITSELF!! with my compiler :)
 need distinguish declarator and abstract_declarator <== parse these 2 at the same time
 TODO: type conversion/check?
 
+TODO: handle local typedef and local extern (don't alloc storage for them)
+
 =========== EXTRA
 
 Compiler optimization

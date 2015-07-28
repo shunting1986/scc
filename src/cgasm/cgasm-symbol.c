@@ -126,6 +126,11 @@ static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
 	}
 
 	assert(general_sym->type == SYMBOL_GLOBAL_VAR);
+	
+	if (general_sym->flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN)) {
+		return;
+	}
+
 	struct global_var_symbol *sym = _val;
 	(void) ctx;
 

@@ -30,14 +30,20 @@ enum {
 // field is not 
 #define struct_union_symbol symbol
 
+#define SYMBOL_FLAG_TYPEDEF 1
+#define SYMBOL_FLAG_EXTERN 2
+
+// NOTE: we will apply storage_class_specifier to symbol
 struct symbol {
 	int type;
+	int flags;
 	char name[SYMBOL_MAX_LEN];
 	struct type *ctype;
 };
 
 struct enumerator_symbol {
 	int type;
+	int flags;
 	char name[SYMBOL_MAX_LEN];
 	struct type *ctype;
 	int val;
@@ -45,19 +51,24 @@ struct enumerator_symbol {
 
 struct global_var_symbol {
 	int type;
+	int flags;
 	char name[SYMBOL_MAX_LEN];
 	struct type *ctype;
 };
 
 struct local_var_symbol {
 	int type;
+	int flags;
 	char name[SYMBOL_MAX_LEN];
 	struct type *ctype;
 	int var_ind;
 };
 
+// Note: although the syntax allow parameter declaration contains storage class
+// GCC denied that.
 struct param_symbol {
 	int type;
+	int flags;
 	char name[SYMBOL_MAX_LEN];
 	struct type *ctype;
 	int param_ind;

@@ -42,6 +42,7 @@ struct struct_field {
 
 struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *name, struct type *type, int offset);
 
+// NOTE: we will apply type_specifier and type_qualifier to type
 struct type {
 	int tag; // T_INT etc.
 	int flags;

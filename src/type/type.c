@@ -85,12 +85,13 @@ static void destroy_struct_union_type_nofree_itself(struct type *type) {
 	assert(type->tag == T_STRUCT || type->tag == T_UNION);
 	assert(type->subtype == NULL);
 
-	assert(type->field_list != NULL);
-	DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
-		struct_field_destroy(each);
-	DYNARR_FOREACH_END();
-
-	dynarr_destroy(type->field_list);
+	if (type->field_list != NULL) {
+		DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
+			struct_field_destroy(each);
+		DYNARR_FOREACH_END();
+	
+		dynarr_destroy(type->field_list);
+	}
 }
 
 void type_destroy(struct type *type) {
@@ -443,7 +444,7 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 		case STORAGE_CLASS_SPECIFIER: 
 			break; // XXX ignore storage class here
 		case TYPE_QUALIFIER:
-			panic("not supported yet");
+			fprintf(stderr, "\033[31mtype qualifier is ignored right now\033[0m\n");
 			break;
 		case TYPE_SPECIFIER:
 			type_specifier = (struct type_specifier *) each;

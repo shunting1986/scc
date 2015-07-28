@@ -2,6 +2,7 @@
 #include <inc/dynarr.h>
 #include <inc/util.h>
 #include <inc/cgc.h>
+#include <inc/symtab.h>
 
 /*
  * need ctx for typedef
@@ -68,16 +69,26 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		final_type = parse_type_from_declarator(ctx, base_type, declarator);
+		bool symbol_flags = 0;
+		if (has_typedef(decl_specifiers)) {
+			symbol_flags |= SYMBOL_FLAG_TYPEDEF;
+		}
+		if (has_extern(decl_specifiers)) {
+			symbol_flags |= SYMBOL_FLAG_EXTERN;
+		}
 
-		// typedef struct _IO_FILE FILE; is allowed even if we do not have the 
+		//   typedef struct _IO_FILE FILE;  or
+		//   extern struct _IO_FILE FILE;  
+		// is allowed even if we do not have the 
 		// definition of struct _IO_FILE
-		if (final_type->size < 0 && !has_typedef(decl_specifiers)) {
+		if (final_type->size < 0 && !(symbol_flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN))) {
 			panic("The size of symbol is undefined: %s", id);
 		}
 
 		// register symbol id with type 'final_type'
 		// TODO: don't allocate space for typedef
 		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type);
+		sym->flags = symbol_flags;
 
 		// handle initializer (XXX does not support struct initializer yet)
 		// TODO: need handle global intializer correctly..
