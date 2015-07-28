@@ -32,7 +32,7 @@ struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *
 	if (dynarr_size(dd->suff_list) > 0) {
 		struct direct_declarator_suffix *suff = dynarr_get(dd->suff_list, 0);
 		if (suff->empty_bracket || suff->const_expr) {
-			final_type = parse_array_type(ctx, base_type, dd->suff_list);
+			final_type = parse_array_type(ctx, final_type, dd->suff_list);
 		} else {
 			panic("case not handled yet");
 		}
