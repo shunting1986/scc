@@ -380,6 +380,12 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 	 *   };
 	 * };
 	 */
+	// for type without declarator, we should register it so that the memory
+	// can be reclaimed
+	if (dynarr_size(decl->declarator_list) == 0) {
+		register_type_ref(ctx, type);
+	}
+
 	DYNARR_FOREACH_BEGIN(decl->declarator_list, struct_declarator, each);
 		struct type *final_type;
 
