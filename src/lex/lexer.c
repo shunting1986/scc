@@ -153,18 +153,39 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 		file_reader_put_back(lexer->cstream, peek);
 	}
 
-	int val = 0;
+	unsigned long long val = 0;
 	while ((ch >= '0' && ch <= '9') || (base == 16 && is_hex_char(ch))) {
 		val = val * base + get_hex_value_from_char(ch);
 		ch = file_reader_next_char(lexer->cstream);
 	}
 
-	if (ch != 'L' && ch != 'l') { // ignore a single following L 
-		file_reader_put_back(lexer->cstream, ch);
+	// stat the following u and l
+	int num_u = 0;
+	int num_l = 0;
+	while (ch == 'u' || ch == 'U' || ch == 'l' || ch == 'L') {
+		num_u += ch == 'u' || ch == 'U';
+		num_l += ch == 'l' || ch == 'L';
+		ch = file_reader_next_char(lexer->cstream);
 	}
+	file_reader_put_back(lexer->cstream, ch);
+
+	// XXX ignore num_u right now
+	if (num_l >= 3) {
+		panic("too many following 'l'");
+	}
+
 	ptok->tok_tag = TOK_CONSTANT_VALUE;
-	ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
-	ptok->const_val.ival = val;
+
+	if (num_l < 2) {
+		ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
+		if (val & 0xFFFFFFFF00000000ll) {
+			panic("Constant exceed 32 bit range");
+		}
+		ptok->const_val.ival = (int) val; 
+	} else {
+		ptok->const_val.flags = CONST_VAL_TOK_LONG_LONG;
+		ptok->const_val.llval = val; 
+	}
 }
 
 void lexer_put_back(struct lexer *lexer, union token token) {
@@ -194,9 +215,10 @@ void lexer_dump_remaining(struct lexer *lexer) {
 union token expect(struct lexer *lexer, int tok_tag) {
 	union token tok = lexer_next_token(lexer);
 	if (tok.tok_tag != tok_tag) {
-		assert(false); // TODO
 		file_reader_dump_remaining(lexer->cstream); // TODO
+		token_dump(tok);
 		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
+		assert(false); // TODO
 	}
 	return tok;
 }

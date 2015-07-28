@@ -159,10 +159,16 @@ static struct unary_expression *parse_unary_expression(struct parser *parser) {
 // only handle the case for unary_expression right now
 static struct cast_expression *parse_cast_expression(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
+	struct cast_expression *cast_expr = cast_expression_init();
+
 	if (tok.tok_tag == TOK_LPAREN) {
 		union token nxtok = lexer_next_token(parser->lexer);
 		if (initiate_type_name(nxtok)) {
-			panic("does not support type cast yet");
+			lexer_put_back(parser->lexer, nxtok);
+			cast_expr->type_name = parse_type_name(parser);
+			expect(parser->lexer, TOK_RPAREN);
+			cast_expr->cast_expr = parse_cast_expression(parser);
+			return cast_expr;
 		}
 		lexer_put_back(parser->lexer, nxtok);
 		lexer_put_back(parser->lexer, tok);
@@ -170,7 +176,6 @@ static struct cast_expression *parse_cast_expression(struct parser *parser) {
 		lexer_put_back(parser->lexer, tok); 
 	}
 
-	struct cast_expression *cast_expr = cast_expression_init();
 	cast_expr->unary_expr = parse_unary_expression(parser);
 	return cast_expr;
 }

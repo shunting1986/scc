@@ -22,12 +22,14 @@ union token {
 
 #define CONST_VAL_TOK_INTEGER 1
 #define CONST_VAL_TOK_FLOAT 2
+#define CONST_VAL_TOK_LONG_LONG 4
 	struct {
 		int tok_tag;
 		int flags;
 		union {
 			int ival;
 			double fval;
+			long long llval;
 		};
 	} const_val;
 };
