@@ -209,7 +209,6 @@ static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expressio
 }
 
 static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr) {
-	fprintf(stderr, "cgc_cast_expression %s\n", node_type_str(expr->nodeType)); // TODO
 	assert(expr->nodeType == CAST_EXPRESSION);
 	if (expr->unary_expr != NULL) {
 		cgc_unary_expression(ctx, expr->unary_expr);
