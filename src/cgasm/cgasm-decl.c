@@ -6,7 +6,9 @@
 
 static struct type *parse_type_from_parameter_declaration(struct cgasm_context *ctx, struct parameter_declaration *param_decl) {
 	struct type *base_type = parse_type_from_decl_specifiers(ctx, param_decl->decl_specifiers);
-	return parse_type_from_declarator(ctx, base_type, param_decl->declarator, NULL);
+	return param_decl->declarator == NULL ?
+		base_type :
+		parse_type_from_declarator(ctx, base_type, param_decl->declarator, NULL);
 }
 
 static struct type *parse_func_type_from_parameter_type_list(struct cgasm_context *ctx, struct type *base_type, struct parameter_type_list *param_type_list) {

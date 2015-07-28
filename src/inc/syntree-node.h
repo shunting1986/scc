@@ -102,7 +102,7 @@ struct declaration_specifiers *declaration_specifiers_init(struct dynarr *darr);
 struct parameter_declaration {
 	int nodeType;
 	struct declaration_specifiers *decl_specifiers;
-	struct declarator *declarator;
+	struct declarator *declarator; // this can be NULL
 };
 
 struct parameter_declaration *parameter_declaration_init(struct declaration_specifiers *decl_specifiers, struct declarator *declarator);

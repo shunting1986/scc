@@ -1,10 +1,7 @@
-  TODO: support function type, register function declaration and 
-		register function ptr typedef
-	
-	TODO: support int main(void)
 
 KEYLIST
 	support other integration tests..
+	TODO: support int main(void)
 	TODO: try out cgasm_emit_abort ...
 
 NOTE:
