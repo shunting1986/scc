@@ -12,6 +12,8 @@ static const char *op_str_table[] = {
 	[TOK_LE] = "<=",
 	[TOK_INC] = "++",
 	[TOK_ADD_ASSIGN] = "+=",
+	[TOK_RSHIFT] = ">>",
+	[TOK_EXCLAMATION] = "!",
 	[TOK_TOTAL_NUM] = NULL, // to make sure memory is allocated
 };
 

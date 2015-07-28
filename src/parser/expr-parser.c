@@ -168,6 +168,7 @@ static struct cast_expression *parse_cast_expression(struct parser *parser) {
 			cast_expr->type_name = parse_type_name(parser);
 			expect(parser->lexer, TOK_RPAREN);
 			cast_expr->cast_expr = parse_cast_expression(parser);
+			assert(cast_expr->unary_expr == NULL);
 			return cast_expr;
 		}
 		lexer_put_back(parser->lexer, nxtok);
@@ -177,6 +178,8 @@ static struct cast_expression *parse_cast_expression(struct parser *parser) {
 	}
 
 	cast_expr->unary_expr = parse_unary_expression(parser);
+	assert(cast_expr->type_name == NULL);
+	assert(cast_expr->cast_expr == NULL);
 	return cast_expr;
 }
 
@@ -229,7 +232,7 @@ static struct shift_expression *parse_shift_expression(struct parser *parser) {
 		}
 
 		dynarr_add(shift_expr->oplist, (void *) (long) tok.tok_tag);
-		dynarr_add(shift_expr->add_expr_list, parse_shift_expression(parser));
+		dynarr_add(shift_expr->add_expr_list, parse_additive_expression(parser));
 	}
 	return shift_expr;
 }

@@ -185,6 +185,7 @@ static void cgc_type_name(struct cgc_context *ctx, struct type_name *type_name) 
 }
 
 static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
+	assert(unary_expr->nodeType == UNARY_EXPRESSION);
 	if (unary_expr->inc_unary != NULL) {
 		cgc_print(ctx, "%s", cgc_get_op_str(TOK_INC));
 		cgc_unary_expression(ctx, unary_expr->inc_unary);
@@ -208,23 +209,35 @@ static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expressio
 }
 
 static void cgc_cast_expression(struct cgc_context *ctx, struct cast_expression *expr) {
-	cgc_unary_expression(ctx, expr->unary_expr);
-	// TODO need handle casting
+	fprintf(stderr, "cgc_cast_expression %s\n", node_type_str(expr->nodeType)); // TODO
+	assert(expr->nodeType == CAST_EXPRESSION);
+	if (expr->unary_expr != NULL) {
+		cgc_unary_expression(ctx, expr->unary_expr);
+	} else {
+		cgc_print(ctx, "(");
+		cgc_type_name(ctx, expr->type_name);
+		cgc_print(ctx, ") ");
+		cgc_cast_expression(ctx, expr->cast_expr);
+	}
 }
 
 static void cgc_multiplicative_expression(struct cgc_context *ctx, struct multiplicative_expression *expr) {
+	assert(expr->nodeType == MULTIPLICATIVE_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->cast_expr_list, cast_expression, expr->oplist, TOK_UNDEF);
 }
 
 static void cgc_additive_expression(struct cgc_context *ctx, struct additive_expression *expr) {
+	assert(expr->nodeType == ADDITIVE_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->mul_expr_list, multiplicative_expression, expr->oplist, TOK_UNDEF);
 }
 
 static void cgc_shift_expression(struct cgc_context *ctx, struct shift_expression *expr) {
+	assert(expr->nodeType == SHIFT_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->add_expr_list, additive_expression, expr->oplist, TOK_UNDEF);
 }
 
 static void cgc_relational_expression(struct cgc_context *ctx, struct relational_expression *expr) {
+	assert(expr->nodeType == RELATIONAL_EXPRESSION);
 	CGC_BINARY_OP_EXPR(ctx, expr, expr->shift_expr_list, shift_expression, expr->oplist, TOK_UNDEF);
 }
 
@@ -606,6 +619,9 @@ static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_
 		break;
 	case TOK_EXTERN:
 		cgc_print(ctx, "extern");
+		break;
+	case TOK_STATIC:
+		cgc_print(ctx, "static");
 		break;
 	default:
 		panic("ni %s", token_tag_str(sc->tok_tag));
