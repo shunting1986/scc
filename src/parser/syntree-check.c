@@ -59,15 +59,24 @@ int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarat
 	return init_declarator->initializer == NULL && is_func_decl_declarator(init_declarator->declarator);
 }
 
+static char *extract_id_from_declarator(struct declarator *declarator) {
+	struct direct_declarator *dd = declarator->direct_declarator;
+	if (dd->id != NULL) {
+		return dd->id;
+	}
+	if (dd->declarator != NULL) {
+		return extract_id_from_declarator(dd->declarator);
+	}
+	return NULL;
+}
+
 /*
  * Retrieve the identifier list from init_declarator_list
  */
 struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_list *init_declarator_list) {
 	struct dynarr *darr = dynarr_init();
 	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
-		// XXX does care about initializer here
-		struct declarator *declarator = each->declarator;
-		char *id = declarator->direct_declarator->id;
+		char * id = extract_id_from_declarator(each->declarator);
 		if (id != NULL) {
 			dynarr_add(darr, id);
 		}

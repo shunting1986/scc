@@ -10,6 +10,9 @@ static const char *keyword_str_list[] = {
 	[TOK_VOID] = "void",
 	[TOK_INT] = "int",
 	[TOK_LONG] = "long",
+	[TOK_FLOAT] = "float",
+	[TOK_DOUBLE] = "double",
+
 	[TOK_RETURN] = "return",
 	[TOK_CHAR] = "char",
 	[TOK_WHILE] = "while",
@@ -24,8 +27,11 @@ static const char *keyword_str_list[] = {
 	[TOK_STRUCT] = "struct",
 	[TOK_UNION] = "union",
 	[TOK_ENUM] = "enum",
+
 	[TOK_EXTERN] = "extern",
 	[TOK_STATIC] = "static",
+	[TOK_VOLATILE] = "volatile",
+
 	[TOK_TOTAL_NUM] = NULL,
 };
 
