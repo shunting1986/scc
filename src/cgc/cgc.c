@@ -116,6 +116,8 @@ static void cgc_constant_value(struct cgc_context *ctx, union token tok) {
 		cgc_print(ctx, "%d", tok.const_val.ival);
 	} else if (flags & CONST_VAL_TOK_FLOAT) {
 		cgc_print(ctx, "%f", tok.const_val.fval);
+	} else if (flags & CONST_VAL_TOK_LONG_LONG) {
+		cgc_print(ctx, "%lldll", tok.const_val.llval);
 	} else {
 		panic("invalid flag");
 	}
@@ -378,6 +380,37 @@ static void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_st
 	}
 }
 
+static void cgc_if_statement(struct cgc_context *ctx, struct expression *expr, struct statement *truestmt, struct statement *falsestmt) {
+	cgc_indent(ctx);
+	cgc_print(ctx, "if (");
+	cgc_expression(ctx, expr);
+	cgc_print(ctx, ")\n");
+	assert(truestmt != NULL);
+	cgc_indent_statement(ctx, truestmt);
+	if (falsestmt) {
+		cgc_indent(ctx);
+		cgc_print(ctx, "else\n");
+		cgc_indent_statement(ctx, falsestmt);
+	}
+}
+
+static void cgc_switch_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
+	panic("ni");
+}
+
+static void cgc_selection_statement(struct cgc_context *ctx, struct selection_statement *stmt) {
+	switch (stmt->selType) {
+	case SEL_TYPE_IF:
+		cgc_if_statement(ctx, stmt->if_stmt.expr, stmt->if_stmt.truestmt, stmt->if_stmt.falsestmt);
+		break;
+	case SEL_TYPE_SWITCH:
+		cgc_switch_statement(ctx, stmt->switch_stmt.expr, stmt->switch_stmt.stmt);
+		break;
+	default:
+		panic("invalid sel type");
+	}
+}
+
 static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
@@ -388,6 +421,9 @@ static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt)
 		break;
 	case ITERATION_STATEMENT:
 		cgc_iteration_statement(ctx, (struct iteration_statement *) stmt);
+		break;
+	case SELECTION_STATEMENT:
+		cgc_selection_statement(ctx, (struct selection_statement *) stmt);
 		break;
 	default:
 		panic("unexpected node type %s", node_type_str(stmt->nodeType));
@@ -528,7 +564,10 @@ static void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *s
 			cgc_print(ctx, ", ");
 		}
 		is_first = 0;
-		cgc_declarator(ctx, each->declarator);
+
+		if (each->declarator != NULL) {
+			cgc_declarator(ctx, each->declarator);
+		}
 		if (each->const_expr != NULL) {
 			cgc_print(ctx, " : ");
 			cgc_constant_expression(ctx, each->const_expr);
@@ -596,6 +635,8 @@ static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *t
 	case TOK_SIGNED: cgc_print(ctx, "signed"); break;
 	case TOK_SHORT: cgc_print(ctx, "short"); break;
 	case TOK_VOID: cgc_print(ctx, "void"); break;
+	case TOK_DOUBLE: cgc_print(ctx, "double"); break;
+	case TOK_FLOAT: cgc_print(ctx, "float"); break;
 	case TOK_TYPE_NAME: 
 		cgc_print(ctx, "%s", type_specifier->type_name); 
 		break;
@@ -631,6 +672,9 @@ static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *q
 	switch (qual->tok_tag) {
 	case TOK_CONST:
 		cgc_print(ctx, "const");
+		break;
+	case TOK_VOLATILE:
+		cgc_print(ctx, "volatile");
 		break;
 	default:
 		panic("ni");

@@ -234,6 +234,7 @@ static struct direct_declarator *parse_direct_declarator(struct parser *parser) 
 			lexer_put_back(parser->lexer, tok);
 			goto parse_suffix;
 		}
+		lexer_put_back(parser->lexer, nxtok);
 		dd->declarator = parse_declarator(parser);
 		expect(parser->lexer, TOK_RPAREN);
 	} else {
