@@ -16,6 +16,7 @@ void cgasm_pop_symtab(struct cgasm_context *ctx) {
 
 static void cgasm_check_sym_redef(struct cgasm_context *ctx, char *id) {
 	if (symtab_lookup_norec(ctx->top_stab, id) != NULL) {
+		assert(false); // TODO
 		panic("symbol redefinition: %s", id);
 	}
 }

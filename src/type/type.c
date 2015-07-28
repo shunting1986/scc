@@ -362,6 +362,7 @@ static void complete_struct_definition(struct cgasm_context *ctx, struct type *s
  * 2. complete one if this is a definition and we have not defined the struct yet
  */
 static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, bool is_struct, const char *name, struct struct_declaration_list *decl_list) {
+	fprintf(stderr, "get register struct %s\n", name); // TODO
 	if (name == NULL) {
 		assert(decl_list != NULL);
 		return parse_struct_type_by_decl_list(ctx, is_struct, decl_list);
@@ -378,8 +379,19 @@ static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, bo
 		// get struct type from current scope
 		struct type *struct_type = cgasm_get_struct_type_by_name(ctx, is_struct, name, false);
 		if (struct_type == NULL) {
-			struct_type = parse_struct_type_by_decl_list(ctx, is_struct, decl_list);
+			/* 
+			 * We should add the struct type to symtab first and then parse the decl list.
+			 * Otherwise, for the following case:
+			 *   struct Node {
+			 *     struct Node *next;
+			 *   };
+			 * At first we assume the symtab does not contains Node. After we parse the 
+			 * decl list, a non-complete Node symbol is added to symtab. So the assumption
+			 * is not true anymore.
+			 */
+			struct_type = create_noncomplete_struct_type(is_struct);
 			cgasm_add_struct_type(ctx, name, struct_type);
+			complete_struct_definition(ctx, struct_type, decl_list);
 		} else {
 			// We must reuse the same type object since the noncomplete type object may 
 			// already being refered

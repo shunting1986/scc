@@ -1,4 +1,5 @@
-#include <stdio.h>
+// #include <stdio.h>
+int printf(const char *fmt, ...);
 
 struct _IO_marker { 
 	struct _IO_marker *_next; 
