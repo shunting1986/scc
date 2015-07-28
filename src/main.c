@@ -1,6 +1,7 @@
 #include <inc/util.h>
 #include <inc/parser.h>
 #include <inc/cgasm.h>
+#include <inc/cgc.h>
 
 int
 main(int argc, char **argv) {
@@ -15,6 +16,12 @@ main(int argc, char **argv) {
 	struct parser *parser = parser_init(lexer);
 
 	struct syntree *tree = parse(parser);
+
+	{
+		struct cgc_context *cgctx = cgc_context_init(stderr, 4);
+		cgc_tree(cgctx, tree);
+		panic("halt");
+	}
 
 	// syntree_dump(tree);
 	cgasm_tree(tree);

@@ -404,9 +404,9 @@ static void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator 
 	assert(init_declarator->initializer == NULL); // not supported yet
 }
 
-static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers) {
+static void cgc_type_specifier_qualifier_sc(struct cgc_context *ctx, struct dynarr *darr) {
 	int first = 1;
-	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
+	DYNARR_FOREACH_BEGIN(darr, syntreebasenode, each);
 		if (!first) {
 			cgc_print(ctx, " ");
 		}
@@ -427,20 +427,64 @@ static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declarati
 	DYNARR_FOREACH_END();
 }
 
+static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers) {
+	cgc_type_specifier_qualifier_sc(ctx, decl_specifiers->darr);
+}
+
+static void cgc_specifier_qualifier_list(struct cgc_context *ctx, struct specifier_qualifier_list *list) {
+	cgc_type_specifier_qualifier_sc(ctx, list->darr);
+}
+
+static void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *struct_declarator_list) {
+	int is_first = 1;
+	DYNARR_FOREACH_BEGIN(struct_declarator_list, struct_declarator, each);
+		if (!is_first) {
+			cgc_print(ctx, ", ");
+		}
+		is_first = 0;
+		cgc_declarator(ctx, each->declarator);
+		if (each->const_expr != NULL) {
+			cgc_print(ctx, " : ");
+			cgc_constant_expression(ctx, each->const_expr);
+		}
+	DYNARR_FOREACH_END();
+}
+
+static void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declaration *field) {
+	cgc_indent(ctx);
+	cgc_specifier_qualifier_list(ctx, field->sqlist);
+	cgc_print(ctx, " ");
+	cgc_struct_declarator_list(ctx, field->declarator_list);
+	cgc_print(ctx, ";\n");
+}
+
 static void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_specifier) {
+	cgc_print(ctx, "struct");
+	if (type_specifier->type_name != NULL) {
+		cgc_print(ctx, " %s", type_specifier->type_name);
+	} 
 	if (type_specifier->struct_decl_list != NULL) {
-		panic("not support struct decl list yet");
+		cgc_print(ctx, " {\n");
+		ctx->indent += ctx->step;
+		DYNARR_FOREACH_BEGIN(type_specifier->struct_decl_list->decl_list, struct_declaration, each);
+			cgc_struct_declaration(ctx, each);
+		DYNARR_FOREACH_END();
+		ctx->indent -= ctx->step;
+		cgc_indent(ctx), cgc_print(ctx, "}");
 	}
-	cgc_print(ctx, "struct %s", type_specifier->type_name);
 }
 
 static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier) {
 	switch (type_specifier->tok_tag) {
-	case TOK_INT:
-		cgc_print(ctx, "int");
-		break;
-	case TOK_CHAR:
-		cgc_print(ctx, "char");
+	case TOK_INT: cgc_print(ctx, "int"); break;
+	case TOK_CHAR: cgc_print(ctx, "char"); break;
+	case TOK_LONG: cgc_print(ctx, "long"); break;
+	case TOK_UNSIGNED: cgc_print(ctx, "unsigned"); break;
+	case TOK_SIGNED: cgc_print(ctx, "signed"); break;
+	case TOK_SHORT: cgc_print(ctx, "short"); break;
+	case TOK_VOID: cgc_print(ctx, "void"); break;
+	case TOK_TYPE_NAME: 
+		cgc_print(ctx, "%s", type_specifier->type_name); 
 		break;
 	case TOK_STRUCT:
 		cgc_struct(ctx, type_specifier);

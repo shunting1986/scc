@@ -1,3 +1,6 @@
+  TODO: fix the current issue struct IO_MARKER redefine issue
+	TODO: dump the tree back to C to have a look !!!	
+	
 	TARGET: fully support sum/main.c first (stdio.h)
 	- next step is /usr/include/stdio.h L right before 390 vsnprintf
 
