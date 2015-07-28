@@ -2,6 +2,9 @@
 #include <inc/util.h>
 #include <inc/symtab.h>
 
+#undef DEBUG
+#define DEBUG 1
+
 void cgasm_push_symtab(struct cgasm_context *ctx) {
 	ctx->top_stab = symtab_init(ctx->top_stab);
 }
@@ -101,6 +104,11 @@ struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct ty
 		assert(ctx->top_stab->enclosing != NULL);	
 		symtab_add(ctx->top_stab, ret = symtab_new_local_var(id, func_alloc_space(func_ctx, type->size), type)); // idx start from 0
 	}
+
+#if DEBUG
+	fprintf(stderr, "\033[31mDump the type of declared symbol %s\033[0m\n", id);
+	type_dump(type, 0);
+#endif
 	return ret;
 }
 
@@ -136,6 +144,10 @@ static void cgasm_dump_one_global_var(void *_ctx, const char *key, void *_val) {
 
 	// TODO does not consider initializer yet
 	assert(sym->ctype != NULL);
+
+	if (sym->ctype->tag == T_FUNC) {
+		return; // function declaration
+	}
 	cgasm_println(ctx, ".comm %s, %d, %d", sym->name, sym->ctype->size, 4); // XXX hardcode to 4 byte alignment right now
 }
 

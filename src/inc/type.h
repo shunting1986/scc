@@ -59,6 +59,12 @@ struct type {
 		int dim; // for array
 		struct dynarr *field_list; // be null for everything except struct/union. 
 			// be null for noncomplete struct type as well
+
+		struct {
+			struct type *retype;
+			struct dynarr *param_type_list;
+			bool has_ellipsis;
+		} func;
 	};
 };
 
@@ -76,13 +82,16 @@ struct type *get_int_type();
 struct type *get_char_type();
 struct type *get_short_type();
 struct type *get_long_long_type();
+struct type *get_array_type(struct type *elem_type, int dim);
+struct type *get_noparam_func_type(struct type *retype);
+struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, bool has_ellipsis);
 int type_get_tag(struct type *type);
 struct type *type_get(struct type *type);
 void type_put(struct type *type);
 void register_type_ref(struct cgasm_context *ctx, struct type *type);
 void free_type_ref_in_list(struct symtab *stab);
 void verify_type_memory_release();
-void type_dump(struct type *type);
+void type_dump(struct type *type, int ind);
 
 struct struct_field *get_struct_field(struct type *type, const char *name);
 

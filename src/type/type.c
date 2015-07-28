@@ -95,14 +95,24 @@ static void destroy_struct_union_type_nofree_itself(struct type *type) {
 	}
 }
 
+static void destroy_func_type_nofree_itself(struct type *type) {
+	assert(type->tag == T_FUNC);
+	assert(type->subtype == NULL);
+
+	type_put(type->func.retype);
+	DYNARR_FOREACH_BEGIN(type->func.param_type_list, type, each);
+		type_put(each);
+	DYNARR_FOREACH_END();
+
+	dynarr_destroy(type->func.param_type_list);
+}
+
 void type_destroy(struct type *type) {
 	CHECK_MAGIC(type);
 	assert(type->ref_cnt == 0);
 	struct type *tofree = NULL;
 
 	switch (type->tag) {
-	case T_INT: // no need to destroy
-		break;
 	case T_ARRAY:
 		type_put(type->subtype);
 		tofree = type;
@@ -113,6 +123,10 @@ void type_destroy(struct type *type) {
 		break;
 	case T_STRUCT: case T_UNION:
 		destroy_struct_union_type_nofree_itself(type);
+		tofree = type;
+		break;
+	case T_FUNC:
+		destroy_func_type_nofree_itself(type);
 		tofree = type;
 		break;
 	default: 
@@ -138,11 +152,45 @@ struct type *type_get(struct type *type) {
 	return type;
 }
 
-void type_dump(struct type *type) {
+static void struct_field_list_dump(struct dynarr *list, int ind) {
 	fprintf(stderr, "\033[31m");
-	fprintf(stderr, "Type dump:\n");
-	fprintf(stderr, "  tag %d, ref_cnt %d, size %d\n", type->tag, type->ref_cnt, type->size);
+	fprintf(stderr, "%*s", ind, "");
+	fprintf(stderr, "struct fields ....\n");
 	fprintf(stderr, "\033[0m");
+}
+
+static void type_list_dump(struct dynarr *list, int ind) {
+	DYNARR_FOREACH_BEGIN(list, type, each);
+		type_dump(each, ind);
+	DYNARR_FOREACH_END();
+}
+
+void type_dump(struct type *type, int ind) {
+	fprintf(stderr, "\033[31m");
+	fprintf(stderr, "%*s", ind, "");
+	fprintf(stderr, "T %d F 0x%x S %d CNT %d\n", type->tag, type->flags, type->size, type->ref_cnt);
+	fprintf(stderr, "\033[0m");
+
+	if (type->tag == T_ARRAY) {
+		fprintf(stderr, "\033[31m");
+		fprintf(stderr, "%*s", ind + 2, "");
+		fprintf(stderr, "dim %d\n", type->dim);
+		fprintf(stderr, "\033[0m");
+		type_dump(type->subtype, ind + 2);
+	} else if (type->tag == T_PTR) {
+		type_dump(type->subtype, ind + 2);
+	} else if (type->tag == T_STRUCT || type->tag == T_UNION) {
+		struct_field_list_dump(type->field_list, ind + 2);
+	} else if (type->tag == T_FUNC) {
+		fprintf(stderr, "\033[31m");
+		fprintf(stderr, "%*s", ind + 2, "");
+		fprintf(stderr, "has ellipsis %d\n", type->func.has_ellipsis);
+		type_dump(type->func.retype, ind + 2);
+		fprintf(stderr, "\033[0m");
+		fprintf(stderr, "\n");
+		
+		type_list_dump(type->func.param_type_list, ind + 2);
+	}
 }
 
 void type_put(struct type *type) {
@@ -154,7 +202,7 @@ void type_put(struct type *type) {
 
 #if TYPE_DEBUG
 	if (type->ref_cnt <= 0) {
-		type_dump(type);
+		type_dump(type, 0);
 	}
 #endif
 
@@ -206,11 +254,28 @@ struct type *get_ptr_type(struct type *elem_type) {
 	return ret_type;
 }
 
-static struct type *get_array_type(struct type *elem_type, int dim) {
+struct type *get_array_type(struct type *elem_type, int dim) {
 	struct type *ret_type = alloc_type(T_ARRAY, dim * elem_type->size);
 	ret_type->subtype = type_get(elem_type);
 	ret_type->dim = dim;
 	return ret_type;
+}
+
+struct type *get_noparam_func_type(struct type *retype) {
+	return get_func_type(retype, dynarr_init(), false);
+}
+
+struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, bool has_ellipsis) {
+	assert(!has_ellipsis || dynarr_size(param_type_list) > 0);
+	struct type *ret = alloc_type(T_FUNC, -1);
+
+	ret->func.retype = type_get(retype);
+	DYNARR_FOREACH_BEGIN(param_type_list, type, each);
+		type_get(each); // add ref count
+	DYNARR_FOREACH_END();
+	ret->func.param_type_list = param_type_list;
+	ret->func.has_ellipsis = has_ellipsis;
+	return ret;
 }
 
 static struct type *create_struct_type(bool is_struct, int size, struct dynarr *field_list) {
@@ -603,35 +668,6 @@ struct type *parse_type_from_specifier_qualifier_list(struct cgasm_context *ctx,
  */
 struct type *parse_type_from_decl_specifiers(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers) {
 	return parse_type_from_raw_type_list(ctx, decl_specifiers->darr);
-}
-
-
-/*
- * the sufflist is the list of direct_declarator_suffix. This method will assum
- * that each element in the list is one dimension of the array
- *
- * XXX pass in cgasm_context since we may need the symtab to parse
- *   sizeof(var) or sizeof(type)
- */
-struct type *parse_array_type(struct cgasm_context *ctx, struct type *base_type, struct dynarr *sufflist) {
-	assert(dynarr_size(sufflist) > 0);
-	struct type *final_type = base_type;
-	int i;
-
-	for (i = dynarr_size(sufflist) - 1; i >= 0; i--) {
-		struct direct_declarator_suffix *suff = dynarr_get(sufflist, i);
-		int dim;
-		if (suff->empty_bracket) {
-			dim = -1;
-		} else if (suff->const_expr) {
-			dim = cgasm_interpret_const_expr(ctx, suff->const_expr);
-		} else {
-			panic("require array dimension");
-		}
-		final_type = get_array_type(final_type, dim);
-	}
-
-	return final_type;
 }
 
 int type_get_size(struct type *type) {
