@@ -289,11 +289,16 @@ static void cgc_expression(struct cgc_context *ctx, struct expression *expr) {
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt) {
-	cgc_indent(ctx); 
+static void cgc_expression_statement(struct cgc_context *ctx, struct expression_statement *stmt, bool with_indent) {
+	if (with_indent) {
+		cgc_indent(ctx); 
+	}
 	if (stmt->expr != NULL)
 		cgc_expression(ctx, stmt->expr);
-	cgc_print(ctx, ";\n");
+	cgc_print(ctx, ";");
+	if (with_indent) {
+		cgc_print(ctx, "\n");
+	}
 }
 
 static void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *stmt) {
@@ -314,14 +319,57 @@ static void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *s
 	cgc_print(ctx, ";\n");
 }
 
+static void cgc_indent_statement(struct cgc_context *ctx, struct statement *stmt) {
+	if (stmt->nodeType != COMPOUND_STATEMENT) {
+		ctx->indent += ctx->step;
+		cgc_statement(ctx, stmt);
+		ctx->indent -= ctx->step;
+	} else {
+		cgc_compound_statement(ctx, (struct compound_statement *) stmt);
+	}
+}
+
+static void cgc_while_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
+	cgc_indent(ctx);
+	cgc_print(ctx, "while (");
+	cgc_expression(ctx, expr);
+	cgc_print(ctx, ")\n");
+	cgc_indent_statement(ctx, stmt);
+}
+
+static void cgc_for_statement(struct cgc_context *ctx, struct expression_statement *expr_stmt_1, struct expression_statement *expr_stmt_2, struct expression *expr, struct statement *stmt) {
+	cgc_indent(ctx);
+	cgc_print(ctx, "for (");
+	cgc_expression_statement(ctx, expr_stmt_1, false);
+	cgc_print(ctx, " ");
+	cgc_expression_statement(ctx, expr_stmt_2, false);
+	if (expr) {
+		cgc_print(ctx, " ");
+		cgc_expression(ctx, expr);
+	}
+	cgc_print(ctx, ")\n");
+	cgc_indent_statement(ctx, stmt);
+}
+
 static void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_statement *stmt) {
-	panic("ni");
+	switch (stmt->iterType) {
+	case ITER_TYPE_WHILE:
+		cgc_while_statement(ctx, stmt->while_stmt.expr, stmt->while_stmt.stmt);
+		break;
+	case ITER_TYPE_DO_WHILE:
+		panic("do-while");
+	case ITER_TYPE_FOR:
+		cgc_for_statement(ctx, stmt->for_stmt.expr_stmt_1, stmt->for_stmt.expr_stmt_2, stmt->for_stmt.expr, stmt->for_stmt.stmt);
+		break;
+	default:
+		panic("invalid iter type %d", stmt->iterType);
+	}
 }
 
 static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
-		cgc_expression_statement(ctx, (struct expression_statement *) stmt);
+		cgc_expression_statement(ctx, (struct expression_statement *) stmt, true);
 		break;
 	case JUMP_STATEMENT:
 		cgc_jump_statement(ctx, (struct jump_statement *) stmt);

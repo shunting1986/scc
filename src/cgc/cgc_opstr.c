@@ -8,6 +8,10 @@ static const char *op_str_table[] = {
 	[TOK_ADD] = "+",
 	[TOK_STAR] = "*",
 	[TOK_SUB] = "-",
+	[TOK_NE] = "!=",
+	[TOK_LE] = "<=",
+	[TOK_INC] = "++",
+	[TOK_ADD_ASSIGN] = "+=",
 	[TOK_TOTAL_NUM] = NULL, // to make sure memory is allocated
 };
 
