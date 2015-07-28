@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+#ifndef EOF
+#define EOF -1
+#endif
+
 int
 main() {
 	int n, i, sum;

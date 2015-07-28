@@ -22,6 +22,7 @@ enum {
 	T_PTR,
 	T_STRUCT,
 	T_UNION,
+	T_FUNC,
 
 	T_NONE, // this means no type specified. Different to T_VOID
 };

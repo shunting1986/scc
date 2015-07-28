@@ -121,7 +121,7 @@ void type_destroy(struct type *type) {
 
 	if (tofree) {
 		type_freed++;
-#if DEBUG
+#if DEBUG && 0
 	fprintf(stderr, "\033[31mtype destroy %p, %d\033[0m\n", tofree, tofree->tag); 
 #endif
 		free(tofree);
@@ -166,7 +166,7 @@ void type_put(struct type *type) {
 
 static struct type *alloc_type(int tag, int size) {
 	struct type *type = mallocz(sizeof(*type));
-#if DEBUG
+#if DEBUG && 0
 	fprintf(stderr, "\033[31mallocated type %p, %d\033[0m\n", type, tag); 
 #endif
 	type->tag = tag;
@@ -377,7 +377,6 @@ static void complete_struct_definition(struct cgasm_context *ctx, struct type *s
  * 2. complete one if this is a definition and we have not defined the struct yet
  */
 static struct type *cgasm_get_register_struct_type(struct cgasm_context *ctx, bool is_struct, const char *name, struct struct_declaration_list *decl_list) {
-	fprintf(stderr, "get register struct %s\n", name); // TODO
 	if (name == NULL) {
 		assert(decl_list != NULL);
 		return parse_struct_type_by_decl_list(ctx, is_struct, decl_list);

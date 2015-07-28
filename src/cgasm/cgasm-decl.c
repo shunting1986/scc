@@ -41,10 +41,12 @@ struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *
 }
 
 void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
+	#if 1
 	// function declaration
 	if (is_func_decl_init_declarator_list(init_declarator_list)) {
 		return; // XXX ignore function declaration right now
-	}
+	} 
+	#endif
 
 #ifdef NAIVE_IMPL
 	struct dynarr *idlist = extract_id_list_from_init_declarator_list(init_declarator_list);
@@ -81,7 +83,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		//   extern struct _IO_FILE FILE;  
 		// is allowed even if we do not have the 
 		// definition of struct _IO_FILE
-		if (final_type->size < 0 && !(symbol_flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN))) {
+		if (final_type->size < 0 && !(symbol_flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN)) && final_type->tag != T_FUNC) {
 			panic("The size of symbol is undefined: %s", id);
 		}
 
