@@ -43,6 +43,7 @@ struct cgasm_func_context {
 
 void cgasm_tree(struct syntree *tree);
 void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
+void cgasm_emit_abort(struct cgasm_context *ctx);
 
 // cgasm-func.c
 void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);

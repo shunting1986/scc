@@ -1,5 +1,6 @@
 KEYLIST
 	support other integration tests..
+	TODO: try out cgasm_emit_abort ...
 
 NOTE:
   the scope of struct/union/enum/typedef/func is similar to variable. When we exit a brace, these definitions are gone as well.

@@ -65,3 +65,7 @@ static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation
 	DYNARR_FOREACH_END();
 	cgasm_leave_translation_unit(ctx);
 }
+
+void cgasm_emit_abort(struct cgasm_context *ctx) {
+	cgasm_println(ctx, "call scc_builtin_abort"); 
+}

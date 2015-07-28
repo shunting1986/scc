@@ -137,6 +137,8 @@ static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token c
 	int flags = const_val.const_val.flags;
 	if (flags & CONST_VAL_TOK_INTEGER) {
 		cgasm_println(ctx, "movl $%d, %%%s", const_val.const_val.ival, get_reg_str_code(reg));
+	} else if (flags & CONST_VAL_TOK_LONG_LONG) {
+		cgasm_emit_abort(ctx); // not support 64 bit yet
 	} else {
 		panic("ni");
 	}
@@ -392,6 +394,16 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		STORE_TO_TEMP();
 		break;
+	case TOK_AMPERSAND: 
+		LOAD_TO_REG();
+		cgasm_println(ctx, "andl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_VERT_BAR:
+		LOAD_TO_REG();
+		cgasm_println(ctx, "orl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
 	case TOK_SUB:
 		LOAD_TO_REG();
 		cgasm_println(ctx, "subl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
@@ -406,6 +418,12 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		LOAD_TO_REG();
 		assert(rhs_reg == REG_ECX);
 		cgasm_println(ctx, "shll %%cl, %%%s", get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_RSHIFT:
+		LOAD_TO_REG();
+		assert(rhs_reg == REG_ECX);
+		cgasm_println(ctx, "shrl %%cl, %%%s", get_reg_str_code(lhs_reg));
 		STORE_TO_TEMP();
 		break;
 	case TOK_EQ: case TOK_NE: case TOK_LE: case TOK_GT: case TOK_LT: case TOK_GE:

@@ -143,8 +143,13 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 }
 
 static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr) {
-	struct expr_val val = cgasm_unary_expression(ctx, expr->unary_expr);
-	// TODO handle cast
+	struct expr_val val;
+	if (expr->unary_expr != NULL) {
+		val = cgasm_unary_expression(ctx, expr->unary_expr);
+	} else {
+		fprintf(stderr, "\033[31mtype casting is not implemented yet\033[0m\n");
+		val = cgasm_cast_expression(ctx, expr->cast_expr);
+	}
 	return val;
 }
 
