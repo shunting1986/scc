@@ -72,8 +72,7 @@ all: handy
 
 handy: rebuild-$(PROG_NAME)
 	@#./scc integration-test/sum/main.c
-	./scc integration-test/func-decl/main.c
-	@#./scc integration-test/syntax-ptr-1dim/main.c
+	./scc integration-test/syntax-ptr-1dim/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

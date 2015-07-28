@@ -3,7 +3,7 @@
 #include <inc/symtab.h>
 
 #undef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 
 void cgasm_push_symtab(struct cgasm_context *ctx) {
 	ctx->top_stab = symtab_init(ctx->top_stab);

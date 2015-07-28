@@ -17,6 +17,8 @@ enum {
 	T_INT,
 	T_LONG_LONG,
 	T_VOID,
+	T_FLOAT,
+	T_DOUBLE,
 
 	T_ARRAY,
 	T_PTR,
@@ -82,6 +84,8 @@ struct type *get_int_type();
 struct type *get_char_type();
 struct type *get_short_type();
 struct type *get_long_long_type();
+struct type *get_double_type();
+struct type *get_float_type();
 struct type *get_array_type(struct type *elem_type, int dim);
 struct type *get_noparam_func_type(struct type *retype);
 struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, bool has_ellipsis);

@@ -40,6 +40,20 @@ static struct type int_type = {
 	.size = 4,
 };
 
+static struct type double_type = {
+	.tag = T_DOUBLE,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	INIT_MAGIC
+	.size = 8,
+};
+
+static struct type float_type = {
+	.tag = T_FLOAT,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	INIT_MAGIC
+	.size = 4,
+};
+
 static struct type long_long_type = {
 	.tag = T_LONG_LONG,
 	.flags = TYPE_FLAG_STATIC, // statically allocated
@@ -135,11 +149,23 @@ void type_destroy(struct type *type) {
 
 	if (tofree) {
 		type_freed++;
-#if DEBUG && 0
-	fprintf(stderr, "\033[31mtype destroy %p, %d\033[0m\n", tofree, tofree->tag); 
+#if DEBUG && 1
+	fprintf(stderr, "\033[31mdebug type memory free addr %p, %d\033[0m\n", tofree, tofree->tag); 
 #endif
 		free(tofree);
 	}
+}
+
+static struct type *alloc_type(int tag, int size) {
+	struct type *type = mallocz(sizeof(*type));
+#if DEBUG && 1
+	fprintf(stderr, "\033[31mdebug type memory allocate addr %p, %d\033[0m\n", type, tag); 
+#endif
+	type->tag = tag;
+	type->size = size;
+	SET_MAGIC(type);
+	type_allocated++;
+	return type;
 }
 
 struct type *type_get(struct type *type) {
@@ -212,24 +238,20 @@ void type_put(struct type *type) {
 	} 
 }
 
-static struct type *alloc_type(int tag, int size) {
-	struct type *type = mallocz(sizeof(*type));
-#if DEBUG && 0
-	fprintf(stderr, "\033[31mallocated type %p, %d\033[0m\n", type, tag); 
-#endif
-	type->tag = tag;
-	type->size = size;
-	SET_MAGIC(type);
-	type_allocated++;
-	return type;
-}
-
 /*
  * XXX We may pre-created all the singletons for base type.
  * XXX think how to reclaim memory for types
  */
 struct type *get_int_type() {
 	return &int_type;
+}
+
+struct type *get_double_type() {
+	return &double_type;
+}
+
+struct type *get_float_type() {
+	return &float_type;
 }
 
 struct type *get_long_long_type() {
@@ -559,6 +581,18 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 				}
 				basetype = T_SHORT;
 				break;
+			case TOK_FLOAT:
+				if (basetype != T_NONE) {
+					panic("multi type specified");
+				}
+				basetype = T_FLOAT;
+				break;
+			case TOK_DOUBLE:
+				if (basetype != T_NONE) {
+					panic("multi type specified");
+				}
+				basetype = T_DOUBLE;
+				break;
 			case TOK_CHAR:
 				if (basetype != T_NONE) {
 					panic("multi type specified");
@@ -638,21 +672,13 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 	}
 
 	switch (basetype) {
-	case T_INT:
-		type = get_int_type();
-		break;
-	case T_VOID:
-		type = get_void_type();
-		break;
-	case T_CHAR:
-		type = get_char_type();
-		break;
-	case T_SHORT:
-		type = get_short_type();
-		break;
-	case T_LONG_LONG:
-		type = get_long_long_type();
-		break; 
+	case T_INT: type = get_int_type(); break;
+	case T_VOID: type = get_void_type(); break;
+	case T_CHAR: type = get_char_type(); break;
+	case T_SHORT: type = get_short_type(); break;
+	case T_LONG_LONG: type = get_long_long_type(); break; 
+	case T_DOUBLE: type = get_double_type(); break;
+	case T_FLOAT: type = get_float_type(); break;
 	default:
 		panic("not supported");
 	}
