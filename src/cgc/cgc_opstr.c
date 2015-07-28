@@ -6,6 +6,8 @@ static const char *op_str_table[] = {
 	[TOK_AMPERSAND] = "&",
 	[TOK_ASSIGN] = "=",
 	[TOK_ADD] = "+",
+	[TOK_STAR] = "*",
+	[TOK_SUB] = "-",
 	[TOK_TOTAL_NUM] = NULL, // to make sure memory is allocated
 };
 

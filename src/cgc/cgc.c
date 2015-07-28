@@ -20,6 +20,7 @@ static void cgc_translation_unit(struct cgc_context *ctx, struct translation_uni
 static void cgc_external_declaration(struct cgc_context *ctx, struct external_declaration *external_decl);
 static void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
 static void cgc_declaration_specifiers(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers);
+static void cgc_specifier_qualifier_list(struct cgc_context *ctx, struct specifier_qualifier_list *list);
 static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *type_specifier);
 static void cgc_type_qualifier(struct cgc_context *ctx, struct type_qualifier *qual);
 static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_specifier *sc);
@@ -85,6 +86,7 @@ static void cgc_external_declaration(struct cgc_context *ctx, struct external_de
 }
 
 static void cgc_function_definition(struct cgc_context *ctx, struct declaration_specifiers* decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {
+	cgc_indent(ctx);
 	cgc_declaration_specifiers(ctx, decl_specifiers);
 	cgc_print(ctx, " ");
 	cgc_declarator(ctx, func_def_declarator);
@@ -174,6 +176,14 @@ static void cgc_postfix_expression(struct cgc_context *ctx, struct postfix_expre
 	DYNARR_FOREACH_END();
 }
 
+static void cgc_type_name(struct cgc_context *ctx, struct type_name *type_name) {
+	cgc_specifier_qualifier_list(ctx, type_name->sqlist);
+	if (type_name->declarator != NULL) {
+		cgc_print(ctx, " ");
+		cgc_declarator(ctx, type_name->declarator);
+	}
+}
+
 static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr) {
 	if (unary_expr->inc_unary != NULL) {
 		cgc_print(ctx, "%s", cgc_get_op_str(TOK_INC));
@@ -186,6 +196,12 @@ static void cgc_unary_expression(struct cgc_context *ctx, struct unary_expressio
 		cgc_cast_expression(ctx, unary_expr->unary_op_cast);
 	} else if (unary_expr->postfix_expr != NULL) {
 		cgc_postfix_expression(ctx, unary_expr->postfix_expr);
+	} else if (unary_expr->sizeof_expr != NULL) {
+		panic("sizeof expr");
+	} else if (unary_expr->sizeof_type != NULL) {
+		cgc_print(ctx, "sizeof(");
+		cgc_type_name(ctx, unary_expr->sizeof_type);
+		cgc_print(ctx, ")");
 	} else {
 		panic("invalid unary expression");
 	}
@@ -298,6 +314,10 @@ static void cgc_jump_statement(struct cgc_context *ctx, struct jump_statement *s
 	cgc_print(ctx, ";\n");
 }
 
+static void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_statement *stmt) {
+	panic("ni");
+}
+
 static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
@@ -305,6 +325,9 @@ static void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt)
 		break;
 	case JUMP_STATEMENT:
 		cgc_jump_statement(ctx, (struct jump_statement *) stmt);
+		break;
+	case ITERATION_STATEMENT:
+		cgc_iteration_statement(ctx, (struct iteration_statement *) stmt);
 		break;
 	default:
 		panic("unexpected node type %s", node_type_str(stmt->nodeType));
@@ -358,7 +381,7 @@ static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declara
 		cgc_declarator(ctx, direct_declarator->declarator);
 		cgc_print(ctx, ")");
 	} else {
-		panic("abstract declarator not supported yet");
+		// fall thru
 	}
 
 	DYNARR_FOREACH_BEGIN(direct_declarator->suff_list, direct_declarator_suffix, suff);
@@ -383,8 +406,11 @@ static void cgc_direct_declarator(struct cgc_context *ctx, struct direct_declara
 void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
 	cgc_indent(ctx);
 	cgc_declaration_specifiers(ctx, decl_specifiers);
-	cgc_print(ctx, " ");
-	cgc_init_declarator_list(ctx, init_declarator_list);
+
+	if (init_declarator_list != NULL) {
+		cgc_print(ctx, " ");
+		cgc_init_declarator_list(ctx, init_declarator_list);
+	}
 	cgc_print(ctx, ";\n");
 }
 
@@ -458,8 +484,9 @@ static void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declar
 	cgc_print(ctx, ";\n");
 }
 
+/* support both struct and union */
 static void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_specifier) {
-	cgc_print(ctx, "struct");
+	cgc_print(ctx, type_specifier->tok_tag == TOK_STRUCT ? "struct" : "union");
 	if (type_specifier->type_name != NULL) {
 		cgc_print(ctx, " %s", type_specifier->type_name);
 	} 
@@ -468,6 +495,32 @@ static void cgc_struct(struct cgc_context *ctx, struct type_specifier *type_spec
 		ctx->indent += ctx->step;
 		DYNARR_FOREACH_BEGIN(type_specifier->struct_decl_list->decl_list, struct_declaration, each);
 			cgc_struct_declaration(ctx, each);
+		DYNARR_FOREACH_END();
+		ctx->indent -= ctx->step;
+		cgc_indent(ctx), cgc_print(ctx, "}");
+	}
+}
+
+static void cgc_enumerator(struct cgc_context *ctx, struct enumerator *enumerator) {
+	cgc_indent(ctx);
+	cgc_print(ctx, "%s", enumerator->name);
+	if (enumerator->expr) {
+		cgc_print(ctx, " = ");
+		cgc_constant_expression(ctx, enumerator->expr);
+	}
+	cgc_print(ctx, ",\n");
+}
+
+static void cgc_enum(struct cgc_context *ctx, struct type_specifier *enum_specifier) {
+	cgc_print(ctx, "enum");
+	if (enum_specifier->type_name != NULL) {
+		cgc_print(ctx, " %s", enum_specifier->type_name);
+	}
+	if (enum_specifier->enumerator_list != NULL) {
+		cgc_print(ctx, " {\n");
+		ctx->indent += ctx->step;
+		DYNARR_FOREACH_BEGIN(enum_specifier->enumerator_list->enum_list, enumerator, each);
+			cgc_enumerator(ctx, each);
 		DYNARR_FOREACH_END();
 		ctx->indent -= ctx->step;
 		cgc_indent(ctx), cgc_print(ctx, "}");
@@ -487,7 +540,11 @@ static void cgc_type_specifier(struct cgc_context *ctx, struct type_specifier *t
 		cgc_print(ctx, "%s", type_specifier->type_name); 
 		break;
 	case TOK_STRUCT:
+	case TOK_UNION:
 		cgc_struct(ctx, type_specifier);
+		break;
+	case TOK_ENUM:
+		cgc_enum(ctx, type_specifier);
 		break;
 	default:
 		panic("ni %s", token_tag_str(type_specifier->tok_tag));
@@ -498,6 +555,9 @@ static void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_
 	switch (sc->tok_tag) {
 	case TOK_TYPEDEF:
 		cgc_print(ctx, "typedef");
+		break;
+	case TOK_EXTERN:
+		cgc_print(ctx, "extern");
 		break;
 	default:
 		panic("ni %s", token_tag_str(sc->tok_tag));
