@@ -9,13 +9,13 @@
  */
 struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator) {
 	struct type *base_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
-	return parse_type_from_declarator(ctx, base_type, declarator);
+	return parse_type_from_declarator(ctx, base_type, declarator, NULL);
 }
 
 /*
  * Need pass in ctx, since array dimension may refer to variables in sizeof
  */
-struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator) {
+struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator, char **idret) {
 	struct direct_declarator *dd = declarator->direct_declarator;
 	struct type *final_type = base_type;
 
@@ -41,7 +41,7 @@ struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *
 }
 
 void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
-	#if 1
+	#if 0
 	// function declaration
 	if (is_func_decl_init_declarator_list(init_declarator_list)) {
 		return; // XXX ignore function declaration right now
@@ -63,20 +63,28 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 			// register struct type
 	}
 	DYNARR_FOREACH_BEGIN(init_declarator_list->darr, init_declarator, each);
-		struct declarator *declarator = each->declarator;
+		#if 0
 		struct direct_declarator *dd = declarator->direct_declarator;
 		char *id = dd->id;
 		if (id == NULL) {
 			panic("only support declarator with direct id right now");
-		}
+		} 
+		#endif
+		struct declarator *declarator = each->declarator;
+		char *id = NULL;
 
-		final_type = parse_type_from_declarator(ctx, base_type, declarator);
+		final_type = parse_type_from_declarator(ctx, base_type, declarator, &id);
+
 		bool symbol_flags = 0;
 		if (has_typedef(decl_specifiers)) {
 			symbol_flags |= SYMBOL_FLAG_TYPEDEF;
 		}
 		if (has_extern(decl_specifiers)) {
 			symbol_flags |= SYMBOL_FLAG_EXTERN;
+		}
+
+		if (id == NULL) {
+			panic("declaration requires id");
 		}
 
 		//   typedef struct _IO_FILE FILE;  or
@@ -88,7 +96,6 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		// register symbol id with type 'final_type'
-		// TODO: don't allocate space for typedef
 		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type);
 		sym->flags = symbol_flags;
 

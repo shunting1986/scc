@@ -111,7 +111,7 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 
 // cgasm-decl.c
 struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator);
-struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator);
+struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator, char **idret);
 
 #ifdef __cplusplus
 }

@@ -120,7 +120,11 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 		struct type *type = parse_type_from_specifier_qualifier_list(ctx, expr->sizeof_type->sqlist);
 		int type_size;
 		if (expr->sizeof_type->declarator != NULL) {
-			type = parse_type_from_declarator(ctx, type, expr->sizeof_type->declarator);
+			char *id = NULL;
+			type = parse_type_from_declarator(ctx, type, expr->sizeof_type->declarator, &id);
+			if (id != NULL) {
+				panic("sizeof can not used with (concrete) declarator");
+			}
 		}
 		register_type_ref(ctx, type);
 		type_size = type_get_size(type);

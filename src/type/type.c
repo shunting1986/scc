@@ -304,7 +304,8 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 				panic("only support struct declaration with id right now");
 			}
 
-			final_type = parse_type_from_declarator(ctx, type, each->declarator);
+			// TODO use the id returned by parse_type_from_declarator
+			final_type = parse_type_from_declarator(ctx, type, each->declarator, NULL);
 		}
 		if (final_type->size < 0) {
 			panic("The size of symbol is undefined: %s", id);
