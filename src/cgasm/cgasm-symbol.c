@@ -19,7 +19,6 @@ void cgasm_pop_symtab(struct cgasm_context *ctx) {
 
 static void cgasm_check_sym_redef(struct cgasm_context *ctx, char *id) {
 	if (symtab_lookup_norec(ctx->top_stab, id) != NULL) {
-		assert(false); // TODO
 		panic("symbol redefinition: %s", id);
 	}
 }
@@ -96,7 +95,16 @@ struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name
 struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
 	struct symbol *ret;
-	cgasm_check_sym_redef(ctx, id);
+
+	if (type->tag == T_FUNC) { // redeclare function is OK
+		ret = symtab_lookup_norec(ctx->top_stab, id);
+		if (ret != NULL) {
+			// TODO verify function declaration
+			return ret;
+		}
+	} else {
+		cgasm_check_sym_redef(ctx, id);
+	}
 	if (func_ctx == NULL) {
 		assert(ctx->top_stab->enclosing == NULL);
 		symtab_add(ctx->top_stab, ret = symtab_new_global_var(id, type));
