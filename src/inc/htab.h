@@ -12,6 +12,7 @@ struct hashtab {
 	struct hashtab_item **buckets; // we use a ptr rather than a static array so that
 		// in future we can do hash table expansion
 	int nbucket;
+	int nitem;
 
 	htab_val_free_fn_type *val_free_fn;
 };

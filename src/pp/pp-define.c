@@ -22,6 +22,22 @@ static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 
 static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 	struct dynarr *darr = store_token_until_newline(lexer);
+
+	// simple check for: #define x x case.
+	// a real example is in: /usr/include/bits/confname.h
+	//
+	// the ultimate way to sovle the (indirectly) referring itself obj/func macro is 
+	// constructing the macro expanding tree
+	if (dynarr_size(darr) == 1) {
+		union token *tok = dynarr_get(darr, 0);
+		if (tok->tok_tag == TOK_IDENTIFIER && strcmp(tok->id.s, name) == 0) {
+			token_destroy(*tok);
+			free(tok);
+			dynarr_destroy(darr);
+			red("ignore identity obj macro %s", name);
+			return;
+		}
+	}
 	struct macro *macro = obj_macro_init(darr);
 	define_macro(lexer, name, macro);
 

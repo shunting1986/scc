@@ -70,13 +70,18 @@ void htab_destroy(struct hashtab *tab) {
 
 void htab_iter(struct hashtab *tab, void *ctx, htab_iter_fn_type *func) {
 	int i;
+	int num = 0;
 	for (i = 0; i < tab->nbucket; i++) {
 		struct hashtab_item *cur, *next;
 		for (cur = tab->buckets[i]; cur != NULL; cur = next) {
 			next = cur->next;
 			func(ctx, cur->key, cur->val);
+			num++;
 		}
 	}
+
+	// do a validation
+	assert(num == tab->nitem);
 }
 
 void *htab_query(struct hashtab *htab, const char *key) {
@@ -94,10 +99,15 @@ void *htab_query(struct hashtab *htab, const char *key) {
  * duplciated and val will be used directly
  */
 void htab_insert(struct hashtab *htab, const char *key, void *val) {
+	if (htab->nitem >= htab->nbucket) {	
+		red("htab too many item %d", htab->nitem); // TODO
+	}
+
 	int bind = hash_fn((unsigned char *) key) % htab->nbucket;
 	struct hashtab_item *item = alloc_item(key, val);
 	item->next = htab->buckets[bind];
 	htab->buckets[bind] = item;
+	htab->nitem++;
 }
 
 int htab_delete(struct hashtab *htab, const char *key) {
@@ -108,6 +118,8 @@ int htab_delete(struct hashtab *htab, const char *key) {
 			struct hashtab_item *todel = *pptr;
 			*pptr = todel->next;
 			destroy_item(htab, todel);
+
+			htab->nitem--;
 			return 1;
 		}
 	}
