@@ -91,7 +91,7 @@ static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_l
 	struct direct_declarator_suffix *suff = dynarr_get(suff_list, 0);
 	if (suff->param_type_list != NULL) {
 		if (suff->param_type_list->has_ellipsis) {
-			panic("ellipsis is not supported yet");
+			red("ellipsis is just ignored right now");
 		}
 
 		DYNARR_FOREACH_BEGIN(suff->param_type_list->param_decl_list, parameter_declaration, each);

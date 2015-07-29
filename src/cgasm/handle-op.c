@@ -97,6 +97,10 @@ static void cgasm_load_local_var_addr_to_reg(struct cgasm_context *ctx, struct l
 	cgasm_println(ctx, "leal %d(%%ebp), %%%s", cgasm_get_local_var_offset(ctx, sym), get_reg_str_code(reg));
 }
 
+static void cgasm_load_param_addr_to_reg(struct cgasm_context *ctx, struct param_symbol *sym, int reg) {
+	cgasm_println(ctx, "leal %d(%%ebp), %%%s", cgasm_get_param_offset(ctx, sym), get_reg_str_code(reg));
+}
+
 static void cgasm_load_sym_to_reg(struct cgasm_context *ctx, struct symbol *sym, int reg) {
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
@@ -123,6 +127,9 @@ static void cgasm_load_sym_addr_to_reg(struct cgasm_context *ctx, struct symbol 
 		break;
 	case SYMBOL_LOCAL_VAR:
 		cgasm_load_local_var_addr_to_reg(ctx, (struct local_var_symbol *) sym, reg);
+		break;
+	case SYMBOL_PARAM:
+		cgasm_load_param_addr_to_reg(ctx, (struct param_symbol *) sym, reg);
 		break;
 	default:
 		panic("ni %d %s", sym->type, sym->name);
