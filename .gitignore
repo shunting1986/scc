@@ -9,3 +9,5 @@ test/runtest
 temp/
 
 scc
+
+/mongoose/mongoose/
