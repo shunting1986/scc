@@ -24,7 +24,7 @@ NOTE:
 	TODO: support function declaration
 
   TODO: how to handle the case that different function in one translation unit can define label with the same name?
-	TODO: switch, break, continue
+	TODO: switch (and break inside switch), break, continue
 	TODO: support struct initializer
 	TODO: array + struct
 
