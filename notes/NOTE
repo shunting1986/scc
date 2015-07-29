@@ -19,9 +19,6 @@ NOTE:
 	TODO: support struct initializer
 	TODO: array + struct
 
-	TODO: add test cases for #include "xx"
-	TODO: support int main(void)
-
 TODO: support va args
 - NOTE: the only external resource I refer is the grammar of C language
 - TODO: let the make file support dependency on header file
