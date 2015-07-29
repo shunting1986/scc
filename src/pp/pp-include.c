@@ -54,6 +54,7 @@ void pp_include(struct lexer *lexer, bool skip) {
 	const char *incl_path = parse_string_literal(lexer, term_tok);
 	(void) incl_path;
 
+	fprintf(stderr, "\033[31mpp_include %s, skip %d\033[0m\n", incl_path, skip); // TODO
 #if 1
 	if (!skip) {
 		open_header_file(lexer, incl_path, incl_tok);

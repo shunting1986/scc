@@ -17,3 +17,15 @@ _panic(const char *fname, int line, const char *funcname, const char *fmt, ...) 
 	// assert(0 && "_panic");
 	exit(1);
 }
+
+#define color(ctag, fmt) do { \
+	va_list va; \
+	va_start(va, fmt); \
+	fprintf(stderr, "\033[" ctag "m"); \
+	vfprintf(stderr, fmt, va); \
+	fprintf(stderr, "\033[0m\n"); \
+} while (0)
+
+void red(const char *fmt, ...) {
+	color("31", fmt);
+}

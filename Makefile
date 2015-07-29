@@ -102,3 +102,5 @@ clean:
 
 btest:
 	@integration-test/batch-test.sh $(TLIST)
+
+include mongoose/Makefile

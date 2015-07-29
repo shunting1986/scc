@@ -124,6 +124,7 @@ void parse_single_quote(struct lexer *lexer, union token *ptok) {
 				panic("invalid usage of backslash");
 			}
 		} else {
+			file_reader_dump_remaining(lexer->cstream);
 			panic("unsupported/invalid single quotation %s", buf);
 		}
 	} else if (size == 1) {
@@ -423,6 +424,7 @@ check_id_token:
 		}
 	case ' ':
 	case '\t':
+	case '\r':
 		goto repeat;
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '?': case '~':

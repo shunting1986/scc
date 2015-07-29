@@ -149,7 +149,7 @@ void type_destroy(struct type *type) {
 
 	if (tofree) {
 		type_freed++;
-#if DEBUG && 1
+#if DEBUG && 0
 	fprintf(stderr, "\033[31mdebug type memory free addr %p, %d\033[0m\n", tofree, tofree->tag); 
 #endif
 		free(tofree);
@@ -158,7 +158,7 @@ void type_destroy(struct type *type) {
 
 static struct type *alloc_type(int tag, int size) {
 	struct type *type = mallocz(sizeof(*type));
-#if DEBUG && 1
+#if DEBUG && 0
 	fprintf(stderr, "\033[31mdebug type memory allocate addr %p, %d\033[0m\n", type, tag); 
 #endif
 	type->tag = tag;

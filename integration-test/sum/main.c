@@ -1,4 +1,15 @@
 #include <stdio.h>
+/*
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <string.h>
+#include <errno.h>
+#include <limits.h>
+#include <stddef.h>
+#include <stdarg.h> 
+ */
 
 #ifndef EOF
 #define EOF -1
