@@ -151,9 +151,6 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 	} else if (expr->unary_op_cast != NULL) {
 		struct expr_val val = cgasm_cast_expression(ctx, expr->unary_op_cast);
 	
-		red("********* dump the unary expression:");
-		cgc_dump(unary_expression, expr);
-
 		return cgasm_handle_unary_op(ctx, expr->unary_op, val);
 	} else if (expr->sizeof_expr) {
 		// TODO we should not interp the expression. Retrieve the type is enough
