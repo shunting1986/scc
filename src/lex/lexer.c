@@ -123,7 +123,14 @@ void parse_single_quote(struct lexer *lexer, union token *ptok) {
 			if (i < size) {
 				panic("invalid usage of backslash");
 			}
+		} else if (size == 2) {
+			switch (buf[1]) {
+			case '\\': val = '\\'; break;
+			default:
+				goto invalid;
+			}
 		} else {
+		invalid:
 			file_reader_dump_remaining(lexer->cstream);
 			panic("unsupported/invalid single quotation %s", buf);
 		}
