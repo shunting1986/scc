@@ -179,10 +179,16 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 
 	if (num_l < 2) {
 		ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
-		if (val & 0xFFFFFFFF00000000ll) {
-			panic("Constant exceed 32 bit range");
+		ptok->const_val.ival = 0;
+
+		// ignore the overflow error if we are in skip mode
+		if (!lexer->in_skip_mode) {
+			if (val & 0xFFFFFFFF00000000ll) {
+				file_reader_dump_remaining(lexer->cstream);
+				panic("Constant exceed 32 bit range");
+			}
+			ptok->const_val.ival = (int) val; 
 		}
-		ptok->const_val.ival = (int) val; 
 	} else {
 		ptok->const_val.flags = CONST_VAL_TOK_LONG_LONG;
 		ptok->const_val.llval = val; 

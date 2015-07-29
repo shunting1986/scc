@@ -37,6 +37,7 @@ struct lexer {
 	int no_expand_macro; // we should no expand macro when we are in the middle of 
 		// expanding another one or when we are defining macros etc.
 	int disable_typedef;
+	int in_skip_mode;
 
 	struct hashtab *macro_tab;
 

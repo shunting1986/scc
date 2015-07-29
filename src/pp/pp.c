@@ -30,6 +30,8 @@ static void put_back_sharp_if(struct lexer *lexer) {
 static void pp_skip(struct lexer *lexer, int mode) {
 	assert(!lexer->want_sharp); // want_sharp can not nesting
 	lexer->want_sharp = 1;
+	assert(!lexer->in_skip_mode);
+	lexer->in_skip_mode = 1;
 
 	union token tok;
 	bool follow_sharp = false;
@@ -89,7 +91,7 @@ static void pp_skip(struct lexer *lexer, int mode) {
 		token_destroy(tok);
 	}
 out:
-
+	lexer->in_skip_mode = 0;
 	lexer->want_sharp = 0;
 }
 
