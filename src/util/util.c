@@ -29,3 +29,16 @@ _panic(const char *fname, int line, const char *funcname, const char *fmt, ...) 
 void red(const char *fmt, ...) {
 	color("31", fmt);
 }
+
+// NOTE: the caller should free the memory
+char *getdir(const char *path) {
+	char *pos = strrchr(path, '/');
+	if (pos == NULL || pos == path) {
+		return strdup(".");
+	}
+	char *ret = mallocz(pos - path + 1);
+	strncpy(ret, path, pos - path);
+	return ret;
+}
+
+

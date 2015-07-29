@@ -10,25 +10,42 @@ static const char *sys_inc_paths[] = {
 	NULL,
 };
 
+// if this method returns true, the new file is already opened and buffered
+static bool try_incl_dir(struct lexer *lexer, const char *dir, const char *file) {
+	char buf[1024];
+	struct file_reader *fr = NULL;
+	snprintf(buf, sizeof(buf), "%s/%s", dir, file);
+#ifdef DEBUG
+	fprintf(stderr, "[%s] try incl path %s\n", lexer->cstream->path, buf);
+#endif
+
+	if ((fr = file_reader_init(buf)) != NULL) {
+		fr->prev = lexer->cstream;
+		lexer->cstream = fr;
+		return true;
+	}
+	return false;
+}
+
 void open_header_file(struct lexer *lexer, const char *incl_path, int incl_tok) {
 	int i;
 	const char *dir;
-	char buf[1024];
-	struct file_reader *fr = NULL;
 
+	// try relative path first before the system dirs
 	if (incl_tok == '"') {
-		panic("#include \"...\" not supported yet, %s", incl_path);
+		assert(lexer->cstream != NULL);
+		assert(lexer->cstream->path != NULL);
+		char *dir = getdir(lexer->cstream->path);
+		bool ret = try_incl_dir(lexer, dir, incl_path);
+		free(dir);
+
+		if (ret) {
+			return;
+		}
 	}
 
 	for (i = 0; (dir = sys_inc_paths[i]) != NULL; i++) {
-		snprintf(buf, sizeof(buf), "%s/%s", dir, incl_path);
-#ifdef DEBUG
-		fprintf(stderr, "[%s] try incl path %s\n", lexer->cstream->path, buf);
-#endif
-
-		if ((fr = file_reader_init(buf)) != NULL) {
-			fr->prev = lexer->cstream;
-			lexer->cstream = fr;
+		if (try_incl_dir(lexer, dir, incl_path)) {
 			return;
 		}
 	}

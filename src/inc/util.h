@@ -23,6 +23,7 @@ void _panic(const char *fname, int line, const char *funcname, const char *fmt, 
 #define panic(...) _panic(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
 
 void red(const char *fmt, ...);
+char *getdir(const char *path);
 
 void *mallocz(size_t sz);
 
