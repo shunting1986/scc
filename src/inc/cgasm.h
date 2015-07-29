@@ -62,6 +62,7 @@ void cgasm_println_noind(struct cgasm_context *ctx, const char *fmt, ...);
 struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type);
 void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, struct type *type);
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
+struct symbol *cgasm_lookup_sym_noabort(struct cgasm_context *ctx, char *id);
 void cgasm_push_symtab(struct cgasm_context *ctx);
 void cgasm_pop_symtab(struct cgasm_context *ctx);
 void cgasm_dump_global_vars(struct cgasm_context *ctx);

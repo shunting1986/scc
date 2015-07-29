@@ -82,6 +82,7 @@ struct type *type_deref(struct type *type);
 struct type *get_ptr_type(struct type *elem_type);
 struct type *get_int_type();
 struct type *get_char_type();
+struct type *get_char_ptr_type();
 struct type *get_short_type();
 struct type *get_long_long_type();
 struct type *get_double_type();

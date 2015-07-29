@@ -179,6 +179,12 @@ static void cgasm_load_cc_to_reg(struct cgasm_context *ctx, struct condcode *cc,
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
+static void cgasm_load_str_literal_to_reg(struct cgasm_context *ctx, int ind, int reg) {
+	char buf[256];
+	get_str_literal_label(ind, buf);
+	cgasm_println(ctx, "movl $%s, %%%s", buf, get_reg_str_code(reg));
+}
+
 static void cgasm_deref_reg(struct cgasm_context *ctx, int reg) {
 	cgasm_println(ctx, "movl (%%%s), %%%s", get_reg_str_code(reg), get_reg_str_code(reg));
 }
@@ -199,6 +205,9 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 		break;
 	case EXPR_VAL_CC:
 		cgasm_load_cc_to_reg(ctx, val.cc, reg);
+		break;
+	case EXPR_VAL_STR_LITERAL:
+		cgasm_load_str_literal_to_reg(ctx, val.ind, reg);
 		break;
 	default:
 		panic("ni 0x%x", val.type);
@@ -328,7 +337,7 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 		return operand;
 	} else {
 		int reg = REG_EAX;
-		struct expr_val temp = cgasm_alloc_temp_var(ctx);
+		struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type()); // XXX assume integer type
 		cgasm_load_val_to_reg(ctx, operand, reg);
 		cgasm_println(ctx, "negl %%%s", get_reg_str_code(reg));
 		cgasm_store_reg_to_mem(ctx, reg, temp);
@@ -337,7 +346,6 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 }
 
 static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr_val operand) {
-	// TODO type memory management
 	if (!expr_val_has_deref_flag(operand) && type_get_tag(operand.ctype) == T_PTR) {
 		return expr_val_add_deref_flag(operand);
 	}
@@ -386,10 +394,17 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 } while (0)
 
 // note: the result is stored in the lhs register 
+// XXX assume integer type for temp var
 #define STORE_TO_TEMP() do { \
-	res = cgasm_alloc_temp_var(ctx); \
+	res = cgasm_alloc_temp_var(ctx, get_int_type()); \
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
+
+#if 0
+	if (lhs.ctype == NULL || lhs.ctype->tag != T_INT || rhs.ctype == NULL || rhs.ctype->tag != T_INT) {
+		panic("binary op only support int right now");
+	}
+#endif
 
 	if (lhs.type == EXPR_VAL_CONST_VAL && rhs.type == EXPR_VAL_CONST_VAL) {
 		return cgasm_handle_binary_op_const(tok_tag, lhs, rhs);
@@ -501,7 +516,8 @@ void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val) {
 /*******************************/
 static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
-	struct expr_val temp_var = cgasm_alloc_temp_var(ctx);
+	// XXX assume integer type for temp var
+	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, get_int_type());
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_store_reg_to_mem(ctx, reg, temp_var);
@@ -617,7 +633,8 @@ struct expr_val cgasm_handle_ptr_op(struct cgasm_context *ctx, struct expr_val s
 	int ptr_reg = REG_EAX;
 	cgasm_load_val_to_reg(ctx, stptr, ptr_reg);
 	cgasm_println(ctx, "addl $%d, %%%s", field->offset, get_reg_str_code(ptr_reg));
-	struct expr_val temp_var = cgasm_alloc_temp_var(ctx);
+	// XXX assume integer type for temp var
+	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, get_int_type());
 	cgasm_store_reg_to_mem(ctx, ptr_reg, temp_var);
 
 	struct type *field_ptr_type = get_ptr_type(field->type);

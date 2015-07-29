@@ -23,6 +23,10 @@ static void cgasm_check_sym_redef(struct cgasm_context *ctx, char *id) {
 	}
 }
 
+struct symbol *cgasm_lookup_sym_noabort(struct cgasm_context *ctx, char *id) {
+	return symtab_lookup(ctx->top_stab, id);
+}
+
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id) {
 	struct symbol *sym = symtab_lookup(ctx->top_stab, id);
 	if (sym == NULL) {

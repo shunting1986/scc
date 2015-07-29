@@ -4,6 +4,8 @@
 #include <inc/syntree-node.h>
 #include <inc/dynarr.h>
 #include <inc/cgc.h>
+#include <inc/type.h>
+#include <inc/symtab.h>
 
 #define cgasm_constant_expression cgasm_conditional_expression
 
@@ -27,10 +29,37 @@ int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expres
 	return const_tok.const_val.ival;
 }
 
+static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *name) {
+	struct symbol *sym = cgasm_lookup_sym_noabort(ctx, name);
+	if (sym == NULL) {
+		return NULL;
+	}
+
+	if (sym->ctype == NULL) {
+		panic("no type defined");
+	}
+
+	if (sym->ctype->tag != T_FUNC) {
+		panic("%s not defined as function", name);
+	}
+	return sym->ctype;
+}
+
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
-	struct expr_val *pval, retval;
+	struct expr_val *pval;
 	int i;
+
+	// get func type
+	struct type *func_type = query_func_type_by_name(ctx, funcname);
+	struct type *ret_type = NULL;
+	if (func_type == NULL) {
+		red("function %s not declared", funcname);
+		ret_type = get_int_type(); // the default
+	} else {
+		ret_type = func_type->func.retype;
+	}
+
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = mallocz(sizeof(*pval));
 		*pval = cgasm_assignment_expression(ctx, each);
@@ -55,10 +84,18 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 
 	dynarr_destroy(argu_val_list);
 
-	// TODO current simple implementation is always return a temp holding eax
-	retval = cgasm_alloc_temp_var(ctx);
-	cgasm_store_reg_to_mem(ctx, REG_EAX, retval);
-	return retval;
+	if (ret_type->tag == T_VOID) {
+		return void_expr_val();
+	} else {
+		struct expr_val retval;
+		// TODO current simple implementation is always return a temp holding eax
+		if (ret_type->size != 4) {
+			panic("return type size other than 4 is not supported yet");
+		}
+		retval = cgasm_alloc_temp_var(ctx, ret_type); 
+		cgasm_store_reg_to_mem(ctx, REG_EAX, retval); // TODO consider returning a long long or struct
+		return retval;
+	}
 }
 
 static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struct primary_expression *expr) {
@@ -113,6 +150,10 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 		return cgasm_postfix_expression(ctx, expr->postfix_expr);
 	} else if (expr->unary_op_cast != NULL) {
 		struct expr_val val = cgasm_cast_expression(ctx, expr->unary_op_cast);
+	
+		red("********* dump the unary expression:");
+		cgc_dump(unary_expression, expr);
+
 		return cgasm_handle_unary_op(ctx, expr->unary_op, val);
 	} else if (expr->sizeof_expr) {
 		// TODO we should not interp the expression. Retrieve the type is enough
@@ -231,7 +272,7 @@ static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, s
 		return left_most;
 	}
 
-	struct expr_val temp = cgasm_alloc_temp_var(ctx);
+	struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type()); // XXX assume integer type
 
 	cgasm_handle_conditional(ctx, left_most, expr->inner_expr_list, 0, expr->or_expr_list, 1, temp);
 	return temp;

@@ -34,6 +34,14 @@ static struct type char_type = {
 	.size = 1,
 };
 
+static struct type char_ptr_type = {
+	.tag = T_PTR,
+	.flags = TYPE_FLAG_STATIC, // statically allocated
+	.subtype = &char_type,
+	INIT_MAGIC
+	.size = 4,
+};
+
 static struct type int_type = {
 	.tag = T_INT,
 	.flags = TYPE_FLAG_STATIC, // statically allocated
@@ -261,6 +269,10 @@ struct type *get_long_long_type() {
 
 struct type *get_short_type() {
 	return &short_type;
+}
+
+struct type *get_char_ptr_type() {
+	return &char_ptr_type;
 }
 
 struct type *get_char_type() {

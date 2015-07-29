@@ -33,13 +33,19 @@ struct expr_val str_literal_expr_val(int ind) {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_STR_LITERAL;
 	ret.ind = ind;
+	ret.ctype = get_char_ptr_type();
 	return ret;
 }
 
-struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx) {
+struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx, struct type *ctype) {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_TEMP;
-	ret.temp_var.ind = ctx->func_ctx->nlocal_word++;
+
+	if (ctx->func_ctx == NULL) {
+		panic("only support allocating temp var for function right now");
+	}
+	ret.temp_var.ind = func_alloc_space(ctx->func_ctx, ctype->size);
+	ret.ctype = ctype;
 	return ret;
 }
 
@@ -51,6 +57,7 @@ struct expr_val const_expr_val(union token tok) {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_CONST_VAL;
 	ret.const_val = tok;
+	ret.ctype = NULL; // XXX set this correctly
 	return ret;
 }
 

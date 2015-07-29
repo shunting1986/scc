@@ -1,4 +1,6 @@
-  TODO: next step is mongoose !!
+  TODO: check function type when making function call 
+	
+	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
 	  2. compile main.c, mongoose.c to .s
 	  3. assemble .s to .o
@@ -8,6 +10,13 @@
 KEYLIST
 
 NOTE:
+	TODO: consider type when do operation
+	1. ptr + integer
+	2. ptr - ptr
+	3. assign
+	4. type conversion
+	5. type check when assign / make func call
+
   the scope of struct/union/enum/typedef/func is similar to variable. When we exit a brace, these definitions are gone as well.
 	struct union, enum share a name space; typedef, func, var share one. 
 	func is special. 1. it can have multiple declaration in one scope; 2. inner scope can not have different specification to outer one

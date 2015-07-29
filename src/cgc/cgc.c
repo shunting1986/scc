@@ -26,7 +26,7 @@ struct cgc_context {
 } while (0)
 
 // this method does not add indent
-static void cgc_print(struct cgc_context *ctx, const char *fmt, ...) {
+void cgc_print(struct cgc_context *ctx, const char *fmt, ...) {
 	va_list va;
 	va_start(va, fmt);
 	vfprintf(ctx->fp, fmt, va);

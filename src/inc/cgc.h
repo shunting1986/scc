@@ -39,12 +39,26 @@ void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *struct_d
 void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declaration *field);
 
 void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr);
+void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr);
+
+
+
+void cgc_print(struct cgc_context *ctx, const char *fmt, ...);
 
 #define cgc_dump_and_quit(type, val) do { \
 	struct cgc_context *ctx = cgc_context_init(stderr, 2); \
 	cgc_ ## type(ctx, val); \
+	cgc_print(ctx, "\n"); \
 	panic("debug"); \
 } while(0)
+
+#define cgc_dump(type, val) do { \
+	struct cgc_context *ctx = cgc_context_init(stderr, 2); \
+	cgc_ ## type(ctx, val); \
+	cgc_print(ctx, "\n"); \
+	cgc_context_destroy(ctx); \
+} while(0)
+
 
 #ifdef __cplusplus
 }

@@ -61,7 +61,7 @@ struct condcode {
 
 struct expr_val str_literal_expr_val(int ind);
 struct expr_val symbol_expr_val(struct symbol *sym);
-struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx);
+struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx, struct type *ctype);
 struct expr_val const_expr_val(union token tok);
 struct expr_val int_const_expr_val(int val);
 bool is_int_const(struct expr_val val);
