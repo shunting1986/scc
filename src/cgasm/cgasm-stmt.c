@@ -24,7 +24,13 @@ static void cgasm_break_statement(struct cgasm_context *ctx) {
 }
 
 static void cgasm_continue_statement(struct cgasm_context *ctx) {
-	panic("ni");
+	if (intstack_size(ctx->continue_label_stk) == 0) {
+		panic("invalid 'continue'");
+	}
+
+	int label = intstack_top(ctx->continue_label_stk);
+	char buf[128];
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(label, buf));
 }
 
 static void cgasm_jump_statement(struct cgasm_context *ctx, struct jump_statement *stmt) {
@@ -184,6 +190,7 @@ static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *
 static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_statement *expr_stmt1, struct expression_statement *expr_stmt2, struct expression *expr, struct statement *stmt) {
 	int entry_label = cgasm_new_label_no(ctx);
 	int exit_label = cgasm_new_label_no(ctx);
+	int continue_label = cgasm_new_label_no(ctx);
 	struct expr_val cond_expr_val;
 	char buf[128];
 	
@@ -193,9 +200,12 @@ static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_sta
 	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
 
 	cgasm_push_break_label(ctx, exit_label);
+	cgasm_push_continue_label(ctx, continue_label);
 	cgasm_statement(ctx, stmt);
 	assert(cgasm_pop_break_label(ctx) == exit_label);
+	assert(cgasm_pop_continue_label(ctx) == continue_label);
 
+	cgasm_emit_jump_label(ctx, continue_label);
 	if (expr) {
 		cgasm_expression(ctx, expr);
 	}

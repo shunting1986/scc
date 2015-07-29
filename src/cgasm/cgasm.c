@@ -85,3 +85,11 @@ void cgasm_push_break_label(struct cgasm_context *ctx, int label_no) {
 int cgasm_pop_break_label(struct cgasm_context *ctx) {
 	return intstack_pop(ctx->break_label_stk);
 }
+
+void cgasm_push_continue_label(struct cgasm_context *ctx, int label_no) {
+	intstack_push(ctx->continue_label_stk, label_no);
+}
+
+int cgasm_pop_continue_label(struct cgasm_context *ctx) {
+	return intstack_pop(ctx->continue_label_stk);
+}

@@ -50,6 +50,8 @@ void cgasm_emit_abort(struct cgasm_context *ctx);
 
 void cgasm_push_break_label(struct cgasm_context *ctx, int label_no);
 int cgasm_pop_break_label(struct cgasm_context *ctx);
+void cgasm_push_continue_label(struct cgasm_context *ctx, int label_no);
+int cgasm_pop_continue_label(struct cgasm_context *ctx);
 
 // cgasm-func.c
 void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt);
