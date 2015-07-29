@@ -61,10 +61,25 @@ void lexer_destroy(struct lexer *lexer) {
 /* XXX: caller should take care of freeing the memory */
 char *parse_string_literal(struct lexer *lexer, int term_tag) {
 	struct cbuf *buf = cbuf_init();
-	char ch = file_reader_next_char(lexer->cstream);
-	while (ch != term_tag && ch != EOF) {
-		cbuf_add(buf, ch);
+	char ch;
+
+	// handle the \" case so that we can get the whole quoted string
+	bool follow_backslash = false;
+
+	while (true) {
 		ch = file_reader_next_char(lexer->cstream);
+		if (ch == EOF || (!follow_backslash && ch == term_tag)) {
+			break;
+		}
+
+		cbuf_add(buf, ch);
+
+		if (ch == '\\') {
+			follow_backslash = !follow_backslash; // two consecutive backslash will not
+				// escape following character
+		} else {
+			follow_backslash = false;
+		}
 	}
 	if (ch == EOF) {
 		panic("unterminated string literal");
@@ -459,6 +474,8 @@ check_id_token:
 			goto repeat;
 		} else {
 			file_reader_put_back(lexer->cstream, ch);
+
+			file_reader_dump_remaining(lexer->cstream);
 			panic("Invalid '\\'");
 		}
 		break;
