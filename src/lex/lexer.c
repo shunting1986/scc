@@ -270,6 +270,10 @@ void lexer_discard_line(struct lexer *lexer) {
 	char ch;
 	while ((ch = file_reader_next_char(lexer->cstream)) != '\n') {
 	}
+
+	// NOTE: we purposely put back the '\n', so that the pp module can identify the '#'
+	// at the begining of a line
+	file_reader_put_back(lexer->cstream, '\n');
 }
 
 static void parse_multi_line_comment(struct lexer *lexer) {

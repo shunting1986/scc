@@ -1,5 +1,9 @@
   TODO: next step is mongoose !!
-	1. manual build mongoose using gcc
+	  DONE. manual build mongoose using gcc
+	  2. compile main.c, mongoose.c to .s
+	  3. assemble .s to .o
+	  4. link
+	  5. run
 
 KEYLIST
 
