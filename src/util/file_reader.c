@@ -33,7 +33,7 @@ void file_reader_dump_remaining(struct file_reader *fr) {
 	printf("\033[31m");
 	while ((ch = file_reader_next_char(fr)) != EOF) {
 		printf("%c", ch);
-		if (++cnt >= 50) {
+		if (++cnt >= 500) {
 			break;
 		}
 	}

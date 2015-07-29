@@ -4,6 +4,7 @@
 #include <inc/parser.h>
 #include <inc/util.h>
 #include <inc/dynarr.h>
+#include <inc/cgc.h>
 
 static struct expression_statement *parse_expression_statement(struct parser *parser);
 
@@ -56,7 +57,20 @@ static struct iteration_statement *parse_while_statement(struct parser *parser) 
 }
 
 static struct iteration_statement *parse_do_while_statement(struct parser *parser) {
-	panic("ni");
+	struct statement *stmt;
+	struct expression *expr;
+	struct iteration_statement *iter_stmt = iteration_statement_init(ITER_TYPE_DO_WHILE);
+
+	stmt = parse_statement(parser);
+	expect(parser->lexer, TOK_WHILE);
+	expect(parser->lexer, TOK_LPAREN);
+	expr = parse_expression(parser);
+	expect(parser->lexer, TOK_RPAREN);
+	expect(parser->lexer, TOK_SEMICOLON);
+
+	iter_stmt->do_while_stmt.stmt = stmt;
+	iter_stmt->do_while_stmt.expr = expr;
+	return iter_stmt;
 }
 
 static struct iteration_statement *parse_for_statement(struct parser *parser) {
@@ -197,6 +211,7 @@ static struct expression_statement *parse_expression_statement(struct parser *pa
 	} else {
 		lexer_put_back(parser->lexer, tok);
 		expr = parse_expression(parser);
+
 		expect(parser->lexer, TOK_SEMICOLON);
 	}
 	return expression_statement_init(expr);
