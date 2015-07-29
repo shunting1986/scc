@@ -57,6 +57,8 @@ struct external_declaration *external_declaration_init(struct declaration_specif
 struct initializer {
 	int nodeType;
 	struct assignment_expression *expr; // the assignment expression
+
+	// TODO not support struct initializer yet
 };
 
 struct initializer *initializer_init();

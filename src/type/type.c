@@ -5,6 +5,7 @@
 #include <inc/cgasm.h>
 #include <inc/symtab.h>
 #include <inc/cgc.h>
+#include <inc/lexer.h>
 
 /*
  * When we parse the array dimension, we still need symtab, because there may

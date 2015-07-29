@@ -111,7 +111,9 @@ void cgc_primary_expression(struct cgc_context *ctx, struct primary_expression *
 	} else if (expr->str) {
 		cgc_print(ctx, "\"%s\"", expr->str);
 	} else if (expr->expr) {
+		cgc_print(ctx, "(");
 		cgc_expression(ctx, expr->expr);
+		cgc_print(ctx, ")");
 	} else if (expr->const_val_tok.tok_tag != TOK_UNDEF) {
 		cgc_constant_value(ctx, expr->const_val_tok);
 	} else {
@@ -182,7 +184,8 @@ void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unar
 	} else if (unary_expr->postfix_expr != NULL) {
 		cgc_postfix_expression(ctx, unary_expr->postfix_expr);
 	} else if (unary_expr->sizeof_expr != NULL) {
-		panic("sizeof expr");
+		cgc_print(ctx, "sizeof ");
+		cgc_unary_expression(ctx, unary_expr->sizeof_expr);
 	} else if (unary_expr->sizeof_type != NULL) {
 		cgc_print(ctx, "sizeof(");
 		cgc_type_name(ctx, unary_expr->sizeof_type);
@@ -503,9 +506,19 @@ void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_li
 	DYNARR_FOREACH_END();
 }
 
+static void cgc_initializer(struct cgc_context *ctx, struct initializer *initializer) {
+	// TODO not support struct initializer yet
+	assert(initializer->expr != NULL);
+	cgc_assignment_expression(ctx, initializer->expr);
+}
+
 void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator) {
 	cgc_declarator(ctx, init_declarator->declarator);
-	assert(init_declarator->initializer == NULL); // not supported yet
+
+	if (init_declarator->initializer != NULL) {
+		cgc_print(ctx, " = ");
+		cgc_initializer(ctx, init_declarator->initializer);
+	}
 }
 
 void cgc_type_specifier_qualifier_sc(struct cgc_context *ctx, struct dynarr *darr) {
