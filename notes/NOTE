@@ -1,4 +1,4 @@
-  TODO: check function type when making function call 
+  TODO: support break and continue .... 
 	
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
@@ -24,7 +24,7 @@ NOTE:
 	TODO: support function declaration
 
   TODO: how to handle the case that different function in one translation unit can define label with the same name?
-	TODO: switch, struct def & dot & ptr, break, continue
+	TODO: switch, break, continue
 	TODO: support struct initializer
 	TODO: array + struct
 
