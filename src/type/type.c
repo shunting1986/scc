@@ -654,6 +654,9 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 	// XXX ignore long if num_long == 1
 	if (num_long >= 1) {
 		if (num_long == 1) {
+			if (basetype == T_NONE) {
+				basetype = T_INT; // use int here
+			}
 			fprintf(stderr, "\033[31m'long' is ignored right now\033[0m\n");
 		} else if (num_long == 2) {
 			if (basetype == T_NONE || basetype == T_INT) {
@@ -686,8 +689,12 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 	case T_LONG_LONG: type = get_long_long_type(); break; 
 	case T_DOUBLE: type = get_double_type(); break;
 	case T_FLOAT: type = get_float_type(); break;
+	case T_NONE:
+		cgc_dump_and_quit(declaration_specifiers, declaration_specifiers_init(darr));
+		panic("no type specified");
+		break;
 	default:
-		panic("not supported");
+		panic("not supported %d", basetype);
 	}
 	return type;
 }

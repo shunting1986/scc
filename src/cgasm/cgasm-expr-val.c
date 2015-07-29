@@ -12,7 +12,14 @@ const char *get_reg_str_code(unsigned int reg) {
 	return reg_name_list[reg];
 }
 
+/*
+ * Rewrite enumerator to constant value
+ */
 struct expr_val symbol_expr_val(struct symbol *sym) {
+	if (sym->type == SYMBOL_ENUMERATOR) {
+		return int_const_expr_val(((struct enumerator_symbol *) sym)->val);
+	}
+
 	struct expr_val ret;
 	ret.type = EXPR_VAL_SYMBOL;
 	ret.sym = sym;

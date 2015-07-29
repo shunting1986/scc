@@ -38,6 +38,8 @@ void cgc_assignment_expression(struct cgc_context *ctx, struct assignment_expres
 void cgc_struct_declarator_list(struct cgc_context *ctx, struct dynarr *struct_declarator_list);
 void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declaration *field);
 
+void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr);
+
 #define cgc_dump_and_quit(type, val) do { \
 	struct cgc_context *ctx = cgc_context_init(stderr, 2); \
 	cgc_ ## type(ctx, val); \

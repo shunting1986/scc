@@ -3,6 +3,7 @@
 #include <inc/syntree.h>
 #include <inc/syntree-node.h>
 #include <inc/dynarr.h>
+#include <inc/cgc.h>
 
 #define cgasm_constant_expression cgasm_conditional_expression
 
@@ -14,6 +15,7 @@ int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expres
 	struct expr_val val = cgasm_constant_expression(ctx, expr);
 
 	if (val.type != EXPR_VAL_CONST_VAL) {
+		cgc_dump_and_quit(conditional_expression, expr); // TODO
 		panic("constant value required");
 	}
 
