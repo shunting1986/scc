@@ -182,7 +182,12 @@ static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *
 	cond_expr_val = cgasm_expression(ctx, expr);
 	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
 
+	cgasm_push_break_label(ctx, exit_label);
+	cgasm_push_continue_label(ctx, entry_label);
 	cgasm_statement(ctx, stmt);
+	assert(cgasm_pop_break_label(ctx) == exit_label);
+	assert(cgasm_pop_continue_label(ctx) == entry_label);
+
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(entry_label, buf));
 	cgasm_emit_jump_label(ctx, exit_label);
 }
