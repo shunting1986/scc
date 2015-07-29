@@ -100,6 +100,10 @@ struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct ty
 		ret = symtab_lookup_norec(ctx->top_stab, id);
 		if (ret != NULL) {
 			// TODO verify function declaration
+			// use the pass in type
+			struct type *old_type = ret->ctype;
+			ret->ctype = type_get(type);
+			type_put(old_type);
 			return ret;
 		}
 	} else {

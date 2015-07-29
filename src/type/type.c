@@ -397,12 +397,12 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 			id = NULL;
 			final_type = parse_type_from_declarator(ctx, type, each->declarator, &id);
 		}
-		if (id == NULL) {
-			panic("only support struct declaration with id right now");
-		}
+
+		// id can be NULL if the struct declaration contains no declarator like
+		// unsigned int  : 16;
 
 		if (final_type->size < 0) {
-			panic("The size of symbol is undefined: %s", id);
+			panic("The size of symbol is undefined: %s", id ? id : "<nil>");
 		}
 
 		struct struct_field *field = struct_field_init(ctx, id, final_type, offset);
