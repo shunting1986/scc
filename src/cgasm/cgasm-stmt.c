@@ -192,6 +192,27 @@ static void cgasm_while_statement(struct cgasm_context *ctx, struct expression *
 	cgasm_emit_jump_label(ctx, exit_label);
 }
 
+static void cgasm_do_while_statement(struct cgasm_context *ctx, struct statement *stmt, struct expression *expr) {
+	struct expr_val cond_expr_val;
+	int entry_label = cgasm_new_label_no(ctx);
+	int exit_label = cgasm_new_label_no(ctx);
+	int continue_label = cgasm_new_label_no(ctx);
+
+	cgasm_emit_jump_label(ctx, entry_label);
+
+	cgasm_push_break_label(ctx, exit_label);
+	cgasm_push_continue_label(ctx, continue_label);
+	cgasm_statement(ctx, stmt); // this is the body
+	assert(cgasm_pop_break_label(ctx) == exit_label);
+	assert(cgasm_pop_continue_label(ctx) == continue_label);
+
+	cgasm_emit_jump_label(ctx, continue_label);
+	cond_expr_val = cgasm_expression(ctx, expr);
+	cgasm_goto_ifcond(ctx, cond_expr_val, entry_label, false);
+
+	cgasm_emit_jump_label(ctx, exit_label);
+}
+
 static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_statement *expr_stmt1, struct expression_statement *expr_stmt2, struct expression *expr, struct statement *stmt) {
 	int entry_label = cgasm_new_label_no(ctx);
 	int exit_label = cgasm_new_label_no(ctx);
@@ -207,6 +228,7 @@ static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_sta
 	cgasm_push_break_label(ctx, exit_label);
 	cgasm_push_continue_label(ctx, continue_label);
 	cgasm_statement(ctx, stmt);
+	
 	assert(cgasm_pop_break_label(ctx) == exit_label);
 	assert(cgasm_pop_continue_label(ctx) == continue_label);
 
@@ -225,6 +247,9 @@ static void cgasm_iteration_statement(struct cgasm_context *ctx, struct iteratio
 		break;
 	case ITER_TYPE_FOR:
 		cgasm_for_statement(ctx, stmt->for_stmt.expr_stmt_1, stmt->for_stmt.expr_stmt_2, stmt->for_stmt.expr, stmt->for_stmt.stmt);
+		break;
+	case ITER_TYPE_DO_WHILE:
+		cgasm_do_while_statement(ctx, stmt->do_while_stmt.stmt, stmt->do_while_stmt.expr);
 		break;
 	default:
 		panic("ni %d", stmt->iterType);
