@@ -17,7 +17,7 @@ void open_header_file(struct lexer *lexer, const char *incl_path, int incl_tok) 
 	struct file_reader *fr = NULL;
 
 	if (incl_tok == '"') {
-		panic("#include \"...\" not supported yet");
+		panic("#include \"...\" not supported yet, %s", incl_path);
 	}
 
 	for (i = 0; (dir = sys_inc_paths[i]) != NULL; i++) {

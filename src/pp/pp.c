@@ -78,8 +78,14 @@ static void pp_skip(struct lexer *lexer, int mode) {
 					break;
 				}
 				goto out;
+			case TOK_IDENTIFIER:
+				if (strcmp("include_next", tok.id.s) == 0) {
+					break;
+				} 
+				// else full thru to default
 			default:
 				token_dump(tok);
+				file_reader_dump_remaining(lexer->cstream);
 				panic("not support in skip mode yet: %s", token_tag_str(tok.tok_tag));
 			}
 		}
