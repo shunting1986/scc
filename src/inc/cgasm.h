@@ -29,7 +29,10 @@ struct cgasm_context {
 	int nasm_label;
 	// int const_required;
 
-	struct dynarr *type_ref_list; // this is a list of type ref that need to release when finish parsing each function
+	// maintain the break continue labels 
+	// right now support for, while, do-while
+	// TODO support switch for break
+	struct intstack *break_label_stk, *continue_label_stk;
 };
 
 struct cgasm_func_context {

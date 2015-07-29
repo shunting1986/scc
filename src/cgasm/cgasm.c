@@ -20,7 +20,8 @@ static struct cgasm_context *cgasm_context_init(FILE *fp) {
 	ctx->state_reg[2] = REG_EBX;
 	ctx->nstate_reg = 3;
 
-	ctx->type_ref_list = dynarr_init();
+	ctx->break_label_stk = intstack_init();
+	ctx->continue_label_stk = intstack_init();
 
 	return ctx;
 }
@@ -30,9 +31,12 @@ static void cgasm_context_destroy(struct cgasm_context *ctx) {
 	cgasm_pop_symtab(ctx);
 	cgasm_destroy_str_literals(ctx);
 
-	assert(dynarr_size(ctx->type_ref_list) == 0);
-	dynarr_destroy(ctx->type_ref_list);
 	verify_type_memory_release();
+
+	assert(intstack_size(ctx->break_label_stk) == 0);
+	assert(intstack_size(ctx->continue_label_stk) == 0);
+	intstack_destroy(ctx->break_label_stk);
+	intstack_destroy(ctx->continue_label_stk);
 
 	free(ctx);
 }
