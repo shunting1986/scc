@@ -52,6 +52,7 @@ static struct argument_expression_list *parse_argument_expression_list(struct pa
 		if (tok.tok_tag == TOK_RPAREN) {
 			break;
 		} else if (tok.tok_tag != TOK_COMMA) {
+			file_reader_dump_remaining(parser->lexer->cstream);
 			panic("argument expression list expects ',', but %s found", token_tag_str(tok.tok_tag));
 		}
 	}

@@ -583,6 +583,31 @@ check_id_token:
 			char *s = parse_string_literal(lexer, TOK_QUOTATION);
 			tok.tok_tag = TOK_STRING_LITERAL;
 			tok.str.s = s;
+
+			// handle consecutive string literals
+			union token nxtok = lexer_next_token(lexer);
+			if (nxtok.tok_tag == TOK_STRING_LITERAL) {
+				struct cbuf *cbuf = cbuf_init();
+				cbuf_add_str(cbuf, tok.str.s);
+				free(tok.str.s);
+				cbuf_add_str(cbuf, nxtok.str.s);
+				free(nxtok.str.s);
+
+				while (true) {
+					nxtok = lexer_next_token(lexer);
+					if (nxtok.tok_tag != TOK_STRING_LITERAL) {
+						lexer_put_back(lexer, nxtok);
+						tok.str.s = cbuf_transfer(cbuf);
+						cbuf_destroy(cbuf);
+						break;
+					}
+
+					cbuf_add_str(cbuf, nxtok.str.s);
+					free(nxtok.str.s);
+				}
+			} else {
+				lexer_put_back(lexer, nxtok);
+			}
 		}
 		break;
 	case '.':
