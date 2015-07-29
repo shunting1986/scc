@@ -429,6 +429,7 @@ check_id_token:
 	case ' ':
 	case '\t':
 	case '\r':
+	case '\f': // some header file may contain this character
 		goto repeat;
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '?': case '~':
