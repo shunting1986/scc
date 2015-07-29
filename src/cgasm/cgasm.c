@@ -70,6 +70,18 @@ static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation
 	cgasm_leave_translation_unit(ctx);
 }
 
+/*********************************/
+/* misc                          */
+/*********************************/
+
 void cgasm_emit_abort(struct cgasm_context *ctx) {
 	cgasm_println(ctx, "call scc_builtin_abort"); 
+}
+
+void cgasm_push_break_label(struct cgasm_context *ctx, int label_no) {
+	intstack_push(ctx->break_label_stk, label_no);
+}
+
+int cgasm_pop_break_label(struct cgasm_context *ctx) {
+	return intstack_pop(ctx->break_label_stk);
 }

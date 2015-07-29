@@ -13,10 +13,30 @@ static void cgasm_return_statement(struct cgasm_context *ctx, struct expression 
 	cgasm_handle_ret(ctx);
 }
 
+static void cgasm_break_statement(struct cgasm_context *ctx) {
+	if (intstack_size(ctx->break_label_stk) == 0) {
+		panic("invalid 'break'");
+	}
+
+	int label = intstack_top(ctx->break_label_stk);
+	char buf[128];
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(label, buf));
+}
+
+static void cgasm_continue_statement(struct cgasm_context *ctx) {
+	panic("ni");
+}
+
 static void cgasm_jump_statement(struct cgasm_context *ctx, struct jump_statement *stmt) {
 	switch (stmt->init_tok_tag) {
 	case TOK_RETURN:
 		cgasm_return_statement(ctx, stmt->ret_expr);
+		break;
+	case TOK_BREAK:
+		cgasm_break_statement(ctx);
+		break;
+	case TOK_CONTINUE:
+		cgasm_continue_statement(ctx);
 		break;
 	default:
 		panic("ni %s", token_tag_str(stmt->init_tok_tag));
@@ -171,7 +191,11 @@ static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_sta
 	cgasm_emit_jump_label(ctx, entry_label);
 	cond_expr_val = cgasm_expression_statement(ctx, expr_stmt2);
 	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
+
+	cgasm_push_break_label(ctx, exit_label);
 	cgasm_statement(ctx, stmt);
+	assert(cgasm_pop_break_label(ctx) == exit_label);
+
 	if (expr) {
 		cgasm_expression(ctx, expr);
 	}
