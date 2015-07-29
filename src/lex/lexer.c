@@ -141,6 +141,7 @@ void parse_single_quote(struct lexer *lexer, union token *ptok) {
 		} else if (size == 2) {
 			switch (buf[1]) {
 			case '\\': val = '\\'; break;
+			case 'n': val = '\n'; break;
 			default:
 				goto invalid;
 			}
