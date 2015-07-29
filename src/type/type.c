@@ -366,7 +366,7 @@ struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *na
 static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_struct, struct struct_declaration *decl, struct dynarr *field_list, int offset) {
 	struct type *type = parse_type_from_specifier_qualifier_list(ctx, decl->sqlist);
 	int size = 0;
-	const char *id;
+	char *id;
 	(void) type;
 
 	if (!is_struct) {
@@ -394,13 +394,13 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 			id = NULL;
 			final_type = type;
 		} else {
-			if ((id = each->declarator->direct_declarator->id) == NULL) {
-				panic("only support struct declaration with id right now");
-			}
-
-			// TODO use the id returned by parse_type_from_declarator
-			final_type = parse_type_from_declarator(ctx, type, each->declarator, NULL);
+			id = NULL;
+			final_type = parse_type_from_declarator(ctx, type, each->declarator, &id);
 		}
+		if (id == NULL) {
+			panic("only support struct declaration with id right now");
+		}
+
 		if (final_type->size < 0) {
 			panic("The size of symbol is undefined: %s", id);
 		}
