@@ -16,7 +16,7 @@
 #endif
 
 int
-main() {
+main(void) {
 	int n, i, sum;
 	while (scanf("%d", &n) != EOF) { 
 		sum = 0;

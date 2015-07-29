@@ -68,22 +68,27 @@ void cgasm_leave_function(struct cgasm_context *ctx) {
 	// free_type_ref_in_list(ctx);
 }
 
+// XXX: does not distinguish between f() and f(void) right now
 static void register_parameter(struct cgasm_context *ctx, struct parameter_declaration *decl) {
-	struct direct_declarator *dd = NULL;
-	if (decl->declarator == NULL) {
-		panic("require declarator right now");
-	}
-	dd = decl->declarator->direct_declarator;
-
-	if (dd->id == NULL) {
-		panic("only support id case right now");
+	struct type *type = parse_type_from_decl_specifiers(ctx, decl->decl_specifiers);
+	char *id = NULL;
+	if (decl->declarator != NULL) {
+		type = parse_type_from_declarator(ctx, type, decl->declarator, &id);
 	}
 
-	struct type *type = parse_type_from_declaration(ctx, decl->decl_specifiers, decl->declarator);
+	if (id == NULL) {
+		if (type->tag != T_VOID) {
+			panic("Non void parameter without identifier");
+		} else {
+			type_put(type);
+			return;
+		}
+	}
+
 	if (type->size < 0) {
-		panic("The size of symbol is undefined: %s", dd->id);
+		panic("The size of symbol is undefined: %s", id);
 	}
-	cgasm_add_param_sym(ctx, dd->id, type);
+	cgasm_add_param_sym(ctx, id, type);
 }
 
 static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_list) {

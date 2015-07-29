@@ -74,14 +74,6 @@ struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *
 	return final_type;
 }
 
-/*
- * need ctx for typedef
- */
-struct type *parse_type_from_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *declarator) {
-	struct type *base_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
-	return parse_type_from_declarator(ctx, base_type, declarator, NULL);
-}
-
 void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
 	#if 0
 	// function declaration
