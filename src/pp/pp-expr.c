@@ -29,19 +29,23 @@ struct eval_result wrap_eval_result(int isNan, int val) {
  * XXX always take care to order the predecence when adding new operator
  */
 static int pred_table[] = {
-	[TOK_ADD] = 8,
-	[TOK_SUB] = 8,
+	[TOK_ADD] = 80,
+	[TOK_SUB] = 80,
 
-	[TOK_GT] = 5,
-	[TOK_GE] = 5,
-	[TOK_LT] = 5,
-	[TOK_LE] = 5,
+	[TOK_GT] = 50,
+	[TOK_GE] = 50,
+	[TOK_LT] = 50,
+	[TOK_LE] = 50,
 
-	[TOK_EQ] = 3,
+	[TOK_EQ] = 30,
 
-	[TOK_LOGIC_AND] = 2,
+	[TOK_LOGIC_AND] = 20,
 
-	[TOK_LOGIC_OR] = 1,
+	[TOK_LOGIC_OR] = 10,
+
+	// right association
+	[TOK_QUESTION] = 5,
+	[TOK_COLON] = 5,
 
 	[TOK_TOTAL_NUM] = 0,
 };
@@ -123,6 +127,18 @@ static struct eval_result pp_unary_expr(struct lexer *lexer) {
 	}
 }
 
+static struct eval_result perform_conditional(struct eval_result cond, struct eval_result lhs, struct eval_result rhs) {
+	struct eval_result invalid = wrap_eval_result(true, 0);
+	if (cond.isNan) {
+		return invalid;
+	}
+	if (cond.val) {
+		return lhs;
+	} else {
+		return rhs;
+	}
+}
+
 static struct eval_result perform_op(int op, struct eval_result lhs, struct eval_result rhs) {
 	struct eval_result result = wrap_eval_result(true, 0);
 
@@ -166,7 +182,26 @@ static void drain_stk_below_pred(struct intstack *stk, struct intstack *nanstk, 
 		struct eval_result lhs;
 		lhs.val = intstack_pop(stk);
 		lhs.isNan = intstack_pop(nanstk);
-		v = perform_op(op, lhs, v);
+
+		if (op == TOK_QUESTION) {
+			panic("conditional without ':'");
+		}
+		if (op == TOK_COLON) {
+			if (intstack_top(stk) == 0) {
+				panic("conditional without '?'");
+			}
+			int llop = intstack_pop(stk);
+			struct eval_result llhs;
+			llhs.val = intstack_pop(stk);
+			llhs.isNan = intstack_pop(nanstk);
+
+			if (llop != TOK_QUESTION) {
+				panic("expect '?'"); // NOTE: assume no operation with lower precedence than '?'/':'
+			}
+			v = perform_conditional(llhs, lhs, v);
+		} else {
+			v = perform_op(op, lhs, v);
+		}
 	}
 	intstack_push(stk, v.val);
 	intstack_push(nanstk, v.isNan);
@@ -189,7 +224,7 @@ static struct eval_result pp_expr_internal(struct lexer *lexer, bool until_newli
 		unary_res = pp_unary_expr(lexer);
 
 		// do the calculation
-		drain_stk_below_pred(stk, nanstk, pred);
+		drain_stk_below_pred(stk, nanstk, tok.tok_tag == TOK_QUESTION || tok.tok_tag == TOK_COLON ? pred + 1 : pred); // consider right association
 		
 		intstack_push(stk, tok.tok_tag);
 		intstack_push(stk, unary_res.val);
