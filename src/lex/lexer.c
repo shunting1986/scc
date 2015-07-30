@@ -444,17 +444,37 @@ check_id_token:
 			goto repeat;
 		} 
 
+#if 0
+		// check for '##'. TODO: seriously, '##' can only occur in macro context, this 
+		// implementation does not restrict this
+		if (lexer_peek_token(lexer) != TOK_BISHARP) {
+			break;
+		}
+		struct cbuf *cbuf = cbuf_init();
+		cbuf_add_str(cbuf, tok.id.s);
+		free(tok.id.s);
+		while (true) {
+			union token nxtok = lexer_next_token(lexer);
+			if (nxtok.tok_tag == TOK_BISHARP) {
+				nxtok = expect(lexer, TOK_IDENTIFIER);
+				cbuf_add_str(cbuf, nxtok.id.s);
+				free(nxtok.id.s);
+			} else {
+				lexer_put_back(lexer, nxtok);
+				tok.id.s = cbuf_transfer(cbuf);
+				red("########## combined identifier %s", tok.id.s); // TODO
+				cbuf_destroy(cbuf);
+				break;
+			}
+		}
+#endif
 		break;
 	case EOF:
 		tok.tok_tag = TOK_EOF;
 		break;
 	case '\n':
-		if (lexer->want_newline) {
-			tok.tok_tag = TOK_NEWLINE;
-			break;
-		} else {
-			goto repeat;
-		}
+		tok.tok_tag = TOK_NEWLINE; // this will be futher processed after the switch
+		break;
 	case ' ':
 	case '\t':
 	case '\r':
@@ -473,9 +493,14 @@ check_id_token:
 		ch = file_reader_next_char(lexer->cstream);
 		if (ch == '\n') {
 			goto repeat;
+		} else if (ch == '\r') {
+			ch = file_reader_next_char(lexer->cstream);
+			if (ch != '\n') {
+				file_reader_put_back(lexer->cstream, ch);
+			}
+			goto repeat;
 		} else {
 			file_reader_put_back(lexer->cstream, ch);
-
 			file_reader_dump_remaining(lexer->cstream);
 			panic("Invalid '\\'");
 		}
@@ -639,6 +664,12 @@ out:
 	if (tok.tok_tag == TOK_SHARP && !lexer->want_sharp) {
 		pp_entry(lexer);
 		goto repeat; 
+	}
+
+	// check for new line here, since we may put back newline token back when parsing
+	// id '##' id
+	if (!lexer->want_newline && tok.tok_tag == TOK_NEWLINE) {
+		goto repeat;
 	}
 
 	return tok;
