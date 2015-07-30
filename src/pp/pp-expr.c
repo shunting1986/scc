@@ -10,6 +10,8 @@ struct eval_result{
 	bool isNan; // short cut case like:
 		// defined __STDC_VERSION__ && __STDC_VERSION__ >= 199409L 
 		// requires a NAN flag when __STDC_VERSION__ is not defined
+		//
+		// we have 3 short cut case right now: &&, ||, ?:
 	int val;
 };
 

@@ -72,7 +72,7 @@ all: handy
 
 handy: rebuild-$(PROG_NAME)
 	@#./scc integration-test/sum/main.c
-	./scc integration-test/syntax-enum/main.c
+	./scc integration-test/pp-conditional/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
