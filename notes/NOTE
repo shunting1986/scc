@@ -1,3 +1,7 @@
+  TODO: support dump mongoose.c from tree back to C
+
+	TODO: current goal is fully pass global-initializer
+	
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
 	  DONE: 2.1 compile main.c to .s 
@@ -6,8 +10,6 @@
 	  3. assemble .s to .o
 	  4. link
 	  5. run
-
-KEYLIST
 
 NOTE:
 	TODO: consider type when do operation
