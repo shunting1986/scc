@@ -1,16 +1,26 @@
 #include <stdio.h>
 
+// basic variables
 int a = 10;
 short b = 5;
 char c = 7;
 
-int
-main(void) {
+void test_basic_variables() {
 	printf("a %d\n", a);
 	printf("b %d\n", b);
 	printf("c %d\n", c);
+}
+
+int
+main(void) {
+	test_basic_variables();
 	return 0;
 }
+
+// TODO basic int arr with unspecified size
+// TODO char array using {} or ""
+// TODO structure (handle unspecified fields)
+// TODO structure array (with specified or unspecified size) (handle unspecified field) (handle extra item, clear them to 0);
 
 #if 0
 
