@@ -85,6 +85,7 @@ struct symbol *cgasm_add_enumerator(struct cgasm_context *ctx, const char *name,
 struct expr_val cgasm_expression(struct cgasm_context *ctx, struct expression *expr);
 struct expr_val cgasm_eval_expr(struct cgasm_context *ctx, struct syntreebasenode *rawexpr);
 int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr);
+int cgasm_get_int_const_from_expr(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
 struct expr_val cgasm_logical_or_expression(struct cgasm_context *ctx, struct logical_or_expression *expr);
 

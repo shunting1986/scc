@@ -3,6 +3,27 @@
 #include <inc/syntree.h>
 #include <inc/symtab.h>
 
+static void cgasm_initialize_global_int(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
+	struct assignment_expression *expr = initializer->expr;
+	if (expr == NULL) {
+		panic("inavlid initializer");
+	}
+	struct expr_val val = cgasm_assignment_expression(ctx, expr);
+	int const_val = cgasm_get_int_const_from_expr(ctx, val);
+	cgasm_println_noind(ctx, "%s:", sym->name);
+	cgasm_println(ctx, ".long %d", const_val);
+}
+
+static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
+	struct type *type = sym->ctype;
+
+	if (type->tag == T_INT) {
+		cgasm_initialize_global_int(ctx, sym, initializer);
+		return;
+	}
+	panic("ni");
+}
+
 void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
 	// no need to allocate space for typedef/extern symbol
 	if (sym->flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN)) {
@@ -21,5 +42,5 @@ void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symb
 	}
 
 	// global variable with initializer
-	panic("ni");
+	cgasm_initialize_global_var(ctx, sym, initializer);
 }

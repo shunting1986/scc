@@ -12,12 +12,8 @@
 static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr);
 static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr);
 
-int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr) {
-	// assert(ctx->const_required); // this not so necessary
-	struct expr_val val = cgasm_constant_expression(ctx, expr);
-
+int cgasm_get_int_const_from_expr(struct cgasm_context *ctx, struct expr_val val) {
 	if (val.type != EXPR_VAL_CONST_VAL) {
-		cgc_dump_and_quit(conditional_expression, expr); // TODO
 		panic("constant value required");
 	}
 
@@ -27,6 +23,12 @@ int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expres
 		panic("integer constant required");
 	}
 	return const_tok.const_val.ival;
+}
+
+int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expression *expr) {
+	// assert(ctx->const_required); // this not so necessary
+	struct expr_val val = cgasm_constant_expression(ctx, expr);
+	return cgasm_get_int_const_from_expr(ctx, val);
 }
 
 static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *name) {
