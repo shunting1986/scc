@@ -11,12 +11,28 @@ void test_basic_variables() {
 	printf("c %d\n", c);
 }
 
+// int array with implicit size
+int iarr_nosize[] = {
+	2, 3, 5
+};
+
+void test_int_arr() {
+	int i;
+	printf("iarr_nosize:");
+	for (i = 0; i < sizeof(iarr_nosize) / sizeof(iarr_nosize[0]); i++) {
+		printf(" %d", iarr_nosize[i]);
+	}
+	printf("\n");
+}
+
 int
 main(void) {
 	test_basic_variables();
+	test_int_arr();
 	return 0;
 }
 
+// int array with explicit size
 // TODO basic int arr with unspecified size
 // TODO char array using {} or ""
 // TODO structure (handle unspecified fields)
