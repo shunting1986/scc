@@ -325,6 +325,7 @@ static struct initializer *parse_initializer(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
 	struct initializer *initializer = initializer_init();
 	if (tok.tok_tag == TOK_LBRACE) {
+		file_reader_dump_remaining(parser->lexer->cstream);
 		panic("struct intializer is not supported yet");
 	}
 	lexer_put_back(parser->lexer, tok);
