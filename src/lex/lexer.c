@@ -360,7 +360,7 @@ static union token obtain_next_expanded_token(struct lexer *lexer) {
 /*
  * Only return the tag to simplify memory manangement for id token etc.
  */
-static int lexer_peek_token(struct lexer *lexer) {
+int lexer_peek_token(struct lexer *lexer) {
 	// don't go into pp directly
 	int old_want_sharp = lexer_push_config(lexer, want_sharp, 1);
 

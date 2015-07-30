@@ -49,7 +49,7 @@ struct macro {
 struct macro *obj_macro_init(struct dynarr *toklist);
 struct macro *func_macro_init(struct dynarr *paramlist, struct dynarr *toklist);
 void macro_destroy(void *_macro);
-void macro_dump(const char *name, struct macro *macro);
+void macro_dump(struct lexer *lexer, const char *name, struct macro *macro);
 
 // pp-expr.c
 int pp_expr(struct lexer *lexer, bool until_newline);

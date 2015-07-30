@@ -194,6 +194,11 @@ bool try_expand_macro(struct lexer *lexer, const char *name) {
 		return false;
 	}
 
+	// if an function macro is not followed by '(', we treat it as regular id
+	if (macro->type == MACRO_FUNC && lexer_peek_token(lexer) != TOK_LPAREN) {
+		return false;
+	}
+
 	lexer->no_expand_macro = 1;
 
 	struct dynarr *expanded_list = dynarr_init();

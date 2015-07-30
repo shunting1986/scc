@@ -24,8 +24,8 @@ struct macro *obj_macro_init(struct dynarr *toklist) {
 	return macro;
 }
 
-void macro_dump(const char *name, struct macro *macro) {
-	fprintf(stderr, "macro %d %s\n", macro->type, name);
+void macro_dump(struct lexer *lexer, const char *name, struct macro *macro) {
+	fprintf(stderr, "[%s] macro %d %s\n", lexer->cstream->path, macro->type, name);
 	if (macro->type == MACRO_FUNC) {
 		fprintf(stderr, "-> param list\n");
 		DYNARR_FOREACH_PLAIN_BEGIN(macro->paramlist, const char *, each);
