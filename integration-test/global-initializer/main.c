@@ -1,10 +1,14 @@
 #include <stdio.h>
 
 int a = 10;
+short b = 5;
+char c = 7;
 
 int
 main(void) {
 	printf("a %d\n", a);
+	printf("b %d\n", b);
+	printf("c %d\n", c);
 	return 0;
 }
 
