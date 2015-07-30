@@ -14,6 +14,7 @@ static struct external_declaration *parse_external_decl(struct parser *parser);
 static struct init_declarator *parse_init_declarator_with_la(struct parser *parser, struct declarator *declarator);
 static struct init_declarator_list *parse_init_declarator_list_with_la(struct parser *parser, struct declarator *declarator);
 static int initiate_storage_class_specifier(union token tok);
+static struct initializer *parse_initializer(struct parser *parser);
 
 struct parser *parser_init(struct lexer *lexer) {
 	struct parser *parser = mallocz(sizeof(*parser));
@@ -322,7 +323,25 @@ struct declarator *parse_declarator(struct parser *parser) {
 }
 
 static struct initializer_list *parse_initializer_list(struct parser *parser) {
-	panic("ni");
+	struct dynarr *list = dynarr_init();
+	union token tok;
+
+	while (true) {
+		dynarr_add(list, parse_initializer(parser));
+		tok = lexer_next_token(parser->lexer);
+
+		if (tok.tok_tag == TOK_RBRACE) {
+			break;
+		}
+		assume(tok, TOK_COMMA);
+
+		tok = lexer_next_token(parser->lexer);
+		if (tok.tok_tag == TOK_RBRACE) {
+			break;
+		}
+		lexer_put_back(parser->lexer, tok);
+	}
+	return initializer_list_init(list);
 }
 
 static struct initializer *parse_initializer(struct parser *parser) {
