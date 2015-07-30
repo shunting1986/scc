@@ -53,6 +53,7 @@ static int pred_table[] = {
 static inline int pp_get_op_pred(unsigned int op) {
 	int pred;
 	if (op >= TOK_TOTAL_NUM || (pred = pred_table[op]) <= 0) {
+		assert(false); // TODO
 		panic("invalid op %s", token_tag_str(op));
 	}
 	return pred;

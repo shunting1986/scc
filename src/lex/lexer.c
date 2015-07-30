@@ -408,8 +408,10 @@ repeat:
 
 		break;
 	case 'a' ... 'z':
-	case 'A' ... 'Z':
+	case 'A' ... 'K': // treat 'L' specially since it can initiate wide char
+	case 'M' ... 'Z':
 	case '_': // identifier
+parse_id:
 		cbuf = cbuf_init();
 		do {
 			cbuf_add(cbuf, ch);
@@ -611,6 +613,14 @@ check_id_token:
 			tok.tok_tag = TOK_GT;
 		}
 		break;
+	case 'L':
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch != '\'') {
+			file_reader_put_back(lexer->cstream, ch);
+			ch = 'L';
+			goto parse_id;
+		}
+		// fall thru (we ignore 'L' before single quotation right now)
 	case '\'':
 		parse_single_quote(lexer, &tok);
 		break;
