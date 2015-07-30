@@ -114,7 +114,20 @@ static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_l
 }
 
 void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {	
-	char *fname = func_def_declarator->direct_declarator->id;
+	char *fname = NULL;
+	struct type *func_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
+	func_type = parse_type_from_declarator(ctx, func_type, func_def_declarator, &fname);
+
+	if (fname == NULL) {
+		panic("function definition without name");
+	}
+	if (func_type->tag != T_FUNC) {
+		panic("requires function type");
+	}
+	// register function declaration
+	cgasm_add_decl_sym(ctx, fname, func_type);
+
+
 	cgasm_enter_function(ctx, fname);
 
 	// handle parameters

@@ -1,4 +1,6 @@
-  TODO: make sure the usage of func pointer in start_mongoose is correct	
+  TODO: register function symbol when function is defined 
+	
+	TODO: make sure the usage of func pointer in start_mongoose is correct	
 	
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
