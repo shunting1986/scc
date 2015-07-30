@@ -50,7 +50,9 @@ struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx, struct type *cty
 }
 
 struct expr_val int_const_expr_val(int val) {
-	return const_expr_val(wrap_int_const_to_token(val));
+	struct expr_val ret = const_expr_val(wrap_int_const_to_token(val));
+	ret.ctype = get_int_type();
+	return ret;
 }
 
 struct expr_val const_expr_val(union token tok) {

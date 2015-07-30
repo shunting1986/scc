@@ -1,3 +1,5 @@
+  TODO: make sure the usage of func pointer in start_mongoose is correct	
+	
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
 	  2. compile main.c, mongoose.c to .s
@@ -25,6 +27,8 @@ NOTE:
 	TODO: switch (and break inside switch), break, continue
 	TODO: support struct initializer
 	TODO: array + struct
+
+TODO: change array and func type to ptr automatically
 
 TODO: support va args
 - NOTE: the only external resource I refer is the grammar of C language
