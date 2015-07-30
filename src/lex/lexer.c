@@ -449,6 +449,11 @@ check_id_token:
 			goto repeat;
 		} 
 
+		// if we are right now processing pp instruction, no need to interpret ##
+		if (lexer->in_pp_context) {
+			break;
+		}
+
 		// check for '##'. TODO: seriously, '##' can only occur in macro context, this 
 		// implementation does not restrict this
 		int old_want_newline = lexer_push_config(lexer, want_newline, 1);
