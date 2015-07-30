@@ -20,6 +20,25 @@ main(void) {
 #endif
 	printf("msg is %s\n", msg);
 
+// same as the previous one except an extra parenthesis
+#undef A
+#undef B
+#undef C
+#undef D
+#undef E
+#undef msg
+#define A 1
+#define B 2
+#define C -1
+#define D -4
+#define E -5
+#if ((A > 0 ? B : C < 0) ? D : E) > 0
+#define msg "true"
+#else
+#define msg "false"
+#endif
+	printf("msg is %s\n", msg);
+
 #undef A
 #undef B
 #undef C
