@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#define LOOKAHEAD_NUM 2 // then maximum number of look aheads
+#define LOOKAHEAD_NUM 10 // then maximum number of look aheads
 
 struct typedef_tab;
 
@@ -32,6 +32,7 @@ struct lexer {
 
 	int in_pp_context; // indicate if we are in preprocessor context
 	int want_newline;
+	int want_space;
 	int want_quotation;
 	int want_sharp;
 	int no_expand_macro; // we should no expand macro when we are in the middle of 

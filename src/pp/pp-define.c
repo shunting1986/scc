@@ -41,7 +41,7 @@ static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 	struct macro *macro = obj_macro_init(darr);
 	define_macro(lexer, name, macro);
 
-#if DEBUG
+#if DEBUG || 1
 	// fprintf(stderr, "%s define the macro %s\n", lexer->cstream->path, name);
 	macro_dump(name, macro);
 #endif
@@ -72,26 +72,35 @@ static void pp_define_func_macro(struct lexer *lexer, const char *name) {
 	struct macro *macro = func_macro_init(paramlist, darr);
 	define_macro(lexer, name, macro);
 
-	red("%s define %s", lexer->cstream->path, name); // TODO
-#if DEBUG
+#if DEBUG || 1
 	macro_dump(name, macro);
 #endif
 }
 
 void pp_define(struct lexer *lexer) {
 	int old_want_sharp = lexer_push_config(lexer, want_sharp, 1);
-	// TODO: note this does not check for the skip mode yet
-	union token idtok = expect(lexer, TOK_IDENTIFIER);
 
-	// we do not use lexer_next_token to handle space correctly
-	char ch = file_reader_next_char(lexer->cstream);
-	if (ch != EOF) { // peek
-		file_reader_put_back(lexer->cstream, ch);
+	// must enable want_space befoer get id token since parsing id will peek
+	int old_want_space = lexer_push_config(lexer, want_space, 1);
+	union token idtok;
+
+	while (true) {
+		idtok = lexer_next_token(lexer);
+		if (idtok.tok_tag != TOK_SPACE && idtok.tok_tag != TOK_TAB) {
+			break;	
+		}
 	}
+	assume(idtok, TOK_IDENTIFIER);
+	union token peektok = lexer_next_token(lexer);
+	lexer_pop_config(lexer, want_space, old_want_space);
 
-	if (ch == '(') {
+	if (peektok.tok_tag == TOK_LPAREN) {
+		lexer_put_back(lexer, peektok);
 		pp_define_func_macro(lexer, idtok.id.s);
 	} else {
+		if (peektok.tok_tag != TOK_SPACE && peektok.tok_tag != TOK_TAB) {
+			lexer_put_back(lexer, peektok);
+		}
 		pp_define_object_macro(lexer, idtok.id.s);
 	}
 	token_destroy(idtok);

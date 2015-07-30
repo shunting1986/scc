@@ -156,6 +156,7 @@ static void expand_func_macro(struct lexer *lexer, const char *name, struct macr
 	release_arg_list(arg_list);
 }
 
+// the caller should not destroy expanded_list
 static void merge_to_expanded_list(struct lexer *lexer, struct dynarr *expanded_list) {
 	// NOTE: we should copy the pointer directly
 	int i;
@@ -166,6 +167,18 @@ static void merge_to_expanded_list(struct lexer *lexer, struct dynarr *expanded_
 	dynarr_destroy(lexer->expanded_macro);
 	lexer->expanded_macro = expanded_list;
 	lexer->expanded_macro_pos = 0;
+}
+
+static void merge_putback_to_expanded_list(struct lexer *lexer) {
+	if (lexer->nputback > 0) {
+		struct dynarr *list = dynarr_init();
+		int i;
+		for (i = lexer->nputback - 1; i >= 0; i--) {
+			dynarr_add(list, token_shallow_dup(&lexer->putback_stk[i]));
+		}
+		lexer->nputback = 0;
+		merge_to_expanded_list(lexer, list);
+	}
 }
 
 /*
@@ -189,6 +202,10 @@ bool try_expand_macro(struct lexer *lexer, const char *name) {
 	} else {
 		expand_func_macro(lexer, name, macro, expanded_list);
 	}
+
+	// handle the case that we have something in the putback list
+	merge_putback_to_expanded_list(lexer);
+
 	merge_to_expanded_list(lexer, expanded_list); // the caller will release expanded_list
 	// dynarr_destroy(expanded_list);
 

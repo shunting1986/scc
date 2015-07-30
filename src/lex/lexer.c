@@ -361,9 +361,14 @@ static union token obtain_next_expanded_token(struct lexer *lexer) {
  * Only return the tag to simplify memory manangement for id token etc.
  */
 static int lexer_peek_token(struct lexer *lexer) {
+	// don't go into pp directly
+	int old_want_sharp = lexer_push_config(lexer, want_sharp, 1);
+
 	union token tok = lexer_next_token(lexer);
 	int tag = tok.tok_tag;
 	lexer_put_back(lexer, tok);
+
+	lexer_pop_config(lexer, want_sharp, old_want_sharp);
 	return tag;
 }
 
@@ -444,12 +449,15 @@ check_id_token:
 			goto repeat;
 		} 
 
-#if 0
 		// check for '##'. TODO: seriously, '##' can only occur in macro context, this 
 		// implementation does not restrict this
-		if (lexer_peek_token(lexer) != TOK_BISHARP) {
+		int old_want_newline = lexer_push_config(lexer, want_newline, 1);
+		int peektok = lexer_peek_token(lexer);
+		lexer_pop_config(lexer, want_newline, old_want_newline);
+		if (peektok != TOK_BISHARP) {
 			break;
 		}
+
 		struct cbuf *cbuf = cbuf_init();
 		cbuf_add_str(cbuf, tok.id.s);
 		free(tok.id.s);
@@ -467,7 +475,6 @@ check_id_token:
 				break;
 			}
 		}
-#endif
 		break;
 	case EOF:
 		tok.tok_tag = TOK_EOF;
@@ -475,14 +482,14 @@ check_id_token:
 	case '\n':
 		tok.tok_tag = TOK_NEWLINE; // this will be futher processed after the switch
 		break;
-	case ' ':
-	case '\t':
+		
 	case '\r':
 	case '\f': // some header file may contain this character
 		goto repeat;
 	case '(': case ')': case '{': case '}':
 	case ',': case ';': case '?': case '~':
 	case '[': case ']': case ':': 
+	case ' ': case '\t': // space
 		tok.tok_tag = ch;
 		break;
 	case '#':
@@ -669,6 +676,10 @@ out:
 	// check for new line here, since we may put back newline token back when parsing
 	// id '##' id
 	if (!lexer->want_newline && tok.tok_tag == TOK_NEWLINE) {
+		goto repeat;
+	}
+
+	if (!lexer->want_space && (tok.tok_tag == TOK_SPACE || tok.tok_tag == TOK_TAB)) {
 		goto repeat;
 	}
 
