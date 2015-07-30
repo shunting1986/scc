@@ -68,6 +68,7 @@ bool is_int_const(struct expr_val val);
 struct expr_val void_expr_val();
 struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, struct syntreebasenode *rhs_lazy);
 const char *get_reg_str_code(unsigned int reg);
+const char *get_reg_str_code_size(unsigned int reg, int size);
 struct expr_val expr_val_add_deref_flag(struct expr_val val);
 struct type *expr_val_get_type(struct expr_val val);
 int expr_val_get_elem_size(struct expr_val val);

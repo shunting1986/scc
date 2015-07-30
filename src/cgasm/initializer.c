@@ -3,7 +3,7 @@
 #include <inc/syntree.h>
 #include <inc/symtab.h>
 
-static void cgasm_initialize_global_int(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
+static void cgasm_initialize_global_vint(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer, const char *directive) {
 	struct assignment_expression *expr = initializer->expr;
 	if (expr == NULL) {
 		panic("inavlid initializer");
@@ -11,17 +11,25 @@ static void cgasm_initialize_global_int(struct cgasm_context *ctx, struct global
 	struct expr_val val = cgasm_assignment_expression(ctx, expr);
 	int const_val = cgasm_get_int_const_from_expr(ctx, val);
 	cgasm_println_noind(ctx, "%s:", sym->name);
-	cgasm_println(ctx, ".long %d", const_val);
+	cgasm_println(ctx, "%s %d", directive, const_val);
 }
 
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
 	struct type *type = sym->ctype;
 
-	if (type->tag == T_INT) {
-		cgasm_initialize_global_int(ctx, sym, initializer);
-		return;
+	switch (type->tag) {
+	case T_INT:
+		cgasm_initialize_global_vint(ctx, sym, initializer, ".long");
+		break;
+	case T_SHORT:
+		cgasm_initialize_global_vint(ctx, sym, initializer, ".word");
+		break;
+	case T_CHAR:
+		cgasm_initialize_global_vint(ctx, sym, initializer, ".byte");
+		break;
+	default:
+		panic("ni %d", type->tag);
 	}
-	panic("ni");
 }
 
 void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {

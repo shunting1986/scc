@@ -4,6 +4,21 @@
 #include <inc/symtab.h>
 #include <inc/pp.h>
 
+const char *suff_table[] = {
+	[1] = "b",
+	[2] = "w",
+	[4] = "l",
+};
+
+
+
+static const char *size_to_suffix(int size) {
+	if (size >= sizeof(suff_table) / sizeof(*suff_table) || suff_table[size] == NULL) {
+		panic("Invalid size to determine suffix %d", size);
+	}
+	return suff_table[size];
+}
+
 static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token const_val, int reg);
 
 /**
@@ -74,6 +89,18 @@ static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val 
 	return buf;
 }
 
+/************************/
+/* sign/zero extension  */
+/************************/
+static void cgasm_extend_reg(struct cgasm_context *ctx, int reg, struct type *type) {
+	// XXX hard code to sign extension right now, should use sign/zero extension 
+	// based on signness of type
+	int size = type->size;
+	if (size != 4) {
+		cgasm_println(ctx, "movs%sl %%%s, %%%s", size_to_suffix(size), get_reg_str_code_size(reg, size), get_reg_str_code(reg));
+	}
+}
+
 /**********************/
 /* load               */
 /**********************/
@@ -86,7 +113,7 @@ static void cgasm_load_param_to_reg(struct cgasm_context *ctx, struct param_symb
 }
 
 static void cgasm_load_global_var_to_reg(struct cgasm_context *ctx, struct global_var_symbol *sym, int reg) {
-	cgasm_println(ctx, "movl %s, %%%s", sym->name, get_reg_str_code(reg));
+	cgasm_println(ctx, "mov%s %s, %%%s", size_to_suffix(sym->ctype->size), sym->name, get_reg_str_code_size(reg, sym->ctype->size));
 }
 
 static void cgasm_load_global_var_addr_to_reg(struct cgasm_context *ctx, struct global_var_symbol *sym, int reg) {
@@ -244,6 +271,7 @@ static void cgasm_push_local_var_addr(struct cgasm_context *ctx, struct local_va
 }
 
 static void cgasm_push_global_var_addr(struct cgasm_context *ctx, struct global_var_symbol *sym) {
+	assert(sym->ctype != NULL);
 	cgasm_println(ctx, "pushl $%s", sym->name);
 }
 
@@ -264,6 +292,8 @@ static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
 	// load the register first
 	int reg = REG_EAX;
 	cgasm_load_sym_to_reg(ctx, sym, reg);
+	cgasm_extend_reg(ctx, reg, sym->ctype);
+
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
 

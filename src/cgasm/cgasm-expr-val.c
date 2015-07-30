@@ -2,14 +2,39 @@
 #include <inc/util.h>
 #include <inc/symtab.h>
 
-static const char *reg_name_list[] = {
-	"eax", "ecx", "edx", "ebx",
-	"esi", "edi", "esp", "ebp",
+static const char *reg_name_list[][8] = {
+	[0] = {
+		"al", "cl", "dl", "bl",
+		"ah", "ch", "dh", "bh",
+	},
+	[1] = {
+		"ax", "cx", "dx", "bx",
+		"si", "di", "sp", "bp",
+	},
+	[2] = {
+		"eax", "ecx", "edx", "ebx",
+		"esi", "edi", "esp", "ebp",
+	}
 };
 
-const char *get_reg_str_code(unsigned int reg) {
+// size is counted as the nubmer of bytes
+const char *get_reg_str_code_size(unsigned int reg, int size) {
 	assert(reg < REG_NUM);
-	return reg_name_list[reg];
+	switch (size) {
+	case 1:
+		return reg_name_list[0][reg];
+	case 2:
+		return reg_name_list[1][reg];
+	case 4:
+		return reg_name_list[2][reg];
+	default:
+		panic("invalid reg size %d", size);
+	}
+}
+
+// default to 4 bytes
+const char *get_reg_str_code(unsigned int reg) {
+	return get_reg_str_code_size(reg, 4);
 }
 
 /*
