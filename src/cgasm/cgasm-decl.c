@@ -118,7 +118,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		if (id == NULL) {
-			panic("declaration requires id");
+			panic("declarator requires id");
 		}
 
 		//   typedef struct _IO_FILE FILE;  or
@@ -133,11 +133,15 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type);
 		sym->flags = symbol_flags; // TODO verify the flags for function redeclare
 
-		// handle initializer (XXX does not support struct initializer yet)
-		// TODO: need handle global intializer correctly..
-		struct initializer *initializer = each->initializer;
-		if (initializer != NULL && initializer->expr != NULL) {
-			(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
+		if (ctx->func_ctx != NULL) { 
+			// handle initializer (XXX does not support struct initializer yet)
+			struct initializer *initializer = each->initializer;
+			if (initializer != NULL && initializer->expr != NULL) {
+				(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
+			} 
+		} else {
+			// global variable
+			cgasm_allocate_global_var(ctx, (struct global_var_symbol *) sym, each->initializer);
 		}
 	DYNARR_FOREACH_END();
 #endif

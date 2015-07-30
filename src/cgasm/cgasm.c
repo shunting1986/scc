@@ -60,7 +60,7 @@ static void cgasm_external_declaration(struct cgasm_context *ctx, struct externa
 
 static void cgasm_leave_translation_unit(struct cgasm_context *ctx) {
 	cgasm_dump_string_literals(ctx); 
-	cgasm_dump_global_vars(ctx);
+	// cgasm_dump_global_vars(ctx);
 }
 
 static void cgasm_translation_unit(struct cgasm_context *ctx, struct translation_unit *trans_unit) {

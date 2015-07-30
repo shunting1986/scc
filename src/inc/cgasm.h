@@ -7,6 +7,7 @@
 #include <inc/syntree-node.h>
 #include <inc/type.h>
 #include <inc/util.h>
+#include <inc/symtab.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,6 +121,9 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 
 // cgasm-decl.c
 struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *base_type, struct declarator *declarator, char **idret);
+
+// initializer.c
+void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer);
 
 #ifdef __cplusplus
 }

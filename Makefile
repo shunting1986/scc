@@ -47,6 +47,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgasm/asm-label.c \
 	cgasm/handle-op.c \
 	cgasm/cgasm-stmt.c \
+	cgasm/initializer.c \
 	symtab/symtab.c 
 
 LIB_SRC_LIST := $(patsubst %,src/%,$(LIB_SRC_LIST))
@@ -71,8 +72,8 @@ PROG_NAME := scc
 all: handy
 
 handy: rebuild-$(PROG_NAME)
-	@#./scc integration-test/sum/main.c
-	./scc integration-test/doublesharp/main.c
+	./scc integration-test/sum/main.c
+	@#./scc integration-test/global-initializer/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

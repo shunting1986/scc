@@ -38,6 +38,7 @@ void cgasm_enter_function(struct cgasm_context *ctx, char *fname) {
 		panic("nested function definition not allowed");
 	}
 
+	cgasm_println(ctx, ".text");
 	cgasm_println_noind(ctx, ".global %s", fname); 
  	cgasm_println_noind(ctx, "%s:", fname);
 
