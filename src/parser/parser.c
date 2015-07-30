@@ -321,15 +321,19 @@ struct declarator *parse_declarator(struct parser *parser) {
 	return declarator;
 }
 
+static struct initializer_list *parse_initializer_list(struct parser *parser) {
+	panic("ni");
+}
+
 static struct initializer *parse_initializer(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
 	struct initializer *initializer = initializer_init();
 	if (tok.tok_tag == TOK_LBRACE) {
-		file_reader_dump_remaining(parser->lexer->cstream);
-		panic("struct intializer is not supported yet");
+		initializer->initz_list = parse_initializer_list(parser);
+	} else {
+		lexer_put_back(parser->lexer, tok);
+		initializer->expr = parse_assignment_expression(parser);
 	}
-	lexer_put_back(parser->lexer, tok);
-	initializer->expr = parse_assignment_expression(parser);
 	return initializer;
 }
 

@@ -368,6 +368,13 @@ struct selection_statement *selection_statement_init(int selType) {
 	return stmt;
 }
 
+struct initializer_list *initializer_list_init(struct dynarr *list) {
+	struct initializer_list *initializer_list = mallocz(sizeof(*initializer_list));
+	initializer_list->nodeType = INITIALIZER_LIST;
+	initializer_list->list = list;
+	return initializer_list;
+}
+
 struct initializer *initializer_init() {
 	struct initializer *initializer = mallocz(sizeof(*initializer));
 	initializer->nodeType = INITIALIZER;

@@ -54,11 +54,19 @@ struct external_declaration {
 // further information need to be set for the returned external_declaration
 struct external_declaration *external_declaration_init(struct declaration_specifiers *decl_specifiers);
 
+struct initializer_list {
+	int nodeType;
+
+	struct dynarr *list;
+};
+
+struct initializer_list *initializer_list_init(struct dynarr *list);
+
 struct initializer {
 	int nodeType;
-	struct assignment_expression *expr; // the assignment expression
 
-	// TODO not support struct initializer yet
+	struct assignment_expression *expr; // the assignment expression
+	struct initializer_list *initz_list;
 };
 
 struct initializer *initializer_init();
