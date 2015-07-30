@@ -45,6 +45,26 @@ static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *nam
 	return sym->ctype;
 }
 
+static void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *pval) {
+	struct type *type = pval->ctype;
+#if 0
+	assert(type != NULL);
+#else
+	if (type == NULL) {
+		red("cgasm_change_array_func_to_ptr: null type");
+		return;
+	}
+#endif
+
+	if (type->tag == T_ARRAY) {
+		panic("array type");
+	}
+
+	if (type->tag == T_FUNC) {
+		panic("func type");
+	}
+}
+
 static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
 	struct expr_val *pval;
@@ -63,6 +83,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = mallocz(sizeof(*pval));
 		*pval = cgasm_assignment_expression(ctx, each);
+		cgasm_change_array_func_to_ptr(ctx, pval);
 		dynarr_add(argu_val_list, pval);
 	DYNARR_FOREACH_END();
 
