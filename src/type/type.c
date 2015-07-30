@@ -228,6 +228,22 @@ void type_dump(struct type *type, int ind) {
 	}
 }
 
+/*
+ * Destroy the type if it's reference count is 0; do nothing otherwise
+ */
+void type_check_ref(struct type *type) {
+	CHECK_MAGIC(type);
+
+	if (type->flags & TYPE_FLAG_STATIC) {
+		return;
+	}
+
+	assert(type->ref_cnt >= 0);
+	if (type->ref_cnt == 0) {
+		type_destroy(type);
+	}
+}
+
 void type_put(struct type *type) {
 	CHECK_MAGIC(type);
 	// no reference count handling for static allocated type object

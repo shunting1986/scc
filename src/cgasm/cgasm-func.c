@@ -80,9 +80,17 @@ static void register_parameter(struct cgasm_context *ctx, struct parameter_decla
 		if (type->tag != T_VOID) {
 			panic("Non void parameter without identifier");
 		} else {
-			type_put(type);
+			type_check_ref(type);
 			return;
 		}
+	}
+
+	// rewrite type for parameter
+	// change array to pointer
+	if (type->tag == T_ARRAY) {
+		struct type *newtype = get_ptr_type(type->subtype);
+		type_check_ref(type);
+		type = newtype;
 	}
 
 	if (type->size < 0) {

@@ -93,6 +93,7 @@ struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, 
 int type_get_tag(struct type *type);
 struct type *type_get(struct type *type);
 void type_put(struct type *type);
+void type_check_ref(struct type *type);
 void register_type_ref(struct cgasm_context *ctx, struct type *type);
 void free_type_ref_in_list(struct symtab *stab);
 void verify_type_memory_release();
