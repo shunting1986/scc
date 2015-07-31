@@ -143,13 +143,14 @@ void parse_single_quote(struct lexer *lexer, union token *ptok) {
 			case '\\': val = '\\'; break;
 			case 'n': val = '\n'; break;
 			case 'r': val = '\r'; break;
+			case '"': val = '"'; break;
 			default:
 				goto invalid;
 			}
 		} else {
 		invalid:
 			file_reader_dump_remaining(lexer->cstream);
-			panic("unsupported/invalid single quotation %s", buf);
+			panic("unsupported/invalid single quotation '%s'", buf);
 		}
 	} else if (size == 1) {
 		val = (unsigned char) buf[0];
@@ -160,6 +161,25 @@ void parse_single_quote(struct lexer *lexer, union token *ptok) {
 	ptok->tok_tag = TOK_CONSTANT_VALUE;
 	ptok->const_val.flags = CONST_VAL_TOK_INTEGER;
 	ptok->const_val.ival = val;
+}
+
+static void parse_fraction(struct lexer *lexer, union token *ptok, unsigned long long ival) {
+	double num = ival;
+	double fact = 0.1;
+	char ch;
+	while (true) {
+		ch = file_reader_next_char(lexer->cstream);
+		if (ch >= '0' && ch <= '9') {
+			num += (ch - '0') * fact;
+			fact *= 0.1;
+		} else {
+			file_reader_put_back(lexer->cstream, ch);
+			break;
+		}
+	}
+	ptok->tok_tag = TOK_CONSTANT_VALUE;
+	ptok->const_val.flags = CONST_VAL_TOK_FLOAT;
+	ptok->const_val.fval = num; 
 }
 
 // XXX: only handle decimal & hexadecima integer right now
@@ -182,6 +202,15 @@ void parse_number(struct lexer *lexer, union token *ptok) {
 	while ((ch >= '0' && ch <= '9') || (base == 16 && is_hex_char(ch))) {
 		val = val * base + get_hex_value_from_char(ch);
 		ch = file_reader_next_char(lexer->cstream);
+	}
+
+	// floating point
+	if (ch == '.') {
+		if (base != 10) {
+			panic("floating point only allows 10 as base");
+		}
+		parse_fraction(lexer, ptok, val);
+		return;	
 	}
 
 	// stat the following u and l

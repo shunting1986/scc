@@ -31,6 +31,7 @@ static const char *keyword_str_list[] = {
 	[TOK_STRUCT] = "struct",
 	[TOK_UNION] = "union",
 	[TOK_ENUM] = "enum",
+	[TOK_GOTO] = "goto",
 
 	[TOK_EXTERN] = "extern",
 	[TOK_STATIC] = "static",
@@ -70,15 +71,23 @@ int check_keyword_token(char *s) {
 	}
 }
 
-/*
- * Used to dump the syntree back to C
- */
-const char *keyword_str(int tok_tag) {
+const char *keyword_str_noabort(int tok_tag) {
 	if (tok_tag >= 0 && tok_tag < TOK_TOTAL_NUM) {
 		const char *cstr = keyword_str_list[tok_tag];
 		if (cstr != NULL) {
 			return cstr;
 		}
 	}
-	panic("not support %s", token_tag_str(tok_tag));
+	return NULL;
+}
+
+/*
+ * Used to dump the syntree back to C
+ */
+const char *keyword_str(int tok_tag) {
+	const char *s = keyword_str_noabort(tok_tag);
+	if (s == NULL) {
+		panic("not support %s", token_tag_str(tok_tag));
+	}
+	return s;
 }

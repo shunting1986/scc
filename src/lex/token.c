@@ -5,6 +5,7 @@
 #include <inc/util.h>
 #include <inc/dynarr.h>
 #include <inc/cgc.h>
+#include <inc/keyword.h>
 
 enum {
 	TOKEN_INVALID = 0,
@@ -184,6 +185,12 @@ void token_to_cstr(union token tok, struct cbuf *cbuf) {
 	}
 
 	s = cgc_get_op_str_noabort(tok.tok_tag);
+	if (s != NULL) {
+		cbuf_add_str(cbuf, s);
+		return;
+	}
+
+	s = keyword_str_noabort(tok.tok_tag);
 	if (s != NULL) {
 		cbuf_add_str(cbuf, s);
 		return;
