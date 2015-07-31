@@ -1,6 +1,8 @@
 #ifndef _INC_TOKEN_H
 #define _INC_TOKEN_H
 
+#include <inc/cbuf.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,6 +55,9 @@ union token wrap_int_const_to_token(int val);
 union token *token_shallow_dup(union token *inp);
 union token *token_deep_dup(union token *inp);
 union token wrap_to_simple_token(int tag);
+union token wrap_to_str_literal_token(char *s);
+void token_list_to_cstr(struct dynarr *toklist, struct cbuf *cbuf);
+void token_to_cstr(union token tok, struct cbuf *cbuf);
 
 #ifdef __cplusplus
 }

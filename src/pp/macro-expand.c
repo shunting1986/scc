@@ -73,17 +73,39 @@ static void concat_tok_list_with_deep_dup(struct dynarr *out_list, struct dynarr
 }
 
 static void expand_func_macro_with_args(struct lexer *lexer, struct dynarr *toklist, struct dynarr *param_list, struct dynarr *arg_list, struct dynarr *out_list) {
-	int ind;
-	DYNARR_FOREACH_PLAIN_BEGIN(toklist, union token *, each);
+	int ind, i;
+
+	for (i = 0; i < dynarr_size(toklist); ) {
+		union token *each = dynarr_get(toklist, i);
 		if (each->tok_tag == TOK_IDENTIFIER	&& (ind = find_param_index(param_list, each->id.s)) >= 0) {
 			// concatenate the arg 
 			// XXX can have better batch support
 			concat_tok_list_with_deep_dup(out_list, dynarr_get(arg_list, ind));
+			i++;
+		} else if (each->tok_tag == TOK_SHARP) {
+			if (i + 1 >= dynarr_size(toklist)) {
+				panic("Invalid positiion of '#'");
+			}
+
+			struct cbuf *cbuf = cbuf_init();
+			if (each->tok_tag == TOK_IDENTIFIER	&& (ind = find_param_index(param_list, each->id.s)) >= 0) {
+				token_list_to_cstr(dynarr_get(arg_list, ind), cbuf); 
+			} else {
+				token_to_cstr(*each, cbuf);
+			}
+			char *s = cbuf_transfer(cbuf);
+			cbuf_destroy(cbuf);
+			panic("s is %s", s);
+
+			union token strtok = wrap_to_str_literal_token(s);
+			dynarr_add(out_list, token_shallow_dup(&strtok)); // use shallow copy to transfer the ownership of 's'
+			i += 2;
 		} else {
 			// append the token
 			dynarr_add(out_list, token_deep_dup(each));
+			i++;
 		}
-	DYNARR_FOREACH_END();
+	}
 }
 
 static void release_arg(struct dynarr *arg) {

@@ -134,3 +134,18 @@ union token wrap_to_simple_token(int tag) {
 	return tok;
 }
 
+union token wrap_to_str_literal_token(char *s) {
+	union token tok;
+	tok.str.tok_tag = TOK_STRING_LITERAL;
+	tok.str.s = s;
+	return tok;
+}
+
+void token_list_to_cstr(struct dynarr *toklist, struct cbuf *cbuf) {
+	panic("ni");
+}
+
+void token_to_cstr(union token tok, struct cbuf *cbuf) {
+	panic("ni");
+}
+
