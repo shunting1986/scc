@@ -436,6 +436,21 @@ struct expression_statement {
 
 struct expression_statement *expression_statement_init(struct expression *expr);
 
+struct labeled_statement {
+	int nodeType;
+	int init_tok;
+
+	// id label
+	char *label_str;
+
+	// case 
+	struct constant_expression *case_expr;
+
+	struct statement *stmt;
+};
+
+struct labeled_statement *labeled_statement_init(int init_tok);
+
 enum {
 	SEL_TYPE_IF,
 	SEL_TYPE_SWITCH,

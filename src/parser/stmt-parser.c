@@ -200,7 +200,24 @@ static int initiate_labeled_statement(union token tok, union token tok2) {
 }
 
 static struct labeled_statement *parse_labeled_statement(struct parser *parser) {
-	panic("parse_labeled_statement ni");
+	union token initok = lexer_next_token(parser->lexer);
+	struct labeled_statement *labeled_stmt = labeled_statement_init(initok.tok_tag);
+	
+	switch (initok.tok_tag) {
+	case TOK_IDENTIFIER:
+		labeled_stmt->label_str = initok.id.s;
+		break;
+	case TOK_CASE:
+		labeled_stmt->case_expr = parse_constant_expression(parser);
+		break;
+	case TOK_DEFAULT:
+		break;
+	default:	
+		panic("invalid labeled statement");
+	}
+	expect(parser->lexer, TOK_COLON);
+	labeled_stmt->stmt = parse_statement(parser);
+	return labeled_stmt;
 }
 
 static struct expression_statement *parse_expression_statement(struct parser *parser) {

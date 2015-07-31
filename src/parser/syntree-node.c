@@ -434,4 +434,10 @@ struct enumerator *enumerator_init(char *name, struct constant_expression *expr)
 	return enumerator;
 }
 
-
+struct labeled_statement *labeled_statement_init(int init_tok) {
+	struct labeled_statement *stmt = mallocz(sizeof(*stmt));
+	assert(init_tok == TOK_IDENTIFIER || init_tok == TOK_CASE || init_tok == TOK_DEFAULT);
+	stmt->nodeType = LABELED_STATEMENT;
+	stmt->init_tok = init_tok;
+	return stmt;
+}
