@@ -11,6 +11,7 @@ static const char *op_str_table[] = {
 	[TOK_NE] = "!=",
 	[TOK_EQ] = "==",
 	[TOK_LE] = "<=",
+	[TOK_GE] = ">=",
 	[TOK_LT] = "<",
 	[TOK_GT] = ">",
 	[TOK_INC] = "++",
@@ -22,15 +23,24 @@ static const char *op_str_table[] = {
 	[TOK_DIV] = "/",
 	[TOK_LOGIC_AND] = "&&",
 	[TOK_LOGIC_OR] = "||",
+	[TOK_PTR_OP] = "->",
 	[TOK_TOTAL_NUM] = NULL, // to make sure memory is allocated
 };
 
-const char *cgc_get_op_str(int tok_tag) {
+const char *cgc_get_op_str_noabort(int tok_tag) {
 	if (tok_tag < TOK_TOTAL_NUM && tok_tag >= 0) {
 		const char *cstr = op_str_table[tok_tag];
 		if (cstr != NULL) {
 			return cstr;
 		}
 	}
-	panic("not supported %s", token_tag_str(tok_tag));
+	return NULL;
+}
+
+const char *cgc_get_op_str(int tok_tag) {
+	const char *s = cgc_get_op_str_noabort(tok_tag);
+	if (s == NULL) {
+		panic("not supported %s", token_tag_str(tok_tag));
+	}
+	return NULL;
 }

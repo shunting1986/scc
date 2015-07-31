@@ -17,6 +17,7 @@ void cgc_tree(struct cgc_context *ctx, struct syntree *tree);
 void cgc_declaration(struct cgc_context *ctx, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list);
 
 const char *cgc_get_op_str(int tok_tag);
+const char *cgc_get_op_str_noabort(int tok_tag);
 
 void cgc_expression(struct cgc_context *ctx, struct expression *expr);
 void cgc_translation_unit(struct cgc_context *ctx, struct translation_unit *trans_unit);

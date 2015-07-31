@@ -4,6 +4,7 @@
 #include <inc/token.h>
 #include <inc/util.h>
 #include <inc/dynarr.h>
+#include <inc/cgc.h>
 
 enum {
 	TOKEN_INVALID = 0,
@@ -142,10 +143,63 @@ union token wrap_to_str_literal_token(char *s) {
 }
 
 void token_list_to_cstr(struct dynarr *toklist, struct cbuf *cbuf) {
-	panic("ni");
+	bool first = true;
+	DYNARR_FOREACH_PLAIN_BEGIN(toklist, union token *, each);
+		if (!first) {
+			cbuf_add(cbuf, ' ');
+		}
+		first = false;
+		token_to_cstr(*each, cbuf);
+	DYNARR_FOREACH_END();
 }
 
-void token_to_cstr(union token tok, struct cbuf *cbuf) {
-	panic("ni");
+void const_val_to_cstr(union token tok, struct cbuf *cbuf) {
+	char buf[256];
+	if (tok.const_val.flags & CONST_VAL_TOK_INTEGER) {
+		snprintf(buf, sizeof(buf), "%d", tok.const_val.ival);
+		cbuf_add_str(cbuf, buf);
+		return;
+	}
+
+	if (tok.const_val.flags & CONST_VAL_TOK_FLOAT) {
+		snprintf(buf, sizeof(buf), "%f", tok.const_val.fval);
+		cbuf_add_str(cbuf, buf);
+		return;
+	}
+
+	if (tok.const_val.flags & CONST_VAL_TOK_LONG_LONG) {
+		snprintf(buf, sizeof(buf), "%lldLL", tok.const_val.llval);
+		cbuf_add_str(cbuf, buf);
+		return;
+	}
+	panic("can not reach here");
 }
+
+// this is used to dump token back to C for pp "'#' arg"
+void token_to_cstr(union token tok, struct cbuf *cbuf) {
+	const char *s;
+	if (tok.tok_tag >= 0 && tok.tok_tag < 256) {
+		cbuf_add(cbuf, tok.tok_tag);
+		return;
+	}
+
+	s = cgc_get_op_str_noabort(tok.tok_tag);
+	if (s != NULL) {
+		cbuf_add_str(cbuf, s);
+		return;
+	}
+
+	switch (tok.tok_tag) {
+	case TOK_IDENTIFIER:
+		cbuf_add_str(cbuf, tok.id.s);
+		break;
+	case TOK_CONSTANT_VALUE:
+		const_val_to_cstr(tok, cbuf);
+		break;
+	default:	
+		panic("ni %s", token_tag_str(tok.tok_tag));
+	}
+}
+
+
 

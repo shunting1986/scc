@@ -25,7 +25,7 @@ static void ensure_space(struct cbuf *buf, int newsize) {
 	}
 }
 
-void cbuf_add_str(struct cbuf *buf, char *s) {
+void cbuf_add_str(struct cbuf *buf, const char *s) {
 	assert(buf->buf != NULL);
 	assert(buf->capa > 0);
 	assert(buf->size < buf->capa);

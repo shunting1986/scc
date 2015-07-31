@@ -87,15 +87,15 @@ static void expand_func_macro_with_args(struct lexer *lexer, struct dynarr *tokl
 				panic("Invalid positiion of '#'");
 			}
 
+			union token *nxtok = dynarr_get(toklist, i + 1);
 			struct cbuf *cbuf = cbuf_init();
-			if (each->tok_tag == TOK_IDENTIFIER	&& (ind = find_param_index(param_list, each->id.s)) >= 0) {
+			if (nxtok->tok_tag == TOK_IDENTIFIER	&& (ind = find_param_index(param_list, nxtok->id.s)) >= 0) {
 				token_list_to_cstr(dynarr_get(arg_list, ind), cbuf); 
 			} else {
 				token_to_cstr(*each, cbuf);
 			}
 			char *s = cbuf_transfer(cbuf);
 			cbuf_destroy(cbuf);
-			panic("s is %s", s);
 
 			union token strtok = wrap_to_str_literal_token(s);
 			dynarr_add(out_list, token_shallow_dup(&strtok)); // use shallow copy to transfer the ownership of 's'
