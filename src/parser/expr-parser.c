@@ -28,9 +28,7 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 		expect(parser->lexer, TOK_RPAREN);
 		prim_expr->expr = expr;
 	} else {
-#if D
-		lexer_dump_remaining(parser->lexer);
-#endif
+		file_reader_dump_remaining(parser->lexer->cstream);
 		// we may destroy primary expression first
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
