@@ -187,9 +187,7 @@ void pp_entry(struct lexer *lexer) {
 		pp_endif(lexer);
 		break;
 	default:
-#if DEBUG
-		// lexer_dump_remaining(lexer);
-#endif
+		file_reader_dump_remaining(lexer->cstream);
 		token_dump(tok);
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}

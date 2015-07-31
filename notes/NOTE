@@ -1,4 +1,5 @@
   TODO: support dump mongoose.c from tree back to C
+	1. support assert which use #
 
 	TODO: current goal is fully pass global-initializer
 	

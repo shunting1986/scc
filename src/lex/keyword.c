@@ -35,6 +35,7 @@ static const char *keyword_str_list[] = {
 	[TOK_EXTERN] = "extern",
 	[TOK_STATIC] = "static",
 	[TOK_VOLATILE] = "volatile",
+	[TOK_REGISTER] = "register",
 
 	[TOK_TOTAL_NUM] = NULL,
 };

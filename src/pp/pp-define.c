@@ -72,7 +72,7 @@ static void pp_define_func_macro(struct lexer *lexer, const char *name) {
 	struct macro *macro = func_macro_init(paramlist, darr);
 	define_macro(lexer, name, macro);
 
-#if DEBUG || 0
+#if DEBUG || 1
 	macro_dump(lexer, name, macro);
 #endif
 }
