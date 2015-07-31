@@ -42,5 +42,5 @@ const char *cgc_get_op_str(int tok_tag) {
 	if (s == NULL) {
 		panic("not supported %s", token_tag_str(tok_tag));
 	}
-	return NULL;
+	return s;
 }

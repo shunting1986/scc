@@ -41,10 +41,13 @@ void cgc_struct_declaration(struct cgc_context *ctx, struct struct_declaration *
 
 void cgc_conditional_expression(struct cgc_context *ctx, struct conditional_expression *cond_expr);
 void cgc_unary_expression(struct cgc_context *ctx, struct unary_expression *unary_expr);
+void cgc_initializer_list(struct cgc_context *ctx, struct initializer_list *initz_list);
+void cgc_initializer(struct cgc_context *ctx, struct initializer *initializer);
 
 
 
 void cgc_print(struct cgc_context *ctx, const char *fmt, ...);
+void cgc_println(struct cgc_context *ctx, const char *fmt, ...);
 
 #define cgc_dump_and_quit(type, val) do { \
 	struct cgc_context *ctx = cgc_context_init(stderr, 2); \

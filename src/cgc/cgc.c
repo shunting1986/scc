@@ -33,6 +33,14 @@ void cgc_print(struct cgc_context *ctx, const char *fmt, ...) {
 	va_end(va);
 }
 
+void cgc_println(struct cgc_context *ctx, const char *fmt, ...) {
+	va_list va;
+	va_start(va, fmt);
+	vfprintf(ctx->fp, fmt, va);
+	va_end(va);
+	fprintf(ctx->fp, "\n");
+}
+
 static void cgc_indent(struct cgc_context *ctx) {
 	fprintf(ctx->fp, "%*s", ctx->indent, "");
 }
@@ -506,10 +514,26 @@ void cgc_init_declarator_list(struct cgc_context *ctx, struct init_declarator_li
 	DYNARR_FOREACH_END();
 }
 
-static void cgc_initializer(struct cgc_context *ctx, struct initializer *initializer) {
-	// TODO not support struct initializer yet
-	assert(initializer->expr != NULL);
-	cgc_assignment_expression(ctx, initializer->expr);
+void cgc_initializer_list(struct cgc_context *ctx, struct initializer_list *initz_list) {
+	cgc_println(ctx, "{");
+	ctx->indent += ctx->step;
+
+	DYNARR_FOREACH_BEGIN(initz_list->list, initializer, each);
+		cgc_indent(ctx);
+		cgc_initializer(ctx, each);
+		cgc_println(ctx, ",");
+	DYNARR_FOREACH_END();
+
+	ctx->indent -= ctx->step;
+	cgc_indent(ctx); cgc_print(ctx, "}");
+}
+
+void cgc_initializer(struct cgc_context *ctx, struct initializer *initializer) {
+	if (initializer->expr != NULL) {
+		cgc_assignment_expression(ctx, initializer->expr);
+	} else {
+		cgc_initializer_list(ctx, initializer->initz_list);
+	}
 }
 
 void cgc_init_declarator(struct cgc_context *ctx, struct init_declarator *init_declarator) {
