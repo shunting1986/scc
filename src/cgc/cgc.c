@@ -344,6 +344,16 @@ void cgc_while_statement(struct cgc_context *ctx, struct expression *expr, struc
 	cgc_indent_statement(ctx, stmt);
 }
 
+void cgc_do_while_statement(struct cgc_context *ctx, struct statement *stmt, struct expression *expr) {
+	cgc_indent(ctx);
+	cgc_println(ctx, "do");
+	cgc_indent_statement(ctx, stmt);
+	cgc_indent(ctx);
+	cgc_print(ctx, "while (");
+	cgc_expression(ctx, expr);
+	cgc_println(ctx, ");");
+}
+
 void cgc_for_statement(struct cgc_context *ctx, struct expression_statement *expr_stmt_1, struct expression_statement *expr_stmt_2, struct expression *expr, struct statement *stmt) {
 	cgc_indent(ctx);
 	cgc_print(ctx, "for (");
@@ -364,7 +374,8 @@ void cgc_iteration_statement(struct cgc_context *ctx, struct iteration_statement
 		cgc_while_statement(ctx, stmt->while_stmt.expr, stmt->while_stmt.stmt);
 		break;
 	case ITER_TYPE_DO_WHILE:
-		panic("do-while");
+		cgc_do_while_statement(ctx, stmt->do_while_stmt.stmt, stmt->do_while_stmt.expr);
+		break;
 	case ITER_TYPE_FOR:
 		cgc_for_statement(ctx, stmt->for_stmt.expr_stmt_1, stmt->for_stmt.expr_stmt_2, stmt->for_stmt.expr, stmt->for_stmt.stmt);
 		break;
@@ -681,6 +692,9 @@ void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_s
 		break;
 	case TOK_STATIC:
 		cgc_print(ctx, "static");
+		break;
+	case TOK_REGISTER:
+		cgc_print(ctx, "register");
 		break;
 	default:
 		panic("ni %s", token_tag_str(sc->tok_tag));

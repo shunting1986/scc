@@ -15,6 +15,7 @@ static const char *op_str_table[] = {
 	[TOK_LT] = "<",
 	[TOK_GT] = ">",
 	[TOK_INC] = "++",
+	[TOK_DEC] = "--",
 	[TOK_ADD_ASSIGN] = "+=",
 	[TOK_RSHIFT] = ">>",
 	[TOK_LSHIFT] = "<<",
