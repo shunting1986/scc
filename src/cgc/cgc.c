@@ -415,6 +415,19 @@ void cgc_selection_statement(struct cgc_context *ctx, struct selection_statement
 	}
 }
 
+void cgc_labeled_statement(struct cgc_context *ctx, struct labeled_statement *labeled_stmt) {
+	switch (labeled_stmt->nodeType) {
+	case TOK_IDENTIFIER:
+		panic("label");
+	case TOK_CASE:
+		panic("case");
+	case TOK_DEFAULT:
+		panic("default");
+	default:
+		panic("can not reach here, %s", token_tag_str(labeled_stmt->nodeType));
+	}
+}
+
 void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
@@ -428,6 +441,9 @@ void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 		break;
 	case SELECTION_STATEMENT:
 		cgc_selection_statement(ctx, (struct selection_statement *) stmt);
+		break;
+	case LABELED_STATEMENT:
+		cgc_labeled_statement(ctx, (struct labeled_statement *) stmt);
 		break;
 	default:
 		panic("unexpected node type %s", node_type_str(stmt->nodeType));
