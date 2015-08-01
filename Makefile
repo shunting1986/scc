@@ -71,11 +71,12 @@ PROG_NAME := scc
 
 all: handy
 
-handy: rebuild-$(PROG_NAME) mongoose
+# handy: rebuild-$(PROG_NAME) mongoose
 
-# handy: rebuild-$(PROG_NAME)
+handy: rebuild-$(PROG_NAME)
+	./scc integration-test/va-args/main.c
+
 #	@#./scc integration-test/sum/main.c
-#	./scc integration-test/global-initializer/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
