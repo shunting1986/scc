@@ -10,7 +10,8 @@
 #undef INT64_MAX
 // XXX the way we parse pp number can not handle the standard definition of 
 // INT64_MAX right now
-#define INT64_MAX ((1LL << 63) - 1)
+// #define INT64_MAX ((1LL << 63) - 1)
+#define INT64_MAX 0x7FFFFFFFFFFFFFFFLL
 
 extern int printf(const char *__format, ...);
 extern void exit(int __status);
