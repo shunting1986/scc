@@ -416,9 +416,12 @@ void cgc_selection_statement(struct cgc_context *ctx, struct selection_statement
 }
 
 void cgc_labeled_statement(struct cgc_context *ctx, struct labeled_statement *labeled_stmt) {
-	switch (labeled_stmt->nodeType) {
+	assert(labeled_stmt->nodeType == LABELED_STATEMENT);
+	switch (labeled_stmt->init_tok) {
 	case TOK_IDENTIFIER:
-		panic("label");
+		cgc_println(ctx, "%s:", labeled_stmt->label_str); // no indent
+		cgc_statement(ctx, labeled_stmt->stmt);
+		break;
 	case TOK_CASE:
 		panic("case");
 	case TOK_DEFAULT:
