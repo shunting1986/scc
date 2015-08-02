@@ -67,6 +67,7 @@ struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx, struct type *cty
 	ret.type = EXPR_VAL_TEMP;
 
 	if (ctx->func_ctx == NULL) {
+		assert(0);
 		panic("only support allocating temp var for function right now");
 	}
 	ret.temp_var.ind = func_alloc_space(ctx->func_ctx, ctype->size);

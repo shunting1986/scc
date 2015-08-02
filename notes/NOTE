@@ -1,8 +1,11 @@
-  TODO: why the 2 dump-back .c generate a back bin.. 
+  == Achievement ==
+	./ The dumped back C files (with several monor changes) can be used to build a valid executable ==> this means we lexical and syntax analysis are GOOD
+	./ main.s is GOOD
 
-	TODO: make sure the the port is already being listened, the prog print the correct msg and exit
-	
-	TODO: support dump mongoose.c from tree back to C
+  =======================
+  Next step is build mongoose.c
+
+
 
 	TODO: support double division for mongoose 
 
