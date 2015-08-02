@@ -312,6 +312,13 @@ struct type *get_array_type(struct type *elem_type, int dim) {
 	return ret_type;
 }
 
+void complete_array_dim(struct type *type, int dim) {
+	CHECK_MAGIC(type);
+	assert(type->tag == T_ARRAY);
+	type->dim = dim;
+	type->size = dim * type->subtype->size;
+}
+
 struct type *get_noparam_func_type(struct type *retype) {
 	return get_func_type(retype, dynarr_init(), false);
 }

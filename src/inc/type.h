@@ -88,6 +88,7 @@ struct type *get_long_long_type();
 struct type *get_double_type();
 struct type *get_float_type();
 struct type *get_array_type(struct type *elem_type, int dim);
+void complete_array_dim(struct type *type, int dim);
 struct type *get_noparam_func_type(struct type *retype);
 struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, bool has_ellipsis);
 int type_get_tag(struct type *type);
