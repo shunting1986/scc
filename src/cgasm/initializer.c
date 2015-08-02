@@ -63,6 +63,38 @@ static void cgasm_initialize_global_array(struct cgasm_context *ctx, struct type
 	}
 }
 
+static void cgasm_initialize_global_struct(struct cgasm_context *ctx, struct type *type, struct initializer *initializer) {
+	assert(type->tag == T_STRUCT);
+	assert(type->size >= 0);
+	if (initializer->initz_list == NULL) {
+		panic("Invalid structure initializer");
+	}
+	struct dynarr *init_list = initializer->initz_list->list;
+	struct dynarr *field_list = type->field_list;
+	if (dynarr_size(field_list) < dynarr_size(init_list)) {
+		panic("too many fields specified in struct initializer");
+	}
+
+	int i;
+	int tot_size_inited = 0;
+
+	// XXX alignment is not handled yet
+	for (i = 0; i < dynarr_size(init_list); i++) {
+		struct initializer *field_init = dynarr_get(init_list, i);
+		struct struct_field *field = dynarr_get(field_list, i);
+		if (field->width != 0) {
+			panic("struct field width is not supported yet");
+		}
+		struct type *field_type = field->type;
+		tot_size_inited += field_type->size;
+		cgasm_initialize_global_var(ctx, field_type, field_init);
+	}
+
+	if (tot_size_inited < type->size) {
+		cgasm_println(ctx, ".zero %d", type->size - tot_size_inited);
+	}
+}
+
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *type, struct initializer *initializer) {
 	if (initializer == NULL) {
 		if (type->size < 0) {
@@ -87,6 +119,9 @@ static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *
 		break;
 	case T_ARRAY:
 		cgasm_initialize_global_array(ctx, type, initializer);
+		break;
+	case T_STRUCT:
+		cgasm_initialize_global_struct(ctx, type, initializer);
 		break;
 	default:
 		cgc_dump(initializer, initializer);

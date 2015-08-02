@@ -36,16 +36,32 @@ void test_int_arr() {
 	printf("\n");
 }
 
+// single structure
+struct item {
+	int first;
+	int second, third;
+	char buf[64];
+};
+
+struct item single = {3, 4};
+
+void test_structure() {
+	printf("single: first %d, second %d, thrid %d\n", single.first, single.second, single.third);
+}
+
 int
 main(void) {
 	test_basic_variables();
 	test_int_arr();
+	test_structure();
 	return 0;
 }
 
-// TODO char array using {} or ""
 // TODO structure (handle unspecified fields)
+
+// TODO support complext structure with func ptr, char *, arr etc..
 // TODO structure array (with specified or unspecified size) (handle unspecified field) (handle extra item, clear them to 0);
+// TODO char array using {} or ""
 
 #if 0
 
