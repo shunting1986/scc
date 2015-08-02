@@ -37,6 +37,15 @@ static void cgasm_initialize_global_ptr(struct cgasm_context *ctx, struct global
 	panic("not initializing char *");
 }
 
+// TODO this function should make sure type's size is > 0 before it returns
+static void cgasm_initialize_global_array(struct cgasm_context *ctx, struct global_var_symbol *sym, struct type *type, struct initializer *initializer) {
+	panic("ni");
+
+	if (type->size < 0) {
+		panic("The size of symbol is undefined: %s", sym->name);
+	}
+}
+
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
 	struct type *type = sym->ctype;
 
@@ -52,6 +61,9 @@ static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct global
 		break;
 	case T_PTR:
 		cgasm_initialize_global_ptr(ctx, sym, sym->ctype, initializer);
+		break;
+	case T_ARRAY:
+		cgasm_initialize_global_array(ctx, sym, sym->ctype, initializer);
 		break;
 	default:
 		cgc_dump(initializer, initializer);

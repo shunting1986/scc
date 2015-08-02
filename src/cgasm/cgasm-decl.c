@@ -125,7 +125,10 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		//   extern struct _IO_FILE FILE;  
 		// is allowed even if we do not have the 
 		// definition of struct _IO_FILE
-		if (final_type->size < 0 && !(symbol_flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN)) && final_type->tag != T_FUNC) {
+		//
+		// for Array type, the top dimension may be implicitly determined by the 
+		// initializer
+		if (final_type->size < 0 && !(symbol_flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN)) && final_type->tag != T_FUNC && final_type->tag != T_ARRAY) {
 			panic("The size of symbol is undefined: %s", id);
 		}
 
