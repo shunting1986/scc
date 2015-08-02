@@ -16,11 +16,22 @@ int iarr_nosize[] = {
 	2, 3, 5
 };
 
+// int array with explicit size
+int iarr_withsize[10] = {
+	16, 8, 4, 2, 1
+}; 
+
 void test_int_arr() {
 	int i;
 	printf("iarr_nosize:");
 	for (i = 0; i < sizeof(iarr_nosize) / sizeof(iarr_nosize[0]); i++) {
 		printf(" %d", iarr_nosize[i]);
+	}
+	printf("\n");
+
+	printf("iarr_withsize:");
+	for (i = 0; i < sizeof(iarr_withsize) / sizeof(iarr_withsize[0]); i++) {
+		printf(" %d", iarr_withsize[i]);
 	}
 	printf("\n");
 }
@@ -32,8 +43,6 @@ main(void) {
 	return 0;
 }
 
-// int array with explicit size
-// TODO basic int arr with unspecified size
 // TODO char array using {} or ""
 // TODO structure (handle unspecified fields)
 // TODO structure array (with specified or unspecified size) (handle unspecified field) (handle extra item, clear them to 0);
