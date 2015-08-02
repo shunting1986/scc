@@ -2,6 +2,7 @@
 #include <inc/util.h>
 #include <inc/syntree.h>
 #include <inc/symtab.h>
+#include <inc/cgc.h>
 
 static void cgasm_initialize_global_vint(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer, const char *directive) {
 	struct assignment_expression *expr = initializer->expr;
@@ -12,6 +13,28 @@ static void cgasm_initialize_global_vint(struct cgasm_context *ctx, struct globa
 	int const_val = cgasm_get_int_const_from_expr(ctx, val);
 	cgasm_println_noind(ctx, "%s:", sym->name);
 	cgasm_println(ctx, "%s %d", directive, const_val);
+}
+
+static void cgasm_initialize_global_ptr(struct cgasm_context *ctx, struct global_var_symbol *sym, struct type *type, struct initializer *initializer) {
+	char buf[256];
+	assert(type->tag == T_PTR);
+
+	// initialize char ptr
+	if (type->subtype->tag == T_CHAR) { 
+		if (initializer->expr != NULL) {
+			struct expr_val val = cgasm_assignment_expression(ctx, initializer->expr);
+			if (val.type == EXPR_VAL_STR_LITERAL) { // use string literal to initialize char *
+				cgasm_println_noind(ctx, "%s:", sym->name);
+				cgasm_println(ctx, ".long %s", get_str_literal_label(val.ind, buf));
+				return;
+			} else {
+				panic("ni");
+			}
+		} else {
+			panic("initializer list case ");
+		}
+	}
+	panic("not initializing char *");
 }
 
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
@@ -27,7 +50,11 @@ static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct global
 	case T_CHAR:
 		cgasm_initialize_global_vint(ctx, sym, initializer, ".byte");
 		break;
+	case T_PTR:
+		cgasm_initialize_global_ptr(ctx, sym, sym->ctype, initializer);
+		break;
 	default:
+		cgc_dump(initializer, initializer);
 		panic("ni %d", type->tag);
 	}
 }
