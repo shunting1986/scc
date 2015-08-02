@@ -1,4 +1,6 @@
   TODO: why the 2 dump-back .c generate a back bin.. 
+
+	TODO: make sure the the port is already being listened, the prog print the correct msg and exit
 	
 	TODO: support dump mongoose.c from tree back to C
 

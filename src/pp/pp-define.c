@@ -4,6 +4,8 @@
 #undef DEBUG
 #define DEBUG 0
 
+#define DUMP_MACRO 0
+
 static struct dynarr *store_token_until_newline(struct lexer *lexer) {
 	struct dynarr *darr = dynarr_init();
 	union token tok;
@@ -41,7 +43,7 @@ static void pp_define_object_macro(struct lexer *lexer, const char *name) {
 	struct macro *macro = obj_macro_init(darr);
 	define_macro(lexer, name, macro);
 
-#if DEBUG || 0
+#if DUMP_MACRO
 	// fprintf(stderr, "%s define the macro %s\n", lexer->cstream->path, name);
 	macro_dump(lexer, name, macro);
 #endif
@@ -72,7 +74,7 @@ static void pp_define_func_macro(struct lexer *lexer, const char *name) {
 	struct macro *macro = func_macro_init(paramlist, darr);
 	define_macro(lexer, name, macro);
 
-#if DEBUG || 0
+#if DUMP_MACRO
 	macro_dump(lexer, name, macro);
 #endif
 }
