@@ -296,22 +296,34 @@ struct expr_val cgasm_logical_or_expression(struct cgasm_context *ctx, struct lo
 }
 
 // right assoc
-static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr) {
-	int or_size = dynarr_size(expr->or_expr_list);
+static struct expr_val cgasm_conditional_expression_rec(struct cgasm_context *ctx, struct dynarr *inner_expr_list, int inner_expr_ind, struct dynarr *or_expr_list, int or_expr_ind) {
+	int or_size = dynarr_size(or_expr_list);
 	struct expr_val left_most;
 
-	assert(or_size > 0);
-	assert(or_size == dynarr_size(expr->inner_expr_list) + 1);
+	assert(or_expr_ind < or_size);
+	assert(or_size - or_expr_ind == dynarr_size(inner_expr_list) - inner_expr_ind + 1);
 
-	left_most = cgasm_logical_or_expression(ctx, dynarr_get(expr->or_expr_list, 0));
-	if (or_size == 1) {
+	left_most = cgasm_logical_or_expression(ctx, dynarr_get(or_expr_list, or_expr_ind));
+	if (or_expr_ind == or_size - 1) {
 		return left_most;
 	}
 
-	struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type()); // XXX assume integer type
+	// check the case that the cond expr is constant
+	if (left_most.type == EXPR_VAL_CONST_VAL) {
+		if (const_token_is_nonzero(left_most.const_val)) {
+			return cgasm_expression(ctx, dynarr_get(inner_expr_list, inner_expr_ind));
+		} else {
+			return cgasm_conditional_expression_rec(ctx, inner_expr_list, inner_expr_ind + 1, or_expr_list, or_expr_ind + 1);
+		}
+	} else {
+		struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type()); // XXX assume integer type
+		cgasm_handle_conditional(ctx, left_most, inner_expr_list, inner_expr_ind, or_expr_list, or_expr_ind + 1, temp);
+		return temp;
+	}
+}
 
-	cgasm_handle_conditional(ctx, left_most, expr->inner_expr_list, 0, expr->or_expr_list, 1, temp);
-	return temp;
+static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr) {
+	return cgasm_conditional_expression_rec(ctx, expr->inner_expr_list, 0, expr->or_expr_list, 0);
 }
 
 struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr) {

@@ -2,6 +2,7 @@
 #define _INC_TOKEN_H
 
 #include <inc/cbuf.h>
+#include <inc/util.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +59,7 @@ union token wrap_to_simple_token(int tag);
 union token wrap_to_str_literal_token(char *s);
 void token_list_to_cstr(struct dynarr *toklist, struct cbuf *cbuf);
 void token_to_cstr(union token tok, struct cbuf *cbuf);
+bool const_token_is_nonzero(union token tok);
 
 #ifdef __cplusplus
 }

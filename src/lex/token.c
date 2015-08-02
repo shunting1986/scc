@@ -122,6 +122,19 @@ const char *token_tag_str(int tok_tag) {
 	return token_tag_str_list[tok_tag];
 }
 
+bool const_token_is_nonzero(union token tok) {
+	assert(tok.tok_tag == TOK_CONSTANT_VALUE);
+	if (tok.const_val.flags & CONST_VAL_TOK_INTEGER) {
+		return tok.const_val.ival != 0;
+	} else if (tok.const_val.flags & CONST_VAL_TOK_FLOAT) {
+		return tok.const_val.fval != 0;
+	} else if (tok.const_val.flags & CONST_VAL_TOK_LONG_LONG) {
+		return tok.const_val.llval != 0;
+	} else {
+		panic("invalid const token");
+	}
+}
+
 union token wrap_int_const_to_token(int val) {
 	union token tok;
 	tok.const_val.tok_tag = TOK_CONSTANT_VALUE;
