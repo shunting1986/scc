@@ -71,12 +71,10 @@ PROG_NAME := scc
 
 all: handy
 
-# handy: rebuild-$(PROG_NAME) mongoose
+handy: rebuild-$(PROG_NAME) mongoose
 
-handy: rebuild-$(PROG_NAME)
-	./scc integration-test/global-enum-init/main.c
-
-#	@#./scc integration-test/sum/main.c
+#handy: rebuild-$(PROG_NAME)
+#	./scc integration-test/global-enum-init/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

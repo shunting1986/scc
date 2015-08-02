@@ -99,7 +99,7 @@ void *htab_query(struct hashtab *htab, const char *key) {
  * duplciated and val will be used directly
  */
 void htab_insert(struct hashtab *htab, const char *key, void *val) {
-	if (htab->nitem >= htab->nbucket) {	
+	if (htab->nitem >= 2 * htab->nbucket) {	
 		red("htab too many item %d", htab->nitem); // TODO
 	}
 

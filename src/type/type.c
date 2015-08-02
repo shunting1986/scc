@@ -579,9 +579,13 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 		switch (each->nodeType) {
 		case STORAGE_CLASS_SPECIFIER: 
 			break; // XXX ignore storage class here
-		case TYPE_QUALIFIER:
-			fprintf(stderr, "\033[31mtype qualifier is ignored right now\033[0m\n");
+		case TYPE_QUALIFIER: {
+			static int times = 0;
+			if (++times <= 5) {
+				fprintf(stderr, "\033[31mtype qualifier is ignored right now\033[0m\n");
+			}
 			break;
+		}
 		case TYPE_SPECIFIER:
 			type_specifier = (struct type_specifier *) each;
 			switch (type_specifier->tok_tag) {
@@ -685,7 +689,13 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 			if (basetype == T_NONE) {
 				basetype = T_INT; // use int here
 			}
-			fprintf(stderr, "\033[31m'long' is ignored right now\033[0m\n");
+
+			{
+				static int times = 0;
+				if (++times <= 5) {
+					fprintf(stderr, "\033[31m'long' is ignored right now\033[0m\n");
+				}
+			}
 		} else if (num_long == 2) {
 			if (basetype == T_NONE || basetype == T_INT) {
 				basetype = T_LONG_LONG;
@@ -701,12 +711,17 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 	}
 
 	if (has_signed) {
-		fprintf(stderr, "\033[31m'signed' is ignored right now\033[0m\n");
+		static int times = 0;
+		if (++times <= 5) {
+			fprintf(stderr, "\033[31m'signed' is ignored right now\033[0m\n");
+		}
 	}
 
 	if (has_unsigned) {
-		// panic("'unsigned' not support yet");
-		fprintf(stderr, "\033[31m'unsigned' is ignored right now\033[0m\n");
+		static int times = 0;
+		if (++times <= 5) {	
+			fprintf(stderr, "\033[31m'unsigned' is ignored right now\033[0m\n");
+		}
 	}
 
 	switch (basetype) {
