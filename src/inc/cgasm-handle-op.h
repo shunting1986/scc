@@ -33,6 +33,7 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 
 struct expr_val cgasm_handle_deref_flag(struct cgasm_context *ctx, struct expr_val operand);
 int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbol *sym);
+void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 
 #ifdef __cplusplus
 }

@@ -172,6 +172,17 @@ static void cgasm_load_sym_addr_to_reg(struct cgasm_context *ctx, struct symbol 
 	}
 }
 
+// should be lval
+void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
+	switch (val.type) {
+	case EXPR_VAL_SYMBOL:
+		cgasm_load_sym_addr_to_reg(ctx, val.sym, reg);
+		break;
+	default:
+		panic("ni %d", val.type);
+	}
+}
+
 static void cgasm_load_temp_to_reg(struct cgasm_context *ctx, struct temp_var temp, int reg) {
 	cgasm_println(ctx, "movl %d(%%ebp), %%%s", cgasm_get_temp_var_offset(ctx, temp), get_reg_str_code(reg));
 }

@@ -26,7 +26,15 @@ static void cgasm_load_ll_sym_to_reg2(struct cgasm_context *ctx, struct symbol *
 	}
 }
 
+// XXX as a simple solution, we use RSI as temp register. A better solution is pass-in the reg constaints
 void cgasm_load_ll_val_to_reg2(struct cgasm_context *ctx, struct expr_val val, int reg1, int reg2) {
+	int addr_reg = REG_ESI;
+	cgasm_load_addr_to_reg(ctx, val, addr_reg);
+	cgasm_println(ctx, "movl (%%%s), %%%s", get_reg_str_code(addr_reg), get_reg_str_code(reg1));
+	cgasm_println(ctx, "movl (%%%s), %%%s", get_reg_str_code(addr_reg), get_reg_str_code(reg2));
+}
+
+static void cgasm_store_reg2_to_ll_temp(struct cgasm_context *ctx, int reg1, int reg2, struct expr_val temp) {
 	panic("ni");
 }
 
@@ -42,7 +50,30 @@ void cgasm_push_ll_sym(struct cgasm_context *ctx, struct symbol *sym) {
 
 
 struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
-	panic("ni");
+	assert(lhs.ctype != NULL && lhs.ctype->tag == T_LONG_LONG);
+	assert(rhs.ctype != NULL && rhs.ctype->tag == T_LONG_LONG); // TODO: should be able to handle long long + int etc.
+
+	int lhs_reg1 = REG_EAX;
+	int lhs_reg2 = REG_ECX;
+	int rhs_reg1 = REG_EDX;
+	int rhs_reg2 = REG_EBX;
+
+	struct expr_val ret = cgasm_alloc_temp_var(ctx, get_long_long_type());
+
+	cgasm_load_ll_val_to_reg2(ctx, lhs, lhs_reg1, lhs_reg2);
+	cgasm_load_ll_val_to_reg2(ctx, rhs, rhs_reg1, rhs_reg2);
+
+	switch (op) {
+	case TOK_ADD:
+		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(rhs_reg1), get_reg_str_code(lhs_reg1));
+		cgasm_println(ctx, "adcl %%%s, %%%s", get_reg_str_code(rhs_reg1), get_reg_str_code(lhs_reg1));
+		cgasm_store_reg2_to_ll_temp(ctx, lhs_reg1, lhs_reg2, ret);
+		break;
+	default:
+		panic("ni %s", token_tag_str(op));
+	}
+
+	return ret;
 }
 
 
