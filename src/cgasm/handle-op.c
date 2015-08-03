@@ -3,6 +3,7 @@
 #include <inc/lexer.h>
 #include <inc/symtab.h>
 #include <inc/pp.h>
+#include <inc/ll-support.h>
 
 const char *suff_table[] = {
 	[1] = "b",
@@ -300,12 +301,18 @@ static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
 }
 
 static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
-	// load the register first
-	int reg = REG_EAX;
-	cgasm_load_sym_to_reg(ctx, sym, reg);
-	cgasm_extend_reg(ctx, reg, sym->ctype);
+	if (sym->ctype->size <= 4) {
+		// load the register first
+		int reg = REG_EAX;
+		cgasm_load_sym_to_reg(ctx, sym, reg);
+		cgasm_extend_reg(ctx, reg, sym->ctype);
 
-	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
+		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
+	} else if (sym->ctype->tag == T_LONG_LONG) {
+		cgasm_push_sym_ll(ctx, sym);
+	} else {
+		panic("push structure not supported yet");
+	}
 }
 
 static void cgasm_push_temp(struct cgasm_context *ctx, struct temp_var temp) {
