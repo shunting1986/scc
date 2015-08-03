@@ -15,16 +15,6 @@
 
 #define DEBUG 1
 
-#if TYPE_DEBUG
-#define INIT_MAGIC .magic = TYPE_MAGIC,
-#define CHECK_MAGIC(type) assert(type->magic == TYPE_MAGIC)
-#define SET_MAGIC(type) type->magic = TYPE_MAGIC
-#else
-#define INIT_MAGIC
-#define CHECK_MAGIC(type)
-#define SET_MAGIC(type)
-#endif
-
 static int type_allocated, type_freed;
 
 static struct type char_type = {

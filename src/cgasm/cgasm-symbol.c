@@ -187,7 +187,17 @@ void cgasm_dump_global_vars(struct cgasm_context *ctx) {
 }
 
 bool check_builtin_symbol(struct cgasm_context *ctx, const char *name, struct expr_val *pval) {
-	panic("ni");
+	if (strcmp("__func__", name) == 0) {
+		*pval = cgasm_register_str_literal(ctx, ctx->func_ctx->name);
+		return true;
+	} else if (strcmp("__FILE__", name) == 0) {
+		*pval = cgasm_register_str_literal(ctx, "unknown"); // XXX not supported yet
+		return true;
+	} else if (strcmp("__LINE__", name) == 0) {
+		*pval = int_const_expr_val(0); // XXX not supported yet
+		return true;
+	}
+	return false;
 }
 
 

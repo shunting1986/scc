@@ -37,6 +37,7 @@ struct cgasm_context {
 };
 
 struct cgasm_func_context {
+	const char *name;
 	int nparam_word; // number of 32bit words for parameter
 	int nlocal_word; // number of 32bit words for local variables
 	struct cbuf *code_buf;
@@ -93,7 +94,7 @@ void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *
 
 // asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);
-struct expr_val cgasm_register_str_literal(struct cgasm_context *ctx, char *str);
+struct expr_val cgasm_register_str_literal(struct cgasm_context *ctx, const char *str);
 char *get_str_literal_label(int ind, char *buf);
 void cgasm_dump_string_literals(struct cgasm_context *ctx);
 int cgasm_new_label_no(struct cgasm_context *ctx);

@@ -11,6 +11,7 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 	if (oldtype->tag >= T_CHAR && oldtype->tag <= T_LONG_LONG && newtype->tag >= T_CHAR && newtype->tag <= T_LONG_LONG) { // both are integer type
 		if (oldtype->tag >= newtype->tag) { // change to smaller type
 			// nothing need to do
+		} else if (oldtype->tag == T_INT && newtype->tag == T_LONG_LONG) { // TODO int to long long is not supported yet
 		} else {
 			// XXX need do zero or sign extension
 			panic("ni");
@@ -19,6 +20,7 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 		// nothing need to do
 	} else if (newtype->tag == T_VOID) { // (void), discard value
 	} else if (oldtype->tag == T_PTR && newtype->tag == T_PTR) { // change from one pointer type to another (can cover func ptr case)
+	} else if (oldtype->tag == T_INT && newtype->tag == T_PTR) { // convert from int to ptr
 	} else {
 		type_dump(oldtype, 4);
 		type_dump(newtype, 4);

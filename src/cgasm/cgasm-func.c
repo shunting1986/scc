@@ -11,9 +11,10 @@ int func_alloc_space(struct cgasm_func_context *func_ctx, int size) {
 	return func_ctx->nlocal_word - 1;
 }
 
-static struct cgasm_func_context *func_context_init() {
+static struct cgasm_func_context *func_context_init(const char *name) {
 	struct cgasm_func_context *ctx = (struct cgasm_func_context *) mallocz(sizeof(*ctx));
 	ctx->code_buf = cbuf_init();
+	ctx->name = name; // no need to free when destroying, caller will do it. Normally the memory is refered by the syntree
 	return ctx;
 }
 
@@ -42,7 +43,7 @@ void cgasm_enter_function(struct cgasm_context *ctx, char *fname) {
 	cgasm_println_noind(ctx, ".global %s", fname); 
  	cgasm_println_noind(ctx, "%s:", fname);
 
-	ctx->func_ctx = func_context_init();
+	ctx->func_ctx = func_context_init(fname);
 	assert(ctx->func_ctx != NULL);
 	cgasm_push_symtab(ctx);
 }

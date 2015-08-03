@@ -357,6 +357,7 @@ static struct expr_val cgasm_conditional_expression_rec(struct cgasm_context *ct
 			return cgasm_conditional_expression_rec(ctx, inner_expr_list, inner_expr_ind + 1, or_expr_list, or_expr_ind + 1);
 		}
 	} else {
+		// TODO: avoid allocating the temp var if the final type is void
 		struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type()); // XXX assume integer type
 		cgasm_handle_conditional(ctx, left_most, inner_expr_list, inner_expr_ind, or_expr_list, or_expr_ind + 1, temp);
 		return temp;

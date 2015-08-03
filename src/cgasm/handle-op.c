@@ -584,6 +584,9 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	case TOK_ADD_ASSIGN:
 		cgasm_println(ctx, "addl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
 		break;
+	case TOK_SUB_ASSIGN:
+		cgasm_println(ctx, "subl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		break;
 	default:
 		panic("ni %s", token_tag_str(op));
 	}
@@ -701,18 +704,27 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_val cond, struct dynarr *inner_expr_list, int inner_expr_ind, struct dynarr *or_expr_list, int or_expr_ind, struct expr_val temp_var) {
 	if (inner_expr_ind == dynarr_size(inner_expr_list)) {
 		assert(or_expr_ind == dynarr_size(or_expr_list));
-		
-		return cgasm_handle_assign_op(ctx, temp_var, cond, TOK_ASSIGN);
+	
+		if (expr_val_get_type(cond)->tag != T_VOID) {
+			return cgasm_handle_assign_op(ctx, temp_var, cond, TOK_ASSIGN);
+		} else {
+			return void_expr_val();
+		}
 	}
 
 	// similar to if-else
 	int else_label = cgasm_new_label_no(ctx);
 	int exit_label = cgasm_new_label_no(ctx);
 	char buf[128];
+	bool is_void;
 
 	cgasm_goto_ifcond(ctx, cond, else_label, true);
+	// TODO check that the 2 branch has the same type
 	struct expr_val inner_val = cgasm_expression(ctx, dynarr_get(inner_expr_list, inner_expr_ind));
-	cgasm_handle_assign_op(ctx, temp_var, inner_val, TOK_ASSIGN);
+	is_void = expr_val_get_type(inner_val)->tag == T_VOID;
+	if (!is_void) {
+		cgasm_handle_assign_op(ctx, temp_var, inner_val, TOK_ASSIGN);
+	}
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(exit_label, buf));
 	cgasm_emit_jump_label(ctx, else_label);
 
@@ -721,7 +733,11 @@ struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_
 
 	cgasm_emit_jump_label(ctx, exit_label);
 
-	return temp_var;
+	if (!is_void) {
+		return temp_var;
+	} else {
+		return void_expr_val();
+	}
 }
 
 /**************************/

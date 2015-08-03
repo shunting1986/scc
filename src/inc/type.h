@@ -11,6 +11,16 @@ extern "C" {
 #define TYPE_DEBUG 1
 #define TYPE_MAGIC 0x55565758
 
+#if TYPE_DEBUG
+#define INIT_MAGIC .magic = TYPE_MAGIC,
+#define CHECK_MAGIC(type) assert(type->magic == TYPE_MAGIC)
+#define SET_MAGIC(type) type->magic = TYPE_MAGIC
+#else
+#define INIT_MAGIC
+#define CHECK_MAGIC(type)
+#define SET_MAGIC(type)
+#endif
+
 enum {
 	// basic type
 	T_CHAR, // the order of these 4 are important

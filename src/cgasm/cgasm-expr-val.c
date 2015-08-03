@@ -107,6 +107,7 @@ bool is_int_const(struct expr_val val) {
 struct expr_val void_expr_val() {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_VOID;
+	ret.ctype = get_void_type(); // this is important
 	return ret;
 }
 
@@ -114,6 +115,7 @@ struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, 
 	struct expr_val ret;
 	struct condcode *cc = mallocz(sizeof(*cc));
 	ret.type = EXPR_VAL_CC;
+	ret.ctype = get_int_type();
 	ret.cc = cc;
 	
 	cc->op = op;
@@ -153,9 +155,11 @@ int expr_val_get_elem_size(struct expr_val val) {
 struct type *expr_val_get_type(struct expr_val val) {
 	struct type *type = val.ctype;
 	assert(type != NULL);
+	CHECK_MAGIC(type);
 
 	if (val.type & EXPR_VAL_FLAG_DEREF) {
 		type = type_deref(type);
+		CHECK_MAGIC(type);
 	}
 	return type;
 }
