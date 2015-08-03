@@ -383,9 +383,12 @@ static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr
 }
 
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {
+#if 0
+	// take care ++ptr
 	if (operand.ctype == NULL || operand.ctype->tag != T_INT) {
-		panic("binary op only support int right now");
+		panic("unary op only support int right now");
 	}
+#endif
 
 	switch (tok_tag) {
 	case TOK_AMPERSAND:
@@ -434,7 +437,7 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
 
-#if 1
+#if 0
 	if ((lhs.ctype == NULL || lhs.ctype->tag != T_INT) || (rhs.ctype == NULL || rhs.ctype->tag != T_INT)) {
 		assert(0);
 		panic("binary op only support int right now");
@@ -501,9 +504,15 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
 	int rhs_reg = REG_EAX;
 	char buf[128];
+	cgasm_change_array_func_to_ptr(ctx, &rhs);
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
-	panic("ni"); // ptr
+#if 0
+	if (rhs.ctype == NULL || rhs.ctype->tag != T_INT) {
+		panic("only support int right now");
+	}
+	// TODO make type conversion if necessary
+#endif
 
 	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
 		int lhs_reg = REG_ECX;
@@ -543,23 +552,45 @@ void cgasm_handle_ret(struct cgasm_context *ctx) {
 /*******************************/
 /* inc/dec                     */
 /*******************************/
+static int get_incdec_step(struct type *type) {
+	int step = -1;
+	if (type->tag == T_INT) {
+		step = 1;
+	} else if (type->tag == T_PTR) {
+		step = type->subtype->size;
+	} else {
+		panic("unsupported type");
+	}
+	assert(step > 0);
+	return step;
+}
+
 static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
 	// XXX assume integer type for temp var
 	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, get_int_type());
-
-	panic("ni"); // ptr case
+	struct type *type = val.ctype;
+	assert(type != NULL);
+	int step = get_incdec_step(type);
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_store_reg_to_mem(ctx, reg, temp_var);
-	cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+
+	if (step == 1) {
+		cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+	} else {
+		cgasm_println(ctx, "%s $%d, %%%s", is_inc ? "addl" : "subl", step, get_reg_str_code(reg));
+	}
+
 	cgasm_store_reg_to_mem(ctx, reg, val);
 	return temp_var;
 }
 
 static struct expr_val cgasm_handle_pre_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
-	panic("ni"); // ptr case
+	if (val.ctype == NULL || val.ctype->tag != T_INT) {
+		panic("only handle int right now");
+	}
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));

@@ -88,6 +88,7 @@ int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expres
 int cgasm_get_int_const_from_expr(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_assignment_expression(struct cgasm_context *ctx, struct assignment_expression *expr);
 struct expr_val cgasm_logical_or_expression(struct cgasm_context *ctx, struct logical_or_expression *expr);
+void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *pval);
 
 // asm-label.c
 void cgasm_destroy_str_literals(struct cgasm_context *ctx);

@@ -47,7 +47,7 @@ static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *nam
 	return sym->ctype;
 }
 
-static void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *pval) {
+void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *pval) {
 #if 0
 	assert(type != NULL);
 #else
@@ -92,9 +92,11 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 		ret_type = func_type->func.retype;
 	}
 
+#if 0
 	if (func_type != NULL) {
 		panic("need check argument type: maybe need do conversion");
 	}
+#endif
 
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = mallocz(sizeof(*pval));

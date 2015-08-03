@@ -162,13 +162,13 @@ void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int g
 	case EXPR_VAL_CC:
 		cgasm_goto_ifcond_cc(ctx, condval.cc, goto_label, inverse);
 		break;
-	case EXPR_VAL_SYMBOL: case EXPR_VAL_TEMP:
+	case EXPR_VAL_SYMBOL: case EXPR_VAL_TEMP: case EXPR_VAL_TEMP | EXPR_VAL_FLAG_DEREF: 
 		cgasm_goto_ifcond_cc(ctx, 
 			condcode_expr(TOK_NE, condval, int_const_expr_val(0), NULL).cc,
 			goto_label, inverse);
 		break;
 	default:
-		panic("ni %d", condval.type);
+		panic("ni 0x%x", condval.type);
 	}
 }
 

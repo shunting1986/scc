@@ -28,6 +28,7 @@ const char *get_reg_str_code_size(unsigned int reg, int size) {
 	case 4:
 		return reg_name_list[2][reg];
 	default:
+		assert(0);
 		panic("invalid reg size %d", size);
 	}
 }
