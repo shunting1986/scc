@@ -86,7 +86,17 @@ struct expr_val const_expr_val(union token tok) {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_CONST_VAL;
 	ret.const_val = tok;
-	ret.ctype = NULL; // XXX set this correctly
+
+	int flags = tok.const_val.flags;
+	if (flags & CONST_VAL_TOK_INTEGER) {
+		ret.ctype = get_int_type();
+	} else if (flags & CONST_VAL_TOK_LONG_LONG) {
+		ret.ctype = get_long_long_type();
+	} else if (flags & CONST_VAL_TOK_FLOAT) {
+		ret.ctype = get_double_type();
+	} else {
+		panic("invalid const token");
+	}
 	return ret;
 }
 

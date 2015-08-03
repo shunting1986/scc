@@ -268,7 +268,7 @@ static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct c
 	} else {
 		struct type *newtype = cgasm_type_name(ctx, expr->type_name);
 		val = cgasm_cast_expression(ctx, expr->cast_expr);
-		val = type_convert(val, newtype);
+		val = type_convert(ctx, val, newtype);
 		register_type_ref(ctx, newtype);
 	}
 	return val;

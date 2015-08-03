@@ -2,7 +2,7 @@
 #define _INC_TYPE_H
 
 #include <inc/syntree.h>
-#include <inc/cgasm-expr-val.h>
+#include <inc/cgasm-handle-op.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,10 +13,11 @@ extern "C" {
 
 enum {
 	// basic type
-	T_CHAR,
+	T_CHAR, // the order of these 4 are important
 	T_SHORT,
 	T_INT,
 	T_LONG_LONG,
+
 	T_VOID,
 	T_FLOAT,
 	T_DOUBLE,
@@ -88,6 +89,8 @@ struct type *get_short_type();
 struct type *get_long_long_type();
 struct type *get_double_type();
 struct type *get_float_type();
+struct type *get_void_type();
+bool is_void_ptr(struct type *type);
 struct type *get_array_type(struct type *elem_type, int dim);
 void complete_array_dim(struct type *type, int dim);
 struct type *get_noparam_func_type(struct type *retype);
@@ -104,7 +107,7 @@ void type_dump(struct type *type, int ind);
 struct struct_field *get_struct_field(struct type *type, const char *name);
 
 /* type-conv.c */
-struct expr_val type_convert(struct expr_val val, struct type *newtype);
+struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, struct type *newtype);
 
 #ifdef __cplusplus
 }

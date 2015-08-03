@@ -295,6 +295,11 @@ struct type *get_char_type() {
 	return &char_type;
 }
 
+bool is_void_ptr(struct type *type) {
+	CHECK_MAGIC(type);
+	return type->tag == T_PTR && type->subtype->tag == T_VOID;
+}
+
 struct type *get_void_type() {
 	return &void_type;
 }

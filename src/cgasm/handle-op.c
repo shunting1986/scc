@@ -376,6 +376,21 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 	}
 }
 
+struct expr_val cgasm_handle_deref_flag(struct cgasm_context *ctx, struct expr_val operand) {
+	if (expr_val_has_deref_flag(operand)) {
+		int reg = REG_EAX;
+		struct type *type = expr_val_get_type(operand);
+
+		// the load operation will handle the existing deref flag
+		cgasm_load_val_to_reg(ctx, operand, reg);
+		struct expr_val temp = cgasm_alloc_temp_var(ctx, type);
+		cgasm_store_reg_to_mem(ctx, reg, temp);
+		return temp;
+	} else {
+		return operand;
+	}
+}
+
 static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr_val operand) {
 	// convert array to ptr
 	struct type *type = expr_val_get_type(operand);
@@ -387,14 +402,7 @@ static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr
 	if (type->tag == T_PTR) {
 		// if we already has deref flag, we should do the real 'DEREF'
 		if (expr_val_has_deref_flag(operand)) {
-			int reg = REG_EAX;
-
-			// the load operation will handle the existing deref flag
-			cgasm_load_val_to_reg(ctx, operand, reg);
-			struct expr_val temp = cgasm_alloc_temp_var(ctx, type);
-			cgasm_store_reg_to_mem(ctx, reg, temp);
-			
-			return expr_val_add_deref_flag(temp);
+			return expr_val_add_deref_flag(cgasm_handle_deref_flag(ctx, operand));
 		} else {
 			return expr_val_add_deref_flag(operand);
 		}
