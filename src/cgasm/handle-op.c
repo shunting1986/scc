@@ -421,6 +421,14 @@ static struct expr_val cgasm_handle_binary_op_const(int tok_op, struct expr_val 
 	return int_const_expr_val(val);
 }
 
+static void clear_div_high_reg(struct cgasm_context *ctx, struct type *type) {
+	assert(type != NULL);
+	int size = type->size;
+	int reg = size == 1 ? REG_ESI : REG_EDX; // REG_ESI is the ind for AH when the size is 1 byte
+	const char *str = get_reg_str_code_size(reg, size);
+	cgasm_println(ctx, "xor%s %%%s, %%%s", size_to_suffix(size), str, str);
+}
+
 struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	int lhs_reg = REG_EAX; // REVISE MUL if we change this register
 	int rhs_reg = REG_ECX;
@@ -472,6 +480,12 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	case TOK_STAR:
 		LOAD_TO_REG(); 
 		cgasm_println(ctx, "mull %%%s", get_reg_str_code(rhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_DIV:
+		LOAD_TO_REG();
+		clear_div_high_reg(ctx, lhs.ctype);
+		cgasm_println(ctx, "divl %%%s", get_reg_str_code(rhs_reg));
 		STORE_TO_TEMP();
 		break;
 	case TOK_LSHIFT:
