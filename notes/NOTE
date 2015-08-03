@@ -4,7 +4,8 @@
 
   =======================
   Next step is build mongoose.c
-	-> next func is ssl_error
+	-> DONE next func is ssl_error 
+	-> next func is mg_strlcpy
 
 
 

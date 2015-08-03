@@ -12,10 +12,13 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 		if (oldtype->tag >= newtype->tag) { // change to smaller type
 			// nothing need to do
 		} else {
+			// XXX need do zero or sign extension
 			panic("ni");
 		}
 	} else if (oldtype->tag == T_INT && is_void_ptr(newtype)) { // int to void *
 		// nothing need to do
+	} else if (newtype->tag == T_VOID) { // (void), discard value
+	} else if (is_func_ptr(oldtype) && is_func_ptr(newtype)) { // change from one function pointer type to another
 	} else {
 		type_dump(oldtype, 4);
 		type_dump(newtype, 4);

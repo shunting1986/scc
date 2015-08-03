@@ -91,6 +91,7 @@ struct type *get_double_type();
 struct type *get_float_type();
 struct type *get_void_type();
 bool is_void_ptr(struct type *type);
+bool is_func_ptr(struct type *type);
 struct type *get_array_type(struct type *elem_type, int dim);
 void complete_array_dim(struct type *type, int dim);
 struct type *get_noparam_func_type(struct type *retype);
