@@ -17,6 +17,9 @@ enum {
 	REG_NUM,
 };
 
+struct type;
+struct cgasm_context;
+
 struct temp_var {
 	int ind; // use (anonymous) local variable as temporary variable right now
 		// may optimize to use register in future

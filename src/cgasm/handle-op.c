@@ -237,6 +237,7 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 		cgasm_load_str_literal_to_reg(ctx, val.ind, reg);
 		break;
 	default:
+		assert(0);
 		panic("ni 0x%x", val.type);
 		break;
 	}
@@ -377,14 +378,29 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 
 static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr_val operand) {
 	// convert array to ptr
-	if (expr_val_get_type(operand)->tag == T_ARRAY) {
+	struct type *type = expr_val_get_type(operand);
+	if (type->tag == T_ARRAY) {
 		cgasm_change_array_func_to_ptr(ctx, &operand);
+		type = expr_val_get_type(operand);
 	}
 
-	if (!expr_val_has_deref_flag(operand) && type_get_tag(operand.ctype) == T_PTR) {
-		return expr_val_add_deref_flag(operand);
-	}
-	panic("only support ptr right now");
+	if (type->tag == T_PTR) {
+		// if we already has deref flag, we should do the real 'DEREF'
+		if (expr_val_has_deref_flag(operand)) {
+			int reg = REG_EAX;
+
+			// the load operation will handle the existing deref flag
+			cgasm_load_val_to_reg(ctx, operand, reg);
+			struct expr_val temp = cgasm_alloc_temp_var(ctx, type);
+			cgasm_store_reg_to_mem(ctx, reg, temp);
+			
+			return expr_val_add_deref_flag(temp);
+		} else {
+			return expr_val_add_deref_flag(operand);
+		}
+	} 
+
+	panic("pointer required");
 }
 
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {

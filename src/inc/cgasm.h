@@ -5,9 +5,9 @@
 #include <stdarg.h>
 #include <inc/syntree.h>
 #include <inc/syntree-node.h>
+#include <inc/symtab.h>
 #include <inc/type.h>
 #include <inc/util.h>
-#include <inc/symtab.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -2,6 +2,7 @@
 #define _INC_TYPE_H
 
 #include <inc/syntree.h>
+#include <inc/cgasm-expr-val.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,6 +102,9 @@ void verify_type_memory_release();
 void type_dump(struct type *type, int ind);
 
 struct struct_field *get_struct_field(struct type *type, const char *name);
+
+/* type-conv.c */
+struct expr_val type_convert(struct expr_val val, struct type *newtype);
 
 #ifdef __cplusplus
 }

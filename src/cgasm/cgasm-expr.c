@@ -215,6 +215,19 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 	return result_val;
 }
 
+static struct type *cgasm_type_name(struct cgasm_context *ctx, struct type_name *type_name) {
+	struct type *type = parse_type_from_specifier_qualifier_list(ctx, type_name->sqlist);
+	if (type_name->declarator != NULL) {
+		char *id = NULL;
+		type = parse_type_from_declarator(ctx, type, type_name->declarator, &id);
+		if (id != NULL) {
+			panic("type_name should not contains identifier");
+		}
+	}
+	// register_type_ref(ctx, type);
+	return type;
+}
+
 static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct unary_expression *expr) {
 	if (expr->postfix_expr != NULL) {
 		return cgasm_postfix_expression(ctx, expr->postfix_expr);
@@ -227,20 +240,12 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 		struct expr_val val = cgasm_unary_expression(ctx, expr->sizeof_expr);
 		return int_const_expr_val(type_get_size(val.ctype));
 	} else if (expr->sizeof_type) {
-		struct type *type = parse_type_from_specifier_qualifier_list(ctx, expr->sizeof_type->sqlist);
-		int type_size;
-		if (expr->sizeof_type->declarator != NULL) {
-			char *id = NULL;
-			type = parse_type_from_declarator(ctx, type, expr->sizeof_type->declarator, &id);
-			if (id != NULL) {
-				panic("sizeof can not used with (concrete) declarator");
-			}
-		}
-		register_type_ref(ctx, type);
-		type_size = type_get_size(type);
+		struct type *type = cgasm_type_name(ctx, expr->sizeof_type);
+		int type_size = type_get_size(type);
 		if (type_size < 0) {
 			panic("sizeof returns negative size type");
 		}
+		type_check_ref(type);
 		return int_const_expr_val(type_size);
 	} else if (expr->inc_unary) {
 		struct expr_val val = cgasm_unary_expression(ctx, expr->inc_unary);
@@ -261,8 +266,10 @@ static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct c
 	if (expr->unary_expr != NULL) {
 		val = cgasm_unary_expression(ctx, expr->unary_expr);
 	} else {
-		fprintf(stderr, "\033[31mtype casting is not implemented yet\033[0m\n");
+		struct type *newtype = cgasm_type_name(ctx, expr->type_name);
 		val = cgasm_cast_expression(ctx, expr->cast_expr);
+		val = type_convert(val, newtype);
+		register_type_ref(ctx, newtype);
 	}
 	return val;
 }
