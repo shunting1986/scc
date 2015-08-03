@@ -33,7 +33,7 @@ enum {
 	EXPR_VAL_VOID,
 	EXPR_VAL_REGISTER, //
 	EXPR_VAL_STR_LITERAL,
-	EXPR_VAL_CONST_VAL,
+	EXPR_VAL_CONST_VAL, // this can also be used to refer to the address of global var
 	EXPR_VAL_CC, // conditional code, should delay the processing
 };
 

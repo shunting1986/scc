@@ -18,23 +18,25 @@ static void cgasm_initialize_global_vint(struct cgasm_context *ctx, struct initi
 
 static void cgasm_initialize_global_ptr(struct cgasm_context *ctx, struct type *type, struct initializer *initializer) {
 	char buf[256];
+	struct expr_val val;
+	int const_val;
 	assert(type->tag == T_PTR);
+	if (initializer->expr == NULL) {
+		panic("invalid pointer initializer");
+	}
+	
+	val = cgasm_assignment_expression(ctx, initializer->expr);
 
 	// initialize char ptr
 	if (type->subtype->tag == T_CHAR) { 
-		if (initializer->expr != NULL) {
-			struct expr_val val = cgasm_assignment_expression(ctx, initializer->expr);
-			if (val.type == EXPR_VAL_STR_LITERAL) { // use string literal to initialize char *
-				cgasm_println(ctx, ".long %s", get_str_literal_label(val.ind, buf));
-				return;
-			} else {
-				panic("ni");
-			}
-		} else {
-			panic("initializer list case ");
-		}
+		if (val.type == EXPR_VAL_STR_LITERAL) { // use string literal to initialize char *
+			cgasm_println(ctx, ".long %s", get_str_literal_label(val.ind, buf));
+			return;
+		} 
 	}
-	panic("not initializing char *");
+
+	const_val = cgasm_get_int_const_from_expr(ctx, val);
+	cgasm_println(ctx, ".long %d", const_val);
 }
 
 // TODO this function should make sure type's size is > 0 before it returns
