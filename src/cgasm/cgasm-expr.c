@@ -31,6 +31,7 @@ int cgasm_interpret_const_expr(struct cgasm_context *ctx, struct constant_expres
 	return cgasm_get_int_const_from_expr(ctx, val);
 }
 
+#if 0
 static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *name) {
 	struct symbol *sym = cgasm_lookup_sym_noabort(ctx, name);
 	if (sym == NULL) {
@@ -46,6 +47,7 @@ static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *nam
 	}
 	return sym->ctype;
 }
+#endif
 
 void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *pval) {
 #if 0
@@ -77,18 +79,31 @@ void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *
 	}
 }
 
-static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
+// static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *funcname, struct argument_expression_list *argu_expr_list) {
+static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct expr_val func, struct argument_expression_list *argu_expr_list) {
 	struct dynarr *argu_val_list = dynarr_init();	
 	struct expr_val *pval;
 	int i;
+	char *funcname;
+
+	if (func.type == EXPR_VAL_SYMBOL) {
+		funcname = func.sym->name;
+	}
 
 	// get func type
-	struct type *func_type = query_func_type_by_name(ctx, funcname);
+	struct type *func_type = expr_val_get_type(func);
 	struct type *ret_type = NULL;
 	if (func_type == NULL) {
 		red("function %s not declared", funcname);
 		ret_type = get_int_type(); // the default
 	} else {
+		if (func_type->tag == T_PTR) { // handle func ptr
+			func_type = func_type->subtype;
+		}
+
+		if (func_type->tag != T_FUNC) {
+			panic("require func type %d", func_type->tag);
+		}
 		ret_type = func_type->func.retype;
 	}
 
@@ -111,7 +126,13 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 	}
 
 	// emit call 
-	cgasm_println(ctx, "call %s", funcname);
+	if (func.type == EXPR_VAL_SYMBOL) {
+		cgasm_println(ctx, "call %s", func.sym->name);
+	} else {
+		int reg = REG_EAX;
+		cgasm_load_val_to_reg(ctx, func, reg);
+		cgasm_println(ctx, "call *%%%s", get_reg_str_code(reg));
+	}
 
 	// pop
 	cgasm_println(ctx, "addl $%d, %%esp", dynarr_size(argu_val_list) * 4); // XXX assume each argument takes 4 bytes right now
@@ -161,12 +182,14 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
  * XXX this method only handle several special cases right now.
  */
 static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struct postfix_expression *expr) {
+	#if 0
 	struct postfix_expression_suffix *suff;
 	char *id;
 	// function call TODO unify this into the general processing
 	if ((id = expr->prim_expr->id) != NULL && dynarr_size(expr->suff_list) == 1 && (suff = dynarr_get(expr->suff_list, 0))->arg_list != NULL) {
 		return cgasm_function_call(ctx, id, suff->arg_list);
 	}
+	#endif
 
 	// first, we get expr_val from the primary expression
 	struct expr_val result_val = cgasm_primary_expression(ctx, expr->prim_expr);
@@ -183,8 +206,10 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 			result_val = cgasm_handle_ptr_op(ctx, result_val, each->dot_id);
 		} else if (each->ptr_id) {
 			result_val = cgasm_handle_ptr_op(ctx, result_val, each->ptr_id);
+		} else if (each->arg_list) {
+			result_val = cgasm_function_call(ctx, result_val, each->arg_list);
 		} else {
-			panic("ni");
+			panic("can not reach here");
 		}
 	DYNARR_FOREACH_END();
 	return result_val;

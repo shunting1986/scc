@@ -376,6 +376,11 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 }
 
 static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr_val operand) {
+	// convert array to ptr
+	if (expr_val_get_type(operand)->tag == T_ARRAY) {
+		cgasm_change_array_func_to_ptr(ctx, &operand);
+	}
+
 	if (!expr_val_has_deref_flag(operand) && type_get_tag(operand.ctype) == T_PTR) {
 		return expr_val_add_deref_flag(operand);
 	}
