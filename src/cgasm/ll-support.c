@@ -5,47 +5,40 @@
 
 // TODO use string operation as a optimization
 static void cgasm_push_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int size) {
-	int end = from_start_off + size;
+	int end = from_start_off + (size + 3) / 4 * 4;
 	int off;
 	int reg = REG_EAX;
-	for (off = from_start_off; off < end; off += 4) {
+
+	for (off = end - 4; off >= from_start_off; off -= 4) {
 		cgasm_println(ctx, "movl %d(%%%s), %%%s", off, get_reg_str_code(from_base_reg), get_reg_str_code(reg));
 		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 	}
 }
 
-static void cgasm_load_ll_sym_to_reg2(struct cgasm_context *ctx, struct symbol *sym, int reg1, int reg2) {
-	int offset;
-	switch (sym->type) {
-	case SYMBOL_LOCAL_VAR:
-		offset = cgasm_get_local_var_offset(ctx, (struct local_var_symbol *) sym);
-		cgasm_push_bytes(ctx, REG_EBP, offset, 8);
-		break;
-	default:	
-		panic("ni %d", sym->type);
-	}
+void cgasm_push_ll_val(struct cgasm_context *ctx, struct expr_val val) {
+	struct type *type = expr_val_get_type(val);
+	assert(type->tag == T_LONG_LONG);
+
+	// int base_reg = REG_EAX; // cgasm_push_bytes already use EAX
+	int base_reg = REG_ESI;
+	cgasm_load_addr_to_reg(ctx, val, base_reg);
+	cgasm_push_bytes(ctx, base_reg, 0, 8);
 }
 
 // XXX as a simple solution, we use RSI as temp register. A better solution is pass-in the reg constaints
+// The constaints is imposed by cgasm_handle_binary_op_ll
 void cgasm_load_ll_val_to_reg2(struct cgasm_context *ctx, struct expr_val val, int reg1, int reg2) {
 	int addr_reg = REG_ESI;
 	cgasm_load_addr_to_reg(ctx, val, addr_reg);
 	cgasm_println(ctx, "movl (%%%s), %%%s", get_reg_str_code(addr_reg), get_reg_str_code(reg1));
-	cgasm_println(ctx, "movl (%%%s), %%%s", get_reg_str_code(addr_reg), get_reg_str_code(reg2));
+	cgasm_println(ctx, "movl 4(%%%s), %%%s", get_reg_str_code(addr_reg), get_reg_str_code(reg2));
 }
 
-static void cgasm_store_reg2_to_ll_temp(struct cgasm_context *ctx, int reg1, int reg2, struct expr_val temp) {
-	panic("ni");
-}
-
-void cgasm_push_ll_sym(struct cgasm_context *ctx, struct symbol *sym) {
-	struct type *type = sym->ctype;
-	assert(type->tag == T_LONG_LONG);
-	int reg1 = REG_EAX, reg2 = REG_EDX;
-	cgasm_load_ll_sym_to_reg2(ctx, sym, reg1, reg2);
-
-	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg2));	
-	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg1));
+void cgasm_store_reg2_to_ll_temp(struct cgasm_context *ctx, int reg1, int reg2, struct expr_val temp) {
+	assert(temp.type == EXPR_VAL_TEMP);
+	int offset = cgasm_get_temp_var_offset(ctx, temp.temp_var);
+	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg1), offset);
+	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg2), offset + 4);
 }
 
 
@@ -66,7 +59,7 @@ struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, str
 	switch (op) {
 	case TOK_ADD:
 		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(rhs_reg1), get_reg_str_code(lhs_reg1));
-		cgasm_println(ctx, "adcl %%%s, %%%s", get_reg_str_code(rhs_reg1), get_reg_str_code(lhs_reg1));
+		cgasm_println(ctx, "adcl %%%s, %%%s", get_reg_str_code(rhs_reg2), get_reg_str_code(lhs_reg2));
 		cgasm_store_reg2_to_ll_temp(ctx, lhs_reg1, lhs_reg2, ret);
 		break;
 	default:

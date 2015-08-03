@@ -35,7 +35,7 @@ int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbo
 	return -((sym->var_ind + ctx->nstate_reg) * 4 + 4);
 }
 
-static int cgasm_get_temp_var_offset(struct cgasm_context *ctx, struct temp_var temp) {
+int cgasm_get_temp_var_offset(struct cgasm_context *ctx, struct temp_var temp) {
 	return -((temp.ind + ctx->nstate_reg) * 4 + 4);
 }
 
@@ -172,11 +172,14 @@ static void cgasm_load_sym_addr_to_reg(struct cgasm_context *ctx, struct symbol 
 	}
 }
 
-// should be lval
+// should be lval or temp var
 void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_load_sym_addr_to_reg(ctx, val.sym, reg);
+		break;
+	case EXPR_VAL_TEMP:
+		cgasm_println(ctx, "leal %d(%%ebp), %%%s", cgasm_get_temp_var_offset(ctx, val.temp_var), get_reg_str_code(reg));
 		break;
 	default:
 		panic("ni %d", val.type);
@@ -310,18 +313,12 @@ static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
 }
 
 static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
-	if (sym->ctype->size <= 4) {
-		// load the register first
-		int reg = REG_EAX;
-		cgasm_load_sym_to_reg(ctx, sym, reg);
-		cgasm_extend_reg(ctx, reg, sym->ctype);
+	assert(sym->ctype->size <= 4); // caller should handle cases greater than 4
+	int reg = REG_EAX;
+	cgasm_load_sym_to_reg(ctx, sym, reg);
+	cgasm_extend_reg(ctx, reg, sym->ctype);
 
-		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
-	} else if (sym->ctype->tag == T_LONG_LONG) {
-		cgasm_push_ll_sym(ctx, sym);
-	} else {
-		panic("push structure not supported yet");
-	}
+	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
 
 static void cgasm_push_temp(struct cgasm_context *ctx, struct temp_var temp) {
@@ -338,6 +335,14 @@ static void cgasm_push_const_val(struct cgasm_context *ctx, union token const_to
 }
 
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
+	struct type *type = expr_val_get_type(val);
+	if (type->tag == T_LONG_LONG) {
+		cgasm_push_ll_val(ctx, val);
+		return;
+	}
+
+	assert(type->size <= 4);
+
 	if (val.type & EXPR_VAL_FLAG_DEREF) {
 		int reg = REG_EAX;
 		// load to reg and then push reg

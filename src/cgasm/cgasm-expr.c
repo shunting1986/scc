@@ -6,6 +6,7 @@
 #include <inc/cgc.h>
 #include <inc/type.h>
 #include <inc/symtab.h>
+#include <inc/ll-support.h>
 
 #define cgasm_constant_expression cgasm_conditional_expression
 
@@ -146,15 +147,16 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 
 	if (ret_type->tag == T_VOID) {
 		return void_expr_val();
-	} else {
-		struct expr_val retval;
-		// TODO current simple implementation is always return a temp holding eax
-		if (ret_type->size != 4) {
-			panic("return type size other than 4 is not supported yet");
-		}
-		retval = cgasm_alloc_temp_var(ctx, ret_type); 
-		cgasm_store_reg_to_mem(ctx, REG_EAX, retval); // TODO consider returning a long long or struct
+	} else if (ret_type->tag == T_LONG_LONG) {
+		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type);
+		cgasm_store_reg2_to_ll_temp(ctx, REG_EAX, REG_EDX, retval);
 		return retval;
+	} else if (ret_type->size == 4) {
+		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type); 
+		cgasm_store_reg_to_mem(ctx, REG_EAX, retval); 
+		return retval;
+	} else {
+		panic("unsupported return type");
 	}
 }
 

@@ -3,7 +3,7 @@
 #include <inc/cbuf.h>
 
 #undef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 
 static void cgasm_vprintln(struct cgasm_context *ctx, int ind, const char *fmt, va_list va);
 static void cgasm_func_vprintln(struct cgasm_func_context *ctx, int ind, const char *fmt, va_list va);
