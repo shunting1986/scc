@@ -8,6 +8,7 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
 static void cgasm_return_statement(struct cgasm_context *ctx, struct expression *expr) {
 	if (expr != NULL) {
 		struct expr_val val = cgasm_expression(ctx, expr);
+		cgasm_change_array_func_to_ptr(ctx, &val);
 		cgasm_load_val_to_reg(ctx, val, REG_EAX);
 	}
 	cgasm_handle_ret(ctx);
