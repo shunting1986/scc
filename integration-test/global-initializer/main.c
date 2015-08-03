@@ -66,16 +66,33 @@ void test_advanced_structure() {
 	printf("null_single: name %p, ptr %p\n", null_single.name, null_single.ptr);
 }
 
+// structure array
+struct adv_item adv_list[] = {
+	{ "First", NULL, 3},
+	{ "Second", NULL},
+	{ "Last", NULL },
+	{ NULL, NULL},
+};
+
+void test_structure_array() {
+	struct adv_item *p;
+	printf("struct list:");
+	for (p = adv_list; p->name; p++) {
+		printf(" %s", p->name);
+	}
+	printf("\n");
+}
+
 int
 main(void) {
 	test_basic_variables();
 	test_int_arr();
 	test_structure();
 	test_advanced_structure();
+	test_structure_array();
 	return 0;
 }
 
-// TODO structure array (with specified or unspecified size) (handle unspecified field) (handle extra item, clear them to 0);
 // TODO char array using {} or ""
 
 #if 0

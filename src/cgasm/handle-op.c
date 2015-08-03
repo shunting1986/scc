@@ -383,6 +383,10 @@ static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr
 }
 
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {
+	if (operand.ctype == NULL || operand.ctype->tag != T_INT) {
+		panic("binary op only support int right now");
+	}
+
 	switch (tok_tag) {
 	case TOK_AMPERSAND:
 		return cgasm_handle_ampersand(ctx, operand);
@@ -430,8 +434,9 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
 
-#if 0
-	if (lhs.ctype == NULL || lhs.ctype->tag != T_INT || rhs.ctype == NULL || rhs.ctype->tag != T_INT) {
+#if 1
+	if ((lhs.ctype == NULL || lhs.ctype->tag != T_INT) || (rhs.ctype == NULL || rhs.ctype->tag != T_INT)) {
+		assert(0);
 		panic("binary op only support int right now");
 	}
 #endif
@@ -498,6 +503,8 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	char buf[128];
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
+	panic("ni"); // ptr
+
 	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
 		int lhs_reg = REG_ECX;
 
@@ -534,20 +541,14 @@ void cgasm_handle_ret(struct cgasm_context *ctx) {
 }
 
 /*******************************/
-/* check truth                 */
-/*******************************/
-void cgasm_test_expr(struct cgasm_context *ctx, struct expr_val val) {
-	// XXX don't need this yet
-	panic("ni");
-}
-
-/*******************************/
 /* inc/dec                     */
 /*******************************/
 static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
 	// XXX assume integer type for temp var
 	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, get_int_type());
+
+	panic("ni"); // ptr case
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_store_reg_to_mem(ctx, reg, temp_var);
@@ -558,6 +559,7 @@ static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struc
 
 static struct expr_val cgasm_handle_pre_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
+	panic("ni"); // ptr case
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));

@@ -92,6 +92,10 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, char *func
 		ret_type = func_type->func.retype;
 	}
 
+	if (func_type != NULL) {
+		panic("need check argument type: maybe need do conversion");
+	}
+
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = mallocz(sizeof(*pval));
 		*pval = cgasm_assignment_expression(ctx, each);

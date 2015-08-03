@@ -3,6 +3,7 @@
 	./ main.s is GOOD
 
   =======================
+	May need to handle (ptr++)
   Next step is build mongoose.c
 
 
