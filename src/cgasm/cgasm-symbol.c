@@ -30,6 +30,7 @@ struct symbol *cgasm_lookup_sym_noabort(struct cgasm_context *ctx, char *id) {
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id) {
 	struct symbol *sym = symtab_lookup(ctx->top_stab, id);
 	if (sym == NULL) {
+		assert(0);
 		panic("symbol undefined: %s", id);
 	}
 	return sym;
@@ -184,5 +185,11 @@ void cgasm_dump_global_vars(struct cgasm_context *ctx) {
 
 	symtab_iter(stab, ctx, cgasm_dump_one_global_var);
 }
+
+bool check_builtin_symbol(struct cgasm_context *ctx, const char *name, struct expr_val *pval) {
+	panic("ni");
+}
+
+
 
 

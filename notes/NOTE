@@ -5,7 +5,10 @@
   =======================
   Next step is build mongoose.c
 	-> DONE next func is ssl_error 
-	-> next func is mg_strlcpy
+	-> DONE next func is mg_strlcpy
+	-> DONE next func is lowercase
+	-> DONE next func is next_option
+	-> next func is start_thread
 
 
 

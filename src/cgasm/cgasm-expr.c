@@ -162,13 +162,16 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
 	if (expr->str != NULL) {
 		return cgasm_register_str_literal(ctx, expr->str);
 	} else if (expr->id != NULL) {
-		struct expr_val ret = symbol_expr_val(cgasm_lookup_sym(ctx, expr->id));
-		#if 0 // this is not true for func call
-		if (ret.ctype->size < 0) {
-			panic("non complement type for symbol used in primary expression");
-		} 
-		#endif
-		return ret;
+		struct symbol *sym = cgasm_lookup_sym_noabort(ctx, expr->id);
+		if (sym != NULL) {
+			return symbol_expr_val(sym);
+		}
+		struct expr_val ret;
+		if (check_builtin_symbol(ctx, expr->id, &ret)) {
+			return ret;
+		}
+
+		panic("symbol undefined: %s", expr->id);
 	} else if (expr->const_val_tok.tok_tag != TOK_UNDEF) {
 		return const_expr_val(expr->const_val_tok);
 	} else if (expr->expr != NULL) {

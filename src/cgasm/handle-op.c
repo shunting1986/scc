@@ -84,6 +84,7 @@ static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val 
 	if (buf == NULL) {
 		buf = mallocz(128); // caller should free it
 	}
+	val = cgasm_handle_deref_flag(ctx, val);
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_get_lval_sym_asm_code(ctx, val.sym, buf);
@@ -92,6 +93,7 @@ static char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val 
 		cgasm_get_lval_temp_asm_code(ctx, val.temp_var, buf);
 		break;
 	default:
+		assert(0);
 		panic("ni 0x%x", val.type);
 	}
 	return buf;
