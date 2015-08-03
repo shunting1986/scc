@@ -7,6 +7,7 @@ extern "C" {
 
 struct cgasm_context;
 struct symbol;
+struct type;
 
 void cgasm_push_sym_ll(struct cgasm_context *ctx, struct symbol *sym);
 

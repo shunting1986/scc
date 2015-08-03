@@ -137,7 +137,10 @@ void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, struct type *type)
 	// assert(ind < func_ctx->nparam_word);
 	assert(ctx->top_stab->enclosing != NULL);
 	cgasm_check_sym_redef(ctx, id);
-	ind = func_ctx->nparam_word++;
+	ind = func_ctx->nparam_word;
+
+	assert(type->size > 0);
+	func_ctx->nparam_word += (type->size + 3) >> 2;
 	// XXX assume the size of parameter is 4 bytes right now
 	symtab_add(ctx->top_stab, symtab_new_param(id, ind, type));
 }

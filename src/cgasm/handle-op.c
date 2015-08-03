@@ -11,8 +11,6 @@ const char *suff_table[] = {
 	[4] = "l",
 };
 
-
-
 static const char *size_to_suffix(int size) {
 	if (size >= sizeof(suff_table) / sizeof(*suff_table) || suff_table[size] == NULL) {
 		panic("Invalid size to determine suffix %d", size);
@@ -33,7 +31,7 @@ static int cgasm_get_param_offset(struct cgasm_context *ctx /* unused */, struct
 	return sym->param_ind * 4 + 8;
 }
 
-static int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbol *sym) {
+int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbol *sym) {
 	return -((sym->var_ind + ctx->nstate_reg) * 4 + 4);
 }
 

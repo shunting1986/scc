@@ -13,7 +13,7 @@ enum {
 	REG_ESI,
 	REG_EDI,
 	REG_ESP,
-	REG_EDP,
+	REG_EBP,
 	REG_NUM,
 };
 
