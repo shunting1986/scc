@@ -14,7 +14,7 @@ static void cgasm_push_bytes(struct cgasm_context *ctx, int from_base_reg, int f
 	}
 }
 
-static void cgasm_load_sym_ll_to_reg2(struct cgasm_context *ctx, struct symbol *sym, int reg1, int reg2) {
+static void cgasm_load_ll_sym_to_reg2(struct cgasm_context *ctx, struct symbol *sym, int reg1, int reg2) {
 	int offset;
 	switch (sym->type) {
 	case SYMBOL_LOCAL_VAR:
@@ -26,12 +26,23 @@ static void cgasm_load_sym_ll_to_reg2(struct cgasm_context *ctx, struct symbol *
 	}
 }
 
-void cgasm_push_sym_ll(struct cgasm_context *ctx, struct symbol *sym) {
+void cgasm_load_ll_val_to_reg2(struct cgasm_context *ctx, struct expr_val val, int reg1, int reg2) {
+	panic("ni");
+}
+
+void cgasm_push_ll_sym(struct cgasm_context *ctx, struct symbol *sym) {
 	struct type *type = sym->ctype;
 	assert(type->tag == T_LONG_LONG);
 	int reg1 = REG_EAX, reg2 = REG_EDX;
-	cgasm_load_sym_ll_to_reg2(ctx, sym, reg1, reg2);
+	cgasm_load_ll_sym_to_reg2(ctx, sym, reg1, reg2);
 
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg2));	
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg1));
 }
+
+
+struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
+	panic("ni");
+}
+
+

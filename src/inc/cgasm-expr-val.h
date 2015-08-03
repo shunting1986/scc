@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <inc/token.h>
+
 enum {
 	REG_EAX,
 	REG_ECX,

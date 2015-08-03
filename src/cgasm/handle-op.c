@@ -307,7 +307,7 @@ static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
 
 		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 	} else if (sym->ctype->tag == T_LONG_LONG) {
-		cgasm_push_sym_ll(ctx, sym);
+		cgasm_push_ll_sym(ctx, sym);
 	} else {
 		panic("push structure not supported yet");
 	}
@@ -495,6 +495,9 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		panic("binary op only support int right now");
 	}
 #endif
+	if ((lhs.ctype != NULL && lhs.ctype->tag == T_LONG_LONG) || (rhs.ctype != NULL && rhs.ctype->tag == T_LONG_LONG)) {
+		return cgasm_handle_binary_op_ll(ctx, tok_tag, lhs, rhs);
+	}
 
 	if (lhs.type == EXPR_VAL_CONST_VAL && rhs.type == EXPR_VAL_CONST_VAL) {
 		return cgasm_handle_binary_op_const(tok_tag, lhs, rhs);

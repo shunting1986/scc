@@ -1,7 +1,7 @@
 #include <inc/cgasm.h>
 #include <inc/syntree.h>
 #include <inc/util.h>
-
+#include <inc/ll-support.h>
 
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt);
 
@@ -9,7 +9,16 @@ static void cgasm_return_statement(struct cgasm_context *ctx, struct expression 
 	if (expr != NULL) {
 		struct expr_val val = cgasm_expression(ctx, expr);
 		cgasm_change_array_func_to_ptr(ctx, &val);
-		cgasm_load_val_to_reg(ctx, val, REG_EAX);
+
+		val = cgasm_handle_deref_flag(ctx, val);
+
+		if (val.ctype->size <= 4) {
+			cgasm_load_val_to_reg(ctx, val, REG_EAX);
+		} else if (val.ctype->tag == T_LONG_LONG) {
+			cgasm_load_ll_val_to_reg2(ctx, val, REG_EAX, REG_EDX);
+		} else {
+			panic("not support returning structure yet");
+		}
 	}
 	cgasm_handle_ret(ctx);
 }
