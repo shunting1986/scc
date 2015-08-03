@@ -35,6 +35,14 @@ static void cgasm_initialize_global_ptr(struct cgasm_context *ctx, struct type *
 		} 
 	}
 
+	// initialize func ptr
+	if (type->subtype->tag == T_FUNC) {
+		if (val.type == EXPR_VAL_SYMBOL && val.ctype->tag == T_FUNC) {
+			cgasm_println(ctx, ".long %s", val.sym->name);
+			return;
+		}
+	}
+
 	const_val = cgasm_get_int_const_from_expr(ctx, val);
 	cgasm_println(ctx, ".long %d", const_val);
 }
