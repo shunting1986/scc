@@ -49,17 +49,32 @@ void test_structure() {
 	printf("single: first %d, second %d, thrid %d\n", single.first, single.second, single.third);
 }
 
+// advanced structure
+struct adv_item {
+	const char *name;
+	void (*ptr)(void);
+	short ss;
+	int junk1;
+	char arr[6];
+};
+
+struct adv_item adv_single = {"hello", NULL, 3};
+struct adv_item null_single = { NULL, NULL };
+
+void test_advanced_structure() {
+	printf("adv single: name %s, ptr %p, ss %d, junk1 %d, arr[0] %d\n", adv_single.name, adv_single.ptr, adv_single.ss, adv_single.junk1, adv_single.arr[0]);
+	printf("null_single: name %p, ptr %p\n", null_single.name, null_single.ptr);
+}
+
 int
 main(void) {
 	test_basic_variables();
 	test_int_arr();
 	test_structure();
+	test_advanced_structure();
 	return 0;
 }
 
-// TODO structure (handle unspecified fields)
-
-// TODO support complext structure with func ptr, char *, arr etc..
 // TODO structure array (with specified or unspecified size) (handle unspecified field) (handle extra item, clear them to 0);
 // TODO char array using {} or ""
 
