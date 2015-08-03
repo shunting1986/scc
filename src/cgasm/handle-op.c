@@ -45,6 +45,11 @@ static void cgasm_get_lval_local_var_asm_code(struct cgasm_context *ctx, struct 
 	sprintf(buf, "%d(%%ebp)", cgasm_get_local_var_offset(ctx, sym));
 }
 
+static void cgasm_get_lval_param_asm_code(struct cgasm_context *ctx, struct param_symbol *sym, char *buf) {
+	assert(buf != NULL);
+	sprintf(buf, "%d(%%ebp)", cgasm_get_param_offset(ctx, sym));
+}
+
 static void cgasm_get_lval_global_var_asm_code(struct cgasm_context *ctx, struct global_var_symbol *sym, char *buf) {
 	assert(buf != NULL);
 	sprintf(buf, "%s", sym->name);
@@ -58,6 +63,9 @@ static void cgasm_get_lval_sym_asm_code(struct cgasm_context *ctx, struct symbol
 		break;
 	case SYMBOL_GLOBAL_VAR:
 		cgasm_get_lval_global_var_asm_code(ctx, (struct global_var_symbol *) sym, buf);
+		break;
+	case SYMBOL_PARAM:
+		cgasm_get_lval_param_asm_code(ctx, (struct param_symbol *) sym, buf);
 		break;
 	default:
 		panic("ni %d", sym->type);
@@ -408,7 +416,7 @@ static struct expr_val cgasm_handle_deref(struct cgasm_context *ctx, struct expr
 		}
 	} 
 
-	panic("pointer required");
+	panic("pointer required %d", type->tag);
 }
 
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand) {
@@ -610,9 +618,8 @@ static int get_incdec_step(struct type *type) {
 
 static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
-	// XXX assume integer type for temp var
-	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, get_int_type());
-	struct type *type = val.ctype;
+	struct type *type = expr_val_get_type(val);
+	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, type);
 	assert(type != NULL);
 	int step = get_incdec_step(type);
 
