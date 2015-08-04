@@ -586,6 +586,15 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 
 	struct type *lhstype = expr_val_get_type(lhs);
 	struct type *rhstype = expr_val_get_type(rhs);
+	(void) lhstype;
+	(void) rhstype;
+
+	{ // type conversion implicitly for assignment
+		if (is_integer_type(lhstype) && is_integer_type(rhstype)) {
+			rhs = type_convert(ctx, rhs, lhstype);
+			rhstype = lhstype;
+		}
+	}
 
 	if (!type_assignable(lhstype, rhstype)) {
 		type_dump(lhstype, 4);
@@ -598,6 +607,7 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		return cgasm_handle_ll_assign_op(ctx, lhs, rhs, op);
 	}
 
+	int size = type_get_size(lhstype);
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
 	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
@@ -606,19 +616,19 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		lhs.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
 		cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
 		lhs.type |= EXPR_VAL_FLAG_DEREF; 
-		cgasm_println(ctx, "movl %%%s, (%%%s)", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		cgasm_println(ctx, "mov%s %%%s, (%%%s)", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), get_reg_str_code_size(lhs_reg, 4)); // the second reg is addr, so we use 32 bit
 		return lhs;
 	}
 
 	switch (op) {
 	case TOK_ASSIGN:
-		cgasm_println(ctx, "movl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		cgasm_println(ctx, "mov%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), cgasm_get_lval_asm_code(ctx, lhs, buf));
 		break;
 	case TOK_ADD_ASSIGN:
-		cgasm_println(ctx, "addl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		cgasm_println(ctx, "add%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), cgasm_get_lval_asm_code(ctx, lhs, buf));
 		break;
 	case TOK_SUB_ASSIGN:
-		cgasm_println(ctx, "subl %%%s, %s", get_reg_str_code(rhs_reg), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		cgasm_println(ctx, "sub%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), cgasm_get_lval_asm_code(ctx, lhs, buf));
 		break;
 	default:
 		panic("ni %s", token_tag_str(op));
