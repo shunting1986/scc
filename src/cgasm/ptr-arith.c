@@ -43,12 +43,35 @@ static struct expr_val cgasm_handle_ptr_add(struct cgasm_context *ctx, struct ex
 	panic("ni");
 }
 
+static struct expr_val cgasm_handle_ptr_sub(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs) {
+	lhs = cgasm_handle_deref_flag(ctx, lhs);
+	rhs = cgasm_handle_deref_flag(ctx, rhs);
+
+	if (lhs.ctype->tag == T_PTR && is_integer_type(rhs.ctype)) {
+		struct type *oldtype = lhs.ctype;
+		struct type *subtype = lhs.ctype->subtype;
+		if (subtype->tag != T_VOID && type_get_size(subtype) != 1) {
+			panic("non unit ptr");
+		}
+
+		lhs.ctype = get_int_type();
+		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_SUB, lhs, rhs);
+		res = cgasm_handle_deref_flag(ctx, res);
+		res.ctype = oldtype;
+		return res;
+	}
+
+	panic("invalid ptr subtraction");
+}
+
 struct expr_val cgasm_handle_ptr_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	switch (tok_tag) {
 	case TOK_EQ: case TOK_NE: case TOK_GT: case TOK_LT: case TOK_GE: case TOK_LE:
 		return cgasm_handle_ptr_cmp(ctx, tok_tag, lhs, rhs);	
 	case TOK_ADD:
 		return cgasm_handle_ptr_add(ctx, lhs, rhs);
+	case TOK_SUB:
+		return cgasm_handle_ptr_sub(ctx, lhs, rhs);
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
 	}
