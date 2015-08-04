@@ -71,12 +71,42 @@ static void cgasm_ll_neg(struct cgasm_context *ctx, struct expr_val diff, struct
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
+static void cgasm_ll_pos(struct cgasm_context *ctx, struct expr_val diff, struct expr_val res) {
+	assert(diff.ctype->tag == T_LONG_LONG);
+	assert(res.ctype->tag == T_INT);
+
+	int addr_reg = REG_ESI;
+	cgasm_load_addr_to_reg(ctx, diff, addr_reg);
+
+	int set0_label = cgasm_new_label_no(ctx);
+	int set1_label = cgasm_new_label_no(ctx);
+	int out_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_println(ctx, "cmpl $0, 4(%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "jl %s", get_jump_label_str(set0_label, buf));
+	cgasm_println(ctx, "jg %s", get_jump_label_str(set1_label, buf));
+	cgasm_println(ctx, "cmpl $0, (%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "je %s", get_jump_label_str(set0_label, buf));
+
+	cgasm_emit_jump_label(ctx, set1_label);
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
+	cgasm_emit_jump_label(ctx, set0_label);
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_emit_jump_label(ctx, out_label);
+}
+
 static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
 	struct expr_val diff = cgasm_handle_binary_op_ll(ctx, TOK_SUB, lhs, rhs);
 	struct expr_val res = cgasm_alloc_temp_var(ctx, get_int_type());
 	switch (op) {
 	case TOK_LT:
 		cgasm_ll_neg(ctx, diff, res);
+		break;
+	case TOK_GT:
+		cgasm_ll_pos(ctx, diff, res);
 		break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
@@ -85,15 +115,26 @@ static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, 
 }
 
 struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
-	assert(lhs.ctype != NULL && lhs.ctype->tag == T_LONG_LONG);
+	assert(lhs.ctype != NULL);
+	assert(rhs.ctype != NULL);
+	assert(lhs.ctype->tag >= T_CHAR && lhs.ctype->tag <= T_LONG_LONG);
+	assert(rhs.ctype->tag >= T_CHAR && rhs.ctype->tag <= T_LONG_LONG);
+	assert(lhs.ctype->tag == T_LONG_LONG || rhs.ctype->tag == T_LONG_LONG);
+
 	if (op == TOK_LSHIFT || op == TOK_RSHIFT) {
 		cgasm_emit_abort(ctx);  // TODO not supported yet
 		return ll_const_expr_val(0LL);
 	}
 
-	assert(rhs.ctype != NULL && rhs.ctype->tag == T_LONG_LONG); // TODO: should be able to handle long long + int etc.
+	if (lhs.ctype->tag != T_LONG_LONG) {
+		lhs = type_convert(ctx, lhs, get_long_long_type());
+	}
 
-	if (op == TOK_LT) {
+	if (rhs.ctype->tag != T_LONG_LONG) {
+		rhs = type_convert(ctx, rhs, get_long_long_type());
+	}
+
+	if (op == TOK_LT || op == TOK_GT) {
 		return cgasm_handle_binary_op_ll_cmp(ctx, op, lhs, rhs);
 	}
 

@@ -10,7 +10,7 @@ main(void) {
 	// the values within 32 bit range are handled correctly
 	long long a, b;
 	while (scanf("%lld%lld", &a, &b) != EOF) {
-		printf("%lld %d\n", add(a, b), a < b);
+		printf("%lld %d %d\n", add(a, b), a < b, a > b);
 	}
 	return 0;
 }
