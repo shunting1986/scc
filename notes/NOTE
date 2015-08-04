@@ -2,11 +2,7 @@
 	./ The dumped back C files (with several monor changes) can be used to build a valid executable ==> this means we lexical and syntax analysis are GOOD
 	./ main.s is GOOD
 
-	TODO: support int64
-	TODO: support fp
-	TODO: support oct constant
-
-  =======================
+	=======================
   Next step is build mongoose.c
 	-> DONE next func is ssl_error 
 	-> DONE next func is mg_strlcpy
@@ -15,6 +11,10 @@
 	-> DONE next func is start_thread
 	-> DONE next func is mg_read
 	-> next func is mg_write
+
+	TODO: support int64
+	TODO: support fp
+	TODO: support oct constant
 
 
 

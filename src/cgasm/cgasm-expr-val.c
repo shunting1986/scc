@@ -82,6 +82,12 @@ struct expr_val int_const_expr_val(int val) {
 	return ret;
 }
 
+struct expr_val ll_const_expr_val(long long llval) {
+	struct expr_val ret = const_expr_val(wrap_ll_const_to_token(llval));
+	ret.ctype = get_long_long_type();
+	return ret;
+}
+
 struct expr_val const_expr_val(union token tok) {
 	struct expr_val ret;
 	ret.type = EXPR_VAL_CONST_VAL;

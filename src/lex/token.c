@@ -143,6 +143,14 @@ union token wrap_int_const_to_token(int val) {
 	return tok;
 }
 
+union token wrap_ll_const_to_token(long long llval) {
+	union token tok;
+	tok.const_val.tok_tag = TOK_CONSTANT_VALUE;
+	tok.const_val.flags = CONST_VAL_TOK_LONG_LONG;
+	tok.const_val.llval = llval;
+	return tok;
+}
+
 union token wrap_to_simple_token(int tag) {
 	union token tok;
 	tok.tok_tag = tag;

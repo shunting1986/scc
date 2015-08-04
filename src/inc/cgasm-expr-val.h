@@ -69,6 +69,7 @@ struct expr_val symbol_expr_val(struct symbol *sym);
 struct expr_val cgasm_alloc_temp_var(struct cgasm_context *ctx, struct type *ctype);
 struct expr_val const_expr_val(union token tok);
 struct expr_val int_const_expr_val(int val);
+struct expr_val ll_const_expr_val(long long llval);
 bool is_int_const(struct expr_val val);
 struct expr_val void_expr_val();
 struct expr_val condcode_expr(int op, struct expr_val lhs, struct expr_val rhs, struct syntreebasenode *rhs_lazy);
