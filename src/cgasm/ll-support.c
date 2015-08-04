@@ -109,6 +109,50 @@ static void cgasm_ll_neg(struct cgasm_context *ctx, struct expr_val diff, struct
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
+static void cgasm_ll_zero(struct cgasm_context *ctx, struct expr_val diff, struct expr_val res) {
+	assert(diff.ctype->tag == T_LONG_LONG);
+	assert(res.ctype->tag == T_INT);
+
+	int addr_reg = REG_ESI;
+	cgasm_load_addr_to_reg(ctx, diff, addr_reg);
+
+	int set0_label = cgasm_new_label_no(ctx);
+	int out_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_println(ctx, "cmpl $0, 4(%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "jne %s", get_jump_label_str(set0_label, buf));
+	cgasm_println(ctx, "cmpl $0, (%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "jne %s", get_jump_label_str(set0_label, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
+	cgasm_emit_jump_label(ctx, set0_label);
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_emit_jump_label(ctx, out_label);
+}
+
+static void cgasm_ll_nonzero(struct cgasm_context *ctx, struct expr_val diff, struct expr_val res) {
+	assert(diff.ctype->tag == T_LONG_LONG);
+	assert(res.ctype->tag == T_INT);
+
+	int addr_reg = REG_ESI;
+	cgasm_load_addr_to_reg(ctx, diff, addr_reg);
+
+	int set1_label = cgasm_new_label_no(ctx);
+	int out_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_println(ctx, "cmpl $0, 4(%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "jne %s", get_jump_label_str(set1_label, buf));
+	cgasm_println(ctx, "cmpl $0, (%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "jne %s", get_jump_label_str(set1_label, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
+	cgasm_emit_jump_label(ctx, set1_label);
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_emit_jump_label(ctx, out_label);
+}
+
 static void cgasm_ll_pos(struct cgasm_context *ctx, struct expr_val diff, struct expr_val res) {
 	assert(diff.ctype->tag == T_LONG_LONG);
 	assert(res.ctype->tag == T_INT);
@@ -146,6 +190,12 @@ static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, 
 	case TOK_GT:
 		cgasm_ll_pos(ctx, diff, res);
 		break;
+	case TOK_EQ:
+		cgasm_ll_zero(ctx, diff, res);
+		break; 
+	case TOK_NE:
+		cgasm_ll_nonzero(ctx, diff, res);
+		break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
 	}
@@ -173,7 +223,7 @@ struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, str
 		rhs = type_convert(ctx, rhs, get_long_long_type());
 	}
 
-	if (op == TOK_LT || op == TOK_GT) {
+	if (op == TOK_LT || op == TOK_GT || op == TOK_EQ || op == TOK_NE) {
 		return cgasm_handle_binary_op_ll_cmp(ctx, op, lhs, rhs);
 	}
 
