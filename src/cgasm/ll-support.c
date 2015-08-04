@@ -51,6 +51,38 @@ void cgasm_store_reg2_to_ll_temp(struct cgasm_context *ctx, int reg1, int reg2, 
 	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg2), offset + 4);
 }
 
+static void cgasm_ll_neg(struct cgasm_context *ctx, struct expr_val diff, struct expr_val res) {
+	assert(diff.ctype->tag == T_LONG_LONG);
+	assert(res.ctype->tag == T_INT);
+
+	int addr_reg = REG_ESI;
+	cgasm_load_addr_to_reg(ctx, diff, addr_reg);
+
+	int set0_label = cgasm_new_label_no(ctx);
+	int out_label = cgasm_new_label_no(ctx);
+	char buf[128];
+
+	cgasm_println(ctx, "cmpl $0, 4(%%%s)", get_reg_str_code(addr_reg));
+	cgasm_println(ctx, "jge %s", get_jump_label_str(set0_label, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
+	cgasm_emit_jump_label(ctx, set0_label);
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_emit_jump_label(ctx, out_label);
+}
+
+static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
+	struct expr_val diff = cgasm_handle_binary_op_ll(ctx, TOK_SUB, lhs, rhs);
+	struct expr_val res = cgasm_alloc_temp_var(ctx, get_int_type());
+	switch (op) {
+	case TOK_LT:
+		cgasm_ll_neg(ctx, diff, res);
+		break;
+	default:
+		panic("unsupported op %s", token_tag_str(op));
+	}
+	return res;
+}
 
 struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
 	assert(lhs.ctype != NULL && lhs.ctype->tag == T_LONG_LONG);
@@ -60,6 +92,10 @@ struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, str
 	}
 
 	assert(rhs.ctype != NULL && rhs.ctype->tag == T_LONG_LONG); // TODO: should be able to handle long long + int etc.
+
+	if (op == TOK_LT) {
+		return cgasm_handle_binary_op_ll_cmp(ctx, op, lhs, rhs);
+	}
 
 	int lhs_reg1 = REG_EAX;
 	int lhs_reg2 = REG_ECX;
@@ -75,6 +111,11 @@ struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, str
 	case TOK_ADD:
 		cgasm_println(ctx, "addl %%%s, %%%s", get_reg_str_code(rhs_reg1), get_reg_str_code(lhs_reg1));
 		cgasm_println(ctx, "adcl %%%s, %%%s", get_reg_str_code(rhs_reg2), get_reg_str_code(lhs_reg2));
+		cgasm_store_reg2_to_ll_temp(ctx, lhs_reg1, lhs_reg2, ret);
+		break;
+	case TOK_SUB:
+		cgasm_println(ctx, "subl %%%s, %%%s", get_reg_str_code(rhs_reg1), get_reg_str_code(lhs_reg1));
+		cgasm_println(ctx, "sbbl %%%s, %%%s", get_reg_str_code(rhs_reg2), get_reg_str_code(lhs_reg2));
 		cgasm_store_reg2_to_ll_temp(ctx, lhs_reg1, lhs_reg2, ret);
 		break;
 	case TOK_AMPERSAND:
