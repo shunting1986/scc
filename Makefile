@@ -75,10 +75,10 @@ PROG_NAME := scc
 
 all: handy
 
-# handy: rebuild-$(PROG_NAME) mongoose
+handy: rebuild-$(PROG_NAME) mongoose
 
-handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/ptr-arith/main.c
+# handy: rebuild-$(PROG_NAME) 
+# 	./scc integration-test/ptr-arith/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

@@ -8,21 +8,18 @@
 	-> DONE next func is mg_strlcpy
 	-> DONE next func is lowercase
 	-> DONE next func is skip_quoted
-	-> next func is next_option
+	-> DONE next func is next_option
 	-> DONE next func is start_thread
+
+	-> next func is push
 	-> DONE next func is mg_read
 	-> next func is mg_write
 
-	TODO: support int64
+
+
 	TODO: support fp
 	TODO: support oct constant
 
-
-
-	TODO: support double division for mongoose 
-
-	TODO: current goal is fully pass global-initializer
-	
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
 	  DONE: 2.1 compile main.c to .s 

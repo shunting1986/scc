@@ -115,7 +115,6 @@ static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, 
 }
 
 struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
-	red("ll op %s", token_tag_str(op)); // TODO
 	assert(lhs.ctype != NULL);
 	assert(rhs.ctype != NULL);
 	assert(lhs.ctype->tag >= T_CHAR && lhs.ctype->tag <= T_LONG_LONG);

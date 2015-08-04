@@ -1,5 +1,6 @@
 #include <inc/type.h>
 #include <inc/util.h>
+#include <inc/cgasm.h>
 
 static struct expr_val type_convert_int_to_ll(struct cgasm_context *ctx, struct expr_val val) {
 	assert(val.ctype->tag == T_INT);
@@ -8,7 +9,16 @@ static struct expr_val type_convert_int_to_ll(struct cgasm_context *ctx, struct 
 		val.const_val = wrap_ll_const_to_token(val.const_val.const_val.ival);
 		return val;
 	}
-	panic("ni");
+
+	// allocate an temp var
+	panic("here");
+	struct expr_val temp = cgasm_alloc_temp_var(ctx, get_long_long_type());
+	int offset = cgasm_get_temp_var_offset(ctx, temp.temp_var);
+	int reg = REG_EAX;
+	cgasm_load_val_to_reg(ctx, val, reg);
+	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg), offset);
+	cgasm_println(ctx, "movl $0, %d(%%ebp)", get_reg_str_code(reg), offset + 4);
+	return temp;
 }
 
 // NOTE: caller will handle the type ref for newtype
