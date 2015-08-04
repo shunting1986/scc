@@ -505,13 +505,14 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
 
-#if 0
-	if ((lhs.ctype == NULL || lhs.ctype->tag != T_INT) || (rhs.ctype == NULL || rhs.ctype->tag != T_INT)) {
-		assert(0);
-		panic("binary op only support int right now");
+	struct type *lhstype = expr_val_get_type(lhs);
+	struct type *rhstype = expr_val_get_type(rhs);
+	if (lhstype->tag == T_PTR || rhstype->tag == T_PTR) {
+		return cgasm_handle_ptr_binary_op(ctx, tok_tag, lhs, rhs);
 	}
-#endif
-	if ((lhs.ctype != NULL && lhs.ctype->tag == T_LONG_LONG) || (rhs.ctype != NULL && rhs.ctype->tag == T_LONG_LONG)) {
+
+	// TODO: floating point is not handled here yet
+	if (lhstype->tag == T_LONG_LONG || rhstype->tag == T_LONG_LONG) {
 		return cgasm_handle_binary_op_ll(ctx, tok_tag, lhs, rhs);
 	}
 
@@ -711,8 +712,11 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 
 	// TODO can optimize for power of 2
 	// struct expr_val offset_val = cgasm_handle_binary_op(ctx, TOK_LSHIFT, ind_val, const_expr_val(wrap_int_const_to_token(2))); 
+
 	struct expr_val offset_val = cgasm_handle_binary_op(ctx, TOK_STAR, ind_val, const_expr_val(wrap_int_const_to_token(elemsize))); 
 
+	cgasm_handle_deref_flag(ctx, base_val);
+	base_val.ctype = get_int_type(); // convert to integer operation
 	struct expr_val result_val = cgasm_handle_binary_op(ctx, TOK_ADD, base_val, offset_val);
 
 	// handle expression type 

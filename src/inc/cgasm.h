@@ -8,6 +8,7 @@
 #include <inc/symtab.h>
 #include <inc/type.h>
 #include <inc/util.h>
+#include <inc/cgasm-ptr-arith.h>
 
 #ifdef __cplusplus
 extern "C" {
