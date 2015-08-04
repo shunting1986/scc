@@ -579,6 +579,19 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 /*******************************/
 /* assignment                  */
 /*******************************/
+
+static struct expr_val cgasm_handle_ptr_addsub_assign(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int assign_op) {
+	int op;
+	switch (assign_op) {
+	case TOK_ADD_ASSIGN: op = TOK_ADD; break;
+	case TOK_SUB_ASSIGN: op = TOK_SUB; break;
+	default:
+		panic("invalid assign op %s", token_tag_str(assign_op));
+	}
+	struct expr_val res = cgasm_handle_ptr_binary_op(ctx, op, lhs, rhs);
+	return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
+}
+
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
 	int rhs_reg = REG_EAX;
 	char buf[128];
@@ -588,6 +601,10 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	struct type *rhstype = expr_val_get_type(rhs);
 	(void) lhstype;
 	(void) rhstype;
+
+	if (lhstype->tag == T_PTR && (op == TOK_ADD_ASSIGN || op == TOK_SUB_ASSIGN)) {
+		return cgasm_handle_ptr_addsub_assign(ctx, lhs, rhs, op);
+	}
 
 	{ // type conversion implicitly for assignment
 		if (is_integer_type(lhstype) && is_integer_type(rhstype)) {

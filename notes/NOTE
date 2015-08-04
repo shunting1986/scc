@@ -6,12 +6,12 @@
   Next step is build mongoose.c
 	-> DONE next func is call_user (2496)
 	-> DONE next func is ssl_error  (2572)
-
-	-> next func is mg_strlcpy (2588)
-
+	-> DONE next func is mg_strlcpy (2588)
 	-> DONE next func is lowercase (2596)
 	-> DONE next func is skip_quoted (2671)
 	-> DONE next func is next_option (2730)
+
+	-> next func is send_http_error (2783)
 	-> DONE next func is start_thread (2836)
 
 	-> next func is push
