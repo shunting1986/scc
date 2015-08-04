@@ -210,6 +210,9 @@ struct expr_val cgasm_handle_ll_assign_op(struct cgasm_context *ctx, struct expr
 	case TOK_ASSIGN:
 		res = rhs;
 		break;
+	case TOK_ADD_ASSIGN:
+		res = cgasm_handle_binary_op_ll(ctx, TOK_ADD, lhs, rhs);
+		break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));
 	}
