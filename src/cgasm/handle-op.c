@@ -182,7 +182,7 @@ void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int 
 		cgasm_println(ctx, "leal %d(%%ebp), %%%s", cgasm_get_temp_var_offset(ctx, val.temp_var), get_reg_str_code(reg));
 		break;
 	default:
-		panic("ni %d", val.type);
+		panic("ni 0x%x", val.type);
 	}
 }
 

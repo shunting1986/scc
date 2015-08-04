@@ -143,22 +143,23 @@ static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, 
 }
 
 struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
-	assert(lhs.ctype != NULL);
-	assert(rhs.ctype != NULL);
-	assert(lhs.ctype->tag >= T_CHAR && lhs.ctype->tag <= T_LONG_LONG);
-	assert(rhs.ctype->tag >= T_CHAR && rhs.ctype->tag <= T_LONG_LONG);
-	assert(lhs.ctype->tag == T_LONG_LONG || rhs.ctype->tag == T_LONG_LONG);
+	struct type *lhstype = expr_val_get_type(lhs);
+	struct type *rhstype = expr_val_get_type(rhs);
+
+	assert(lhstype->tag >= T_CHAR && lhstype->tag <= T_LONG_LONG);
+	assert(rhstype->tag >= T_CHAR && rhstype->tag <= T_LONG_LONG);
+	assert(lhstype->tag == T_LONG_LONG || rhstype->tag == T_LONG_LONG);
 
 	if (op == TOK_LSHIFT || op == TOK_RSHIFT) {
 		cgasm_emit_abort(ctx);  // TODO not supported yet
 		return ll_const_expr_val(0LL);
 	}
 
-	if (lhs.ctype->tag != T_LONG_LONG) {
+	if (lhstype->tag != T_LONG_LONG) {
 		lhs = type_convert(ctx, lhs, get_long_long_type());
 	}
 
-	if (rhs.ctype->tag != T_LONG_LONG) {
+	if (rhstype->tag != T_LONG_LONG) {
 		rhs = type_convert(ctx, rhs, get_long_long_type());
 	}
 
