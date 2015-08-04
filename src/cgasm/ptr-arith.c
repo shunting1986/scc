@@ -2,7 +2,7 @@
 #include <inc/cgasm-ptr-arith.h>
 #include <inc/cgasm.h>
 
-static struct expr_val cgasm_handle_ptr_eq(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
+static struct expr_val cgasm_handle_ptr_cmp(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	lhs = cgasm_handle_deref_flag(ctx, lhs);
 	rhs = cgasm_handle_deref_flag(ctx, rhs);
 	if (lhs.ctype->tag != T_PTR || rhs.ctype->tag != T_PTR) {
@@ -45,8 +45,8 @@ static struct expr_val cgasm_handle_ptr_add(struct cgasm_context *ctx, struct ex
 
 struct expr_val cgasm_handle_ptr_binary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	switch (tok_tag) {
-	case TOK_EQ: case TOK_NE:
-		return cgasm_handle_ptr_eq(ctx, tok_tag, lhs, rhs);	
+	case TOK_EQ: case TOK_NE: case TOK_GT: case TOK_LT: case TOK_GE: case TOK_LE:
+		return cgasm_handle_ptr_cmp(ctx, tok_tag, lhs, rhs);	
 	case TOK_ADD:
 		return cgasm_handle_ptr_add(ctx, lhs, rhs);
 	default:
