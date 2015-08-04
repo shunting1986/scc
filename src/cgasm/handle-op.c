@@ -588,7 +588,10 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	struct type *rhstype = expr_val_get_type(rhs);
 
 	if (!type_assignable(lhstype, rhstype)) {
-		panic("require equal type for assignemnt right now");
+		type_dump(lhstype, 4);
+		type_dump(rhstype, 4);
+		assert(0);
+		panic("types not compatible for assignemnt");
 	}
 
 	if (lhstype->tag == T_LONG_LONG) {
@@ -739,6 +742,9 @@ struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_
 		assert(or_expr_ind == dynarr_size(or_expr_list));
 	
 		if (expr_val_get_type(cond)->tag != T_VOID) {
+			if (temp_var.type == EXPR_VAL_VOID) {
+				temp_var = cgasm_alloc_temp_var(ctx, expr_val_get_type(cond));
+			}
 			return cgasm_handle_assign_op(ctx, temp_var, cond, TOK_ASSIGN);
 		} else {
 			return void_expr_val();
@@ -756,6 +762,9 @@ struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_
 	struct expr_val inner_val = cgasm_expression(ctx, dynarr_get(inner_expr_list, inner_expr_ind));
 	is_void = expr_val_get_type(inner_val)->tag == T_VOID;
 	if (!is_void) {
+		if (temp_var.type == EXPR_VAL_VOID) {
+			temp_var = cgasm_alloc_temp_var(ctx, expr_val_get_type(inner_val));
+		}
 		cgasm_handle_assign_op(ctx, temp_var, inner_val, TOK_ASSIGN);
 	}
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(exit_label, buf));
