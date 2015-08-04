@@ -80,6 +80,7 @@ struct type *expr_val_get_type(struct expr_val val);
 int expr_val_get_elem_size(struct expr_val val);
 int expr_val_has_deref_flag(struct expr_val val);
 struct expr_val expr_val_remove_deref_flag(struct expr_val val);
+int find_avail_reg(int mask);
 
 #ifdef __cplusplus
 }

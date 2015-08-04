@@ -66,7 +66,17 @@ static void cgasm_store_reg2_to_ll_sym(struct cgasm_context *ctx, int reg1, int 
 	cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg2), offset + 4, get_reg_str_code(base_reg));
 }
 
-void cgasm_store_reg2_to_ll_mem(struct cgasm_context *ctx, int reg1, int reg2, struct expr_val mem) {
+void cgasm_store_reg2_to_ll_mem(struct cgasm_context *ctx, int reg1, int reg2, struct expr_val mem, int reg_mask) {
+	if (mem.type & EXPR_VAL_FLAG_DEREF) {
+		int addr_reg = find_avail_reg(reg_mask);
+		mem.type &= ~EXPR_VAL_FLAG_DEREF;
+		cgasm_load_val_to_reg(ctx, mem, addr_reg);
+
+		cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg1), 0, get_reg_str_code(addr_reg));
+		cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg2), 4, get_reg_str_code(addr_reg));
+		return;
+	}
+
 	switch (mem.type) {
 	case EXPR_VAL_TEMP:
 		cgasm_store_reg2_to_ll_temp(ctx, reg1, reg2, mem);
@@ -219,8 +229,9 @@ struct expr_val cgasm_handle_ll_assign_op(struct cgasm_context *ctx, struct expr
 	}
 
 	int reg1 = REG_EAX, reg2 = REG_ECX;
+	int mask = (1 << reg1) | (1 << reg2);
 	cgasm_load_ll_val_to_reg2(ctx, res, reg1, reg2);
-	cgasm_store_reg2_to_ll_mem(ctx, reg1, reg2, lhs);
+	cgasm_store_reg2_to_ll_mem(ctx, reg1, reg2, lhs, mask);
 	return lhs;
 }
 

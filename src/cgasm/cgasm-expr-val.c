@@ -17,6 +17,16 @@ static const char *reg_name_list[][8] = {
 	}
 };
 
+int find_avail_reg(int mask) {
+	int i;
+	for (i = REG_EAX; i <= REG_EDI; i++) {
+		if ((mask & (1 << i)) == 0) {
+			return i;
+		}
+	}
+	assert(false && "should not reach here");
+}
+
 // size is counted as the nubmer of bytes
 const char *get_reg_str_code_size(unsigned int reg, int size) {
 	assert(reg < REG_NUM);
