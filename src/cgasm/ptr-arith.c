@@ -36,7 +36,7 @@ static struct expr_val cgasm_handle_ptr_add(struct cgasm_context *ctx, struct ex
 	if (subtype->tag == T_VOID || type_get_size(subtype) == 1) {
 		lhs.ctype = get_int_type(); // convert to int
 		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_ADD, lhs, rhs);
-		cgasm_handle_deref_flag(ctx, res);
+		res = cgasm_handle_deref_flag(ctx, res);
 		res.ctype = ptrtype;
 		return res;
 	}
