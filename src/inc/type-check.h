@@ -10,6 +10,7 @@ extern "C" {
 struct type;
 
 bool type_eq(struct type *lsh, struct type *rhs);
+bool type_assignable(struct type *lhs, struct type *rhs);
 
 #ifdef __cplusplus
 }

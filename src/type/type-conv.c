@@ -10,14 +10,15 @@ static struct expr_val type_convert_int_to_ll(struct cgasm_context *ctx, struct 
 		return val;
 	}
 
+	// panic("type_conv");
+
 	// allocate an temp var
-	panic("here");
 	struct expr_val temp = cgasm_alloc_temp_var(ctx, get_long_long_type());
 	int offset = cgasm_get_temp_var_offset(ctx, temp.temp_var);
 	int reg = REG_EAX;
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg), offset);
-	cgasm_println(ctx, "movl $0, %d(%%ebp)", get_reg_str_code(reg), offset + 4);
+	cgasm_println(ctx, "movl $0, %d(%%ebp)", offset + 4);
 	return temp;
 }
 

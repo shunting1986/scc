@@ -583,14 +583,19 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	int rhs_reg = REG_EAX;
 	char buf[128];
 	cgasm_change_array_func_to_ptr(ctx, &rhs);
-	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
-#if 0
-	if (rhs.ctype == NULL || rhs.ctype->tag != T_INT) {
-		panic("only support int right now");
+	struct type *lhstype = expr_val_get_type(lhs);
+	struct type *rhstype = expr_val_get_type(rhs);
+
+	if (!type_assignable(lhstype, rhstype)) {
+		panic("require equal type for assignemnt right now");
 	}
-	// TODO make type conversion if necessary
-#endif
+
+	if (lhstype->tag == T_LONG_LONG) {
+		return cgasm_handle_ll_assign_op(ctx, lhs, rhs, op);
+	}
+
+	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
 	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
 		int lhs_reg = REG_ECX;

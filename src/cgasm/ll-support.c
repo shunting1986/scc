@@ -51,6 +51,34 @@ void cgasm_store_reg2_to_ll_temp(struct cgasm_context *ctx, int reg1, int reg2, 
 	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg2), offset + 4);
 }
 
+static void cgasm_store_reg2_to_ll_sym(struct cgasm_context *ctx, int reg1, int reg2, struct symbol *sym) {
+	int base_reg, offset;
+
+	switch (sym->type) {
+	case SYMBOL_LOCAL_VAR:
+		base_reg = REG_EBP;
+		offset = cgasm_get_local_var_offset(ctx, (struct local_var_symbol *) sym);
+		break;
+	default:
+		panic("unsupported sym type %d", sym->type);
+	}
+	cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg1), offset, get_reg_str_code(base_reg));
+	cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg2), offset + 4, get_reg_str_code(base_reg));
+}
+
+void cgasm_store_reg2_to_ll_mem(struct cgasm_context *ctx, int reg1, int reg2, struct expr_val mem) {
+	switch (mem.type) {
+	case EXPR_VAL_TEMP:
+		cgasm_store_reg2_to_ll_temp(ctx, reg1, reg2, mem);
+		break;
+	case EXPR_VAL_SYMBOL:
+		cgasm_store_reg2_to_ll_sym(ctx, reg1, reg2, mem.sym);
+		break;
+	default:
+		panic("unsupported type %d", mem.type);
+	}
+}
+
 static void cgasm_ll_neg(struct cgasm_context *ctx, struct expr_val diff, struct expr_val res) {
 	assert(diff.ctype->tag == T_LONG_LONG);
 	assert(res.ctype->tag == T_INT);
@@ -175,5 +203,23 @@ struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, str
 
 	return ret;
 }
+
+struct expr_val cgasm_handle_ll_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
+	struct expr_val res;
+	switch (op) {
+	case TOK_ASSIGN:
+		res = rhs;
+		break;
+	default:
+		panic("unsupported op %s", token_tag_str(op));
+	}
+
+	int reg1 = REG_EAX, reg2 = REG_ECX;
+	cgasm_load_ll_val_to_reg2(ctx, res, reg1, reg2);
+	cgasm_store_reg2_to_ll_mem(ctx, reg1, reg2, lhs);
+	return lhs;
+}
+
+
 
 
