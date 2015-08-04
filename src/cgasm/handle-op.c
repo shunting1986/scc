@@ -19,6 +19,7 @@ static const char *size_to_suffix(int size) {
 }
 
 static void cgasm_load_const_val_to_reg(struct cgasm_context *ctx, union token const_val, int reg);
+static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx, struct expr_val lhs, int rhs_reg, int op);
 
 /**
  * handle unary op, binary op, push op, load op, store op etc.
@@ -282,10 +283,7 @@ void cgasm_load_val_to_reg(struct cgasm_context *ctx, struct expr_val val, int r
 /* store               */
 /***********************/
 void cgasm_store_reg_to_mem(struct cgasm_context *ctx, int reg, struct expr_val mem) {
-	char buf[128];
-
-	cgasm_get_lval_asm_code(ctx, mem, buf);
-	cgasm_println(ctx, "movl %%%s, %s", get_reg_str_code(reg), buf);
+	cgasm_handle_assign_op_with_reg(ctx, mem, reg, TOK_ASSIGN);
 }
 
 /***********************/
@@ -600,9 +598,41 @@ static struct expr_val cgasm_handle_ptr_addsub_assign(struct cgasm_context *ctx,
 	return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
 }
 
+// we extract this method for reusing
+static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx, struct expr_val lhs, int rhs_reg, int op) {
+	char lhs_asm_code[128];
+	struct type *lhstype = expr_val_get_type(lhs);
+	int size = type_get_size(lhstype);
+	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
+		int lhs_reg = rhs_reg == REG_EAX ? REG_ECX : REG_EAX; // use reg other than rhs_reg
+
+		lhs.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
+		cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
+		lhs.type |= EXPR_VAL_FLAG_DEREF; 
+
+		snprintf(lhs_asm_code, sizeof(lhs_asm_code), "(%%%s)", get_reg_str_code_size(lhs_reg, 4));
+	} else {
+		cgasm_get_lval_asm_code(ctx, lhs, lhs_asm_code);
+	}
+
+	switch (op) {
+	case TOK_ASSIGN:
+		cgasm_println(ctx, "mov%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
+		break;
+	case TOK_ADD_ASSIGN:
+		cgasm_println(ctx, "add%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
+		break;
+	case TOK_SUB_ASSIGN:
+		cgasm_println(ctx, "sub%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
+		break;
+	default:
+		panic("ni %s", token_tag_str(op));
+	}
+	return lhs;
+}
+
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
 	int rhs_reg = REG_EAX;
-	char lhs_asm_code[128];
 	cgasm_change_array_func_to_ptr(ctx, &rhs);
 
 	struct type *lhstype = expr_val_get_type(lhs);
@@ -632,35 +662,9 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		return cgasm_handle_ll_assign_op(ctx, lhs, rhs, op);
 	}
 
-	int size = type_get_size(lhstype);
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
-	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
-		int lhs_reg = REG_ECX;
-
-		lhs.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
-		cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
-		lhs.type |= EXPR_VAL_FLAG_DEREF; 
-
-		snprintf(lhs_asm_code, sizeof(lhs_asm_code), "(%%%s)", get_reg_str_code_size(lhs_reg, 4));
-	} else {
-		cgasm_get_lval_asm_code(ctx, lhs, lhs_asm_code);
-	}
-
-	switch (op) {
-	case TOK_ASSIGN:
-		cgasm_println(ctx, "mov%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
-		break;
-	case TOK_ADD_ASSIGN:
-		cgasm_println(ctx, "add%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
-		break;
-	case TOK_SUB_ASSIGN:
-		cgasm_println(ctx, "sub%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
-		break;
-	default:
-		panic("ni %s", token_tag_str(op));
-	}
-	return lhs;
+	return cgasm_handle_assign_op_with_reg(ctx, lhs, rhs_reg, op);
 }
 
 /********************************/
