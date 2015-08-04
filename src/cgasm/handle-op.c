@@ -83,7 +83,9 @@ char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, ch
 	if (buf == NULL) {
 		buf = mallocz(128); // caller should free it
 	}
-	val = cgasm_handle_deref_flag(ctx, val);
+	assert((val.type & EXPR_VAL_FLAG_DEREF) == 0 && "this function does not support deref");
+
+	// val = cgasm_handle_deref_flag(ctx, val); 
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_get_lval_sym_asm_code(ctx, val.sym, buf);
@@ -174,6 +176,12 @@ static void cgasm_load_sym_addr_to_reg(struct cgasm_context *ctx, struct symbol 
 
 // should be lval or temp var
 void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg) {
+	if (val.type & EXPR_VAL_FLAG_DEREF) {
+		val.type &= ~EXPR_VAL_FLAG_DEREF;
+		cgasm_load_val_to_reg(ctx, val, reg);
+		return;
+	}
+
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_load_sym_addr_to_reg(ctx, val.sym, reg);
@@ -594,7 +602,7 @@ static struct expr_val cgasm_handle_ptr_addsub_assign(struct cgasm_context *ctx,
 
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
 	int rhs_reg = REG_EAX;
-	char buf[128];
+	char lhs_asm_code[128];
 	cgasm_change_array_func_to_ptr(ctx, &rhs);
 
 	struct type *lhstype = expr_val_get_type(lhs);
@@ -633,19 +641,21 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		lhs.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
 		cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
 		lhs.type |= EXPR_VAL_FLAG_DEREF; 
-		cgasm_println(ctx, "mov%s %%%s, (%%%s)", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), get_reg_str_code_size(lhs_reg, 4)); // the second reg is addr, so we use 32 bit
-		return lhs;
+
+		snprintf(lhs_asm_code, sizeof(lhs_asm_code), "(%%%s)", get_reg_str_code_size(lhs_reg, 4));
+	} else {
+		cgasm_get_lval_asm_code(ctx, lhs, lhs_asm_code);
 	}
 
 	switch (op) {
 	case TOK_ASSIGN:
-		cgasm_println(ctx, "mov%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		cgasm_println(ctx, "mov%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
 		break;
 	case TOK_ADD_ASSIGN:
-		cgasm_println(ctx, "add%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		cgasm_println(ctx, "add%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
 		break;
 	case TOK_SUB_ASSIGN:
-		cgasm_println(ctx, "sub%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), cgasm_get_lval_asm_code(ctx, lhs, buf));
+		cgasm_println(ctx, "sub%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
 		break;
 	default:
 		panic("ni %s", token_tag_str(op));

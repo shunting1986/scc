@@ -75,7 +75,7 @@ void cgasm_store_reg2_to_ll_mem(struct cgasm_context *ctx, int reg1, int reg2, s
 		cgasm_store_reg2_to_ll_sym(ctx, reg1, reg2, mem.sym);
 		break;
 	default:
-		panic("unsupported type %d", mem.type);
+		panic("unsupported type 0x%x", mem.type);
 	}
 }
 
