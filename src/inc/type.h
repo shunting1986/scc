@@ -3,6 +3,7 @@
 
 #include <inc/syntree.h>
 #include <inc/cgasm-handle-op.h>
+#include <inc/type-check.h>
 
 #ifdef __cplusplus
 extern "C" {

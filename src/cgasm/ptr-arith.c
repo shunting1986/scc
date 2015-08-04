@@ -61,6 +61,22 @@ static struct expr_val cgasm_handle_ptr_sub(struct cgasm_context *ctx, struct ex
 		return res;
 	}
 
+	if (lhs.ctype->tag == T_PTR && rhs.ctype->tag == T_PTR) {
+		if (!type_eq(lhs.ctype->subtype, rhs.ctype->subtype)) {
+			panic("incompatible pointer types");
+		}
+
+		struct type *elem_type = lhs.ctype->subtype;
+		lhs.ctype = get_int_type();
+		rhs.ctype = get_int_type();
+		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_SUB, lhs, rhs);
+		int elem_size = type_get_size(elem_type);
+		if (elem_size != 1) {
+			res = cgasm_handle_binary_op(ctx, TOK_DIV, res, int_const_expr_val(elem_size));
+		}
+		return res;
+	}
+
 	panic("invalid ptr subtraction");
 }
 
