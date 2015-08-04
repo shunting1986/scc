@@ -715,7 +715,7 @@ struct expr_val cgasm_handle_index_op(struct cgasm_context *ctx, struct expr_val
 
 	struct expr_val offset_val = cgasm_handle_binary_op(ctx, TOK_STAR, ind_val, const_expr_val(wrap_int_const_to_token(elemsize))); 
 
-	cgasm_handle_deref_flag(ctx, base_val);
+	base_val = cgasm_handle_deref_flag(ctx, base_val);
 	base_val.ctype = get_int_type(); // convert to integer operation
 	struct expr_val result_val = cgasm_handle_binary_op(ctx, TOK_ADD, base_val, offset_val);
 
