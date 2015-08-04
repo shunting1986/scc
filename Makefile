@@ -77,7 +77,7 @@ all: handy
 # handy: rebuild-$(PROG_NAME) mongoose
 
 handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/matrix-mul-ptr/main.c
+	./scc integration-test/va-args/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
