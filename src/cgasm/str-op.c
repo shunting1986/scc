@@ -14,6 +14,7 @@ void cgasm_push_bytes(struct cgasm_context *ctx, int from_base_reg, int from_sta
 
 // TODO use string op
 void cgasm_copy_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int to_base_reg, int to_start_off, int size) {
+	red("before copy %d", size); 
 	int reg_mask = (1 << from_base_reg) | (1 << to_base_reg);
 	int temp_reg = find_avail_reg(reg_mask);
 	int off;
@@ -38,6 +39,7 @@ void cgasm_copy_bytes(struct cgasm_context *ctx, int from_base_reg, int from_sta
 			}
 		}
 	}
+	red("after copy %d", size); 
 }
 
 void cgasm_copy_bytes_to_temp(struct cgasm_context *ctx, int from_base_reg, int from_start_off, struct expr_val temp) {

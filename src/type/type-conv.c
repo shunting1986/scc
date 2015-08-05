@@ -46,10 +46,10 @@ struct expr_val extend_int_type(struct cgasm_context *ctx, struct expr_val val, 
 // NOTE: caller will handle the type ref for newtype
 struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, struct type *newtype) {
 	assert(val.ctype != NULL);
-
 	val = cgasm_handle_deref_flag(ctx, val); // the DEREF flag is already handled here
 
-	struct type *oldtype = val.ctype;
+	// for array, the deref flag is not removed
+	struct type *oldtype = expr_val_get_type(val);
 
 	if (oldtype->tag >= T_CHAR && oldtype->tag <= T_LONG_LONG && newtype->tag >= T_CHAR && newtype->tag <= T_LONG_LONG) { // both are integer type
 		if (oldtype->tag >= newtype->tag) { // change to smaller type

@@ -454,8 +454,10 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 }
 
 struct expr_val cgasm_handle_deref_flag(struct cgasm_context *ctx, struct expr_val operand) {
-	if (expr_val_has_deref_flag(operand)) {
-		struct type *type = expr_val_get_type(operand);
+	struct type *type = expr_val_get_type(operand);
+
+	// the deref flag for array does not need to be removed here
+	if (expr_val_has_deref_flag(operand) && type->tag != T_ARRAY) {
 		struct expr_val temp = cgasm_alloc_temp_var(ctx, type);
 		int reg = REG_EAX;
 		cgasm_load_addr_to_reg(ctx, operand, reg);
