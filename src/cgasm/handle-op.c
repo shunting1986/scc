@@ -343,6 +343,14 @@ static void cgasm_push_const_val(struct cgasm_context *ctx, union token const_to
 	cgasm_println(ctx, "pushl $%d", const_tok.const_val.ival);
 }
 
+static void cgasm_push_struct(struct cgasm_context *ctx, struct expr_val val) {
+	struct type *type = expr_val_get_type(val);
+	assert(type->tag == T_STRUCT);
+	int addr_reg = REG_EAX;
+	cgasm_load_addr_to_reg(ctx, val, addr_reg);
+	cgasm_push_bytes(ctx, addr_reg, 0, type_get_size(type));
+}
+
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 	struct type *type = expr_val_get_type(val);
 	if (type->tag == T_LONG_LONG) {
@@ -352,6 +360,11 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 
 	if (is_floating_type(type)) {
 		cgasm_push_fp_val_to_gstk(ctx, val);
+		return;
+	}
+
+	if (type->tag == T_STRUCT) {
+		cgasm_push_struct(ctx, val);
 		return;
 	}
 

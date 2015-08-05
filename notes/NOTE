@@ -5,6 +5,9 @@
 	=======================
   Next step is build mongoose.c
 	-> DONE next func is call_user (2496)
+
+	-> next func is cry (2530)
+
 	-> DONE next func is ssl_error  (2572)
 	-> DONE next func is mg_strlcpy (2588)
 	-> DONE next func is lowercase (2596)
@@ -25,8 +28,6 @@
 	-> next func is print_dir_entry (3999)
 
 
-
-	TODO: support fp
 	TODO: support oct constant
 
 	TODO: next step is mongoose !!

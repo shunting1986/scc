@@ -179,8 +179,19 @@ struct type *type_get(struct type *type) {
 
 static void struct_field_list_dump(struct dynarr *list, int ind) {
 	fprintf(stderr, "\033[31m");
+
 	fprintf(stderr, "%*s", ind, "");
-	fprintf(stderr, "struct fields ....\n");
+	fprintf(stderr, "struct fields:\n");
+
+	if (list != NULL) { // dump the field list is the type is complete
+		DYNARR_FOREACH_BEGIN(list, struct_field, each);
+			fprintf(stderr, "%*s", ind, "");
+			fprintf(stderr, "%s W %d\n", each->name, each->width);
+
+			// don't dump the type of field to avoid dead loop..
+			// type_dump(each->type, ind + 2); 
+		DYNARR_FOREACH_END();
+	}
 	fprintf(stderr, "\033[0m");
 }
 
