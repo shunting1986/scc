@@ -40,6 +40,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
 	cgasm/cgasm.c \
+	cgasm/str-op.c \
 	cgasm/fp.c \
 	cgasm/ll-support.c \
 	cgasm/ptr-arith.c \

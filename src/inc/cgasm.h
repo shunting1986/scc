@@ -111,6 +111,11 @@ struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *
 // initializer.c
 void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer);
 
+// str-op.c
+void cgasm_push_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int size);
+void cgasm_copy_bytes_to_temp(struct cgasm_context *ctx, int from_base_reg, int from_start_off, struct expr_val temp);
+void cgasm_copy_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int to_base_reg, int to_start_off, int size);
+
 #ifdef __cplusplus
 }
 #endif

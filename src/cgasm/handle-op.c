@@ -350,7 +350,13 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		return;
 	}
 
+	if (is_floating_type(type)) {
+		cgasm_push_fp_val_to_gstk(ctx, val);
+		return;
+	}
+
 	assert(type->size <= 4);
+	assert(type->tag == T_PTR || is_integer_type(type));
 
 	if (val.type & EXPR_VAL_FLAG_DEREF) {
 		int reg = REG_EAX;
