@@ -400,6 +400,22 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 	return operand;
 }
 
+struct expr_val cgasm_handle_bitreverse(struct cgasm_context *ctx, struct expr_val operand) {
+	// special case for constant
+	if (operand.type == EXPR_VAL_CONST_VAL) {
+		assert(operand.const_val.const_val.flags & CONST_VAL_TOK_INTEGER);
+		operand.const_val.const_val.ival = ~operand.const_val.const_val.ival;
+		return operand;
+	} else {
+		int reg = REG_EAX;
+		struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type()); // XXX assume integer type
+		cgasm_load_val_to_reg(ctx, operand, reg);
+		cgasm_println(ctx, "notl %%%s", get_reg_str_code(reg));
+		cgasm_store_reg_to_mem(ctx, reg, temp);
+		return temp;
+	}
+}
+
 struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val operand) {
 	// special case for constant
 	if (operand.type == EXPR_VAL_CONST_VAL) {
@@ -466,6 +482,8 @@ struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, st
 		return cgasm_handle_deref(ctx, operand);
 	case TOK_EXCLAMATION:	// optimized for some cases like 'if(!x) { }'
 		return condcode_expr(TOK_EXCLAMATION, operand, void_expr_val(), NULL);
+	case TOK_BITREVERSE:
+		return cgasm_handle_bitreverse(ctx, operand);
 	default:
 		panic("ni %s", token_tag_str(tok_tag));
 	}
@@ -557,6 +575,11 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	case TOK_VERT_BAR:
 		LOAD_TO_REG();
 		cgasm_println(ctx, "orl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
+		STORE_TO_TEMP();
+		break;
+	case TOK_XOR:
+		LOAD_TO_REG();
+		cgasm_println(ctx, "xorl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));
 		STORE_TO_TEMP();
 		break;
 	case TOK_SUB:

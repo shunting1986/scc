@@ -18,8 +18,9 @@
 	-> DONE next func is url_decode (3025)
 	-> DONE next func is get_document_root (3112)
 	-> DONE next func is mg_connect (3143)
+	-> DONE next func is MD5Transform (3556)
 
-	-> next func is MD5Transform (3556)
+	-> next func is MD5Update (3632)
 
 
 	TODO: support fp

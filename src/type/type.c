@@ -734,6 +734,10 @@ static struct type *parse_type_from_raw_type_list(struct cgasm_context *ctx, str
 		if (++times <= 5) {	
 			fprintf(stderr, "\033[31m'unsigned' is ignored right now\033[0m\n");
 		}
+
+		if (basetype == T_NONE) {
+			basetype = T_INT; // default is int for unsigned
+		}
 	}
 
 	switch (basetype) {
