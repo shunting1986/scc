@@ -17,6 +17,7 @@ void cgasm_store_reg2_to_ll_temp(struct cgasm_context *ctx, int reg1, int reg2, 
 void cgasm_push_ll_val(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_ll_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op);
 void cgasm_copy_bytes_to_temp(struct cgasm_context *ctx, int from_base_reg, int from_start_off, struct expr_val temp);
+void cgasm_copy_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int to_base_reg, int to_start_off, int size);
 
 #ifdef __cplusplus
 }

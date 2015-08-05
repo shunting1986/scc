@@ -353,6 +353,7 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		int reg = REG_EAX;
 		// load to reg and then push reg
 		cgasm_load_val_to_reg(ctx, val, reg);
+		cgasm_extend_reg(ctx, reg, type);
 		cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 		return;
 	}
@@ -645,6 +646,21 @@ static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx
 	return lhs;
 }
 
+struct expr_val cgasm_handle_struct_assign(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs) {
+	struct type *lhstype = expr_val_get_type(lhs);
+	struct type *rhstype = expr_val_get_type(rhs);
+	assert(lhstype->tag == T_STRUCT);
+	assert(rhstype->tag == T_STRUCT);
+	assert(type_eq(lhstype, rhstype));
+
+	int from_base_reg = REG_EAX;
+	int to_base_reg = REG_ECX;
+	cgasm_load_addr_to_reg(ctx, rhs, from_base_reg);
+	cgasm_load_addr_to_reg(ctx, lhs, to_base_reg);
+	cgasm_copy_bytes(ctx, from_base_reg, 0, to_base_reg, 0, type_get_size(lhstype));
+	return lhs;
+}
+
 struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
 	int rhs_reg = REG_EAX;
 	cgasm_change_array_func_to_ptr(ctx, &rhs);
@@ -674,6 +690,13 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 
 	if (lhstype->tag == T_LONG_LONG) {
 		return cgasm_handle_ll_assign_op(ctx, lhs, rhs, op);
+	}
+
+	if (lhstype->tag == T_STRUCT) {
+		if (op != TOK_ASSIGN) {
+			panic("struct only allow plain assign");
+		}
+		return cgasm_handle_struct_assign(ctx, lhs, rhs);
 	}
 
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
