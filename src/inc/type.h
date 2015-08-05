@@ -4,6 +4,7 @@
 #include <inc/syntree.h>
 #include <inc/cgasm-handle-op.h>
 #include <inc/type-check.h>
+#include <inc/util.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,6 +96,7 @@ struct type *type_deref(struct type *type);
 struct type *get_ptr_type(struct type *elem_type);
 struct type *get_int_type();
 int is_integer_type(struct type *type);
+bool is_floating_type(struct type *type);
 struct type *get_char_type();
 struct type *get_char_ptr_type();
 struct type *get_short_type();

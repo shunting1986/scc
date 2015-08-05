@@ -40,6 +40,7 @@ LIB_SRC_LIST := util/file_reader.c \
 	cgc/cgc.c \
 	cgc/cgc_opstr.c \
 	cgasm/cgasm.c \
+	cgasm/fp.c \
 	cgasm/ll-support.c \
 	cgasm/ptr-arith.c \
 	cgasm/cgasm-func.c \
@@ -78,7 +79,7 @@ all: handy
 mm: rebuild-$(PROG_NAME) mongoose
 
 handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/degen-for/main.c
+	./scc integration-test/float-point/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

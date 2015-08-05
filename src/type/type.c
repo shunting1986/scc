@@ -266,6 +266,11 @@ int is_integer_type(struct type *type) {
 	return type->tag >= T_CHAR && type->tag <= T_LONG_LONG;
 }
 
+bool is_floating_type(struct type *type) {
+	CHECK_MAGIC(type);
+	return type->tag == T_FLOAT || type->tag == T_DOUBLE;
+}
+
 struct type *get_double_type() {
 	return &double_type;
 }

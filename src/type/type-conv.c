@@ -1,6 +1,7 @@
 #include <inc/type.h>
 #include <inc/util.h>
 #include <inc/cgasm.h>
+#include <inc/fp.h>
 
 static struct expr_val type_convert_int_to_ll(struct cgasm_context *ctx, struct expr_val val) {
 	assert(val.ctype->tag == T_INT);
@@ -46,7 +47,6 @@ struct expr_val extend_int_type(struct cgasm_context *ctx, struct expr_val val, 
 struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, struct type *newtype) {
 	assert(val.ctype != NULL);
 
-	// TODO
 	val = cgasm_handle_deref_flag(ctx, val); // the DEREF flag is already handled here
 
 	struct type *oldtype = val.ctype;
@@ -75,6 +75,8 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 	#endif
 		cgasm_change_array_func_to_ptr(ctx, &val);
 		return val;
+	} else if (is_floating_type(oldtype) || is_floating_type(newtype)) {
+		return fp_type_convert(ctx, val, newtype);
 	} else {
 		type_dump(oldtype, 4);
 		type_dump(newtype, 4);
