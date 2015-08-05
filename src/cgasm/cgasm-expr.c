@@ -54,9 +54,15 @@ void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *
 	struct type *type = expr_val_get_type(*pval);
 
 	if (type->tag == T_ARRAY) {
-		assert((pval->type & EXPR_VAL_FLAG_DEREF) == 0);
-		assert(pval->type == EXPR_VAL_SYMBOL);
-		pval->type = EXPR_VAL_SYMBOL_ADDR;
+		*pval = cgasm_handle_deref_flag(ctx, *pval);
+
+		if (pval->type == EXPR_VAL_SYMBOL) {
+			pval->type = EXPR_VAL_SYMBOL_ADDR;
+		} else if (pval->type == EXPR_VAL_TEMP) {
+			// do nothing
+		} else {
+			panic("expr val type %d", pval->type);
+		}
 
 		struct type *newtype = get_ptr_type(type->subtype);
 		type_check_ref(type);

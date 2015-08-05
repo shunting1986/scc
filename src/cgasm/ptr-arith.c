@@ -33,14 +33,19 @@ static struct expr_val cgasm_handle_ptr_add(struct cgasm_context *ctx, struct ex
 
 	struct type *ptrtype = lhs.ctype;
 	struct type *subtype = ptrtype->subtype;
-	if (subtype->tag == T_VOID || type_get_size(subtype) == 1) {
-		lhs.ctype = get_int_type(); // convert to int
-		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_ADD, lhs, rhs);
-		res = cgasm_handle_deref_flag(ctx, res);
-		res.ctype = ptrtype;
-		return res;
+
+	lhs.ctype = get_int_type(); // convert to int
+	struct expr_val res;
+
+	if (subtype->tag != T_VOID && type_get_size(subtype) != 1) {
+		rhs = cgasm_handle_binary_op(ctx, TOK_STAR, rhs, int_const_expr_val(type_get_size(subtype)));
 	}
-	panic("ni");
+	res = cgasm_handle_binary_op(ctx, TOK_ADD, lhs, rhs);
+
+	res = cgasm_handle_deref_flag(ctx, res);
+
+	res.ctype = ptrtype;
+	return res;
 }
 
 static struct expr_val cgasm_handle_ptr_sub(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs) {

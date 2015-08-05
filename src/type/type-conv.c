@@ -45,6 +45,8 @@ struct expr_val extend_int_type(struct cgasm_context *ctx, struct expr_val val, 
 // NOTE: caller will handle the type ref for newtype
 struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, struct type *newtype) {
 	assert(val.ctype != NULL);
+
+	// TODO
 	val = cgasm_handle_deref_flag(ctx, val); // the DEREF flag is already handled here
 
 	struct type *oldtype = val.ctype;
@@ -62,9 +64,16 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 	} else if (newtype->tag == T_VOID) { // (void), discard value
 	} else if (oldtype->tag == T_PTR && newtype->tag == T_PTR) { // change from one pointer type to another (can cover func ptr case)
 	} else if (oldtype->tag == T_INT && newtype->tag == T_PTR) { // convert from int to ptr
+	} else if (oldtype->tag == T_ARRAY && newtype->tag == T_PTR) {
+		if (!type_eq(oldtype->subtype, newtype->subtype)) {
+			panic("invalid type conversion from array to ptr");
+		}
+		cgasm_change_array_func_to_ptr(ctx, &val);
+		return val;
 	} else {
 		type_dump(oldtype, 4);
 		type_dump(newtype, 4);
+		assert(0);
 		panic("ni");
 	}
 
