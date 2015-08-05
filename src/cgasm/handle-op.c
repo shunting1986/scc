@@ -632,10 +632,14 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		cgasm_println(ctx, "mull %%%s", get_reg_str_code(rhs_reg));
 		STORE_TO_TEMP();
 		break;
-	case TOK_DIV:
+	case TOK_DIV: case TOK_MOD:
 		LOAD_TO_REG();
 		clear_div_high_reg(ctx, lhs.ctype);
 		cgasm_println(ctx, "divl %%%s", get_reg_str_code(rhs_reg));
+
+		if (tok_tag == TOK_MOD) {
+			lhs_reg = REG_EDX;
+		}
 		STORE_TO_TEMP();
 		break;
 	case TOK_LSHIFT:
@@ -782,6 +786,9 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
 	} else if (op == TOK_DIV_ASSIGN) {
 		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_DIV, lhs, rhs);
+		return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
+	} else if (op == TOK_MOD_ASSIGN) {
+		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_MOD, lhs, rhs);
 		return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
 	}
 
