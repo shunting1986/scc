@@ -4,6 +4,7 @@
 #include <inc/symtab.h>
 #include <inc/pp.h>
 #include <inc/ll-support.h>
+#include <inc/fp.h>
 
 const char *suff_table[] = {
 	[1] = "b",
@@ -539,7 +540,11 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		return cgasm_handle_ptr_binary_op(ctx, tok_tag, lhs, rhs);
 	}
 
-	// TODO: floating point is not handled here yet
+	// must handle fp before long long
+	if (is_floating_type(lhstype) || is_floating_type(rhstype)) {
+		return cgasm_handle_binary_op_fp(ctx, tok_tag, lhs, rhs);
+	}
+
 	if (lhstype->tag == T_LONG_LONG || rhstype->tag == T_LONG_LONG) {
 		return cgasm_handle_binary_op_ll(ctx, tok_tag, lhs, rhs);
 	}
@@ -626,16 +631,26 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 /* assignment                  */
 /*******************************/
 
-static struct expr_val cgasm_handle_ptr_addsub_assign(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int assign_op) {
-	int op;
+static struct expr_val cgasm_handle_ptr_assign(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int assign_op) {
+	struct expr_val res;
 	switch (assign_op) {
-	case TOK_ADD_ASSIGN: op = TOK_ADD; break;
-	case TOK_SUB_ASSIGN: op = TOK_SUB; break;
+	case TOK_ASSIGN:
+		res = rhs;
+		break;
+	case TOK_ADD_ASSIGN: 
+		res = cgasm_handle_ptr_binary_op(ctx, TOK_ADD, lhs, rhs);
+		break;
+	case TOK_SUB_ASSIGN: 
+		res = cgasm_handle_ptr_binary_op(ctx, TOK_SUB, lhs, rhs);
+		break;
 	default:
 		panic("invalid assign op %s", token_tag_str(assign_op));
 	}
-	struct expr_val res = cgasm_handle_ptr_binary_op(ctx, op, lhs, rhs);
-	return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
+
+	int rhs_reg = REG_EAX;
+	cgasm_load_val_to_reg(ctx, res, rhs_reg);
+
+	return cgasm_handle_assign_op_with_reg(ctx, lhs, rhs_reg, TOK_ASSIGN);
 }
 
 // we extract this method for reusing
@@ -695,8 +710,8 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	(void) lhstype;
 	(void) rhstype;
 
-	if (lhstype->tag == T_PTR && (op == TOK_ADD_ASSIGN || op == TOK_SUB_ASSIGN)) {
-		return cgasm_handle_ptr_addsub_assign(ctx, lhs, rhs, op);
+	if (lhstype->tag == T_PTR && (op == TOK_ADD_ASSIGN || op == TOK_SUB_ASSIGN || op == TOK_ASSIGN)) {
+		return cgasm_handle_ptr_assign(ctx, lhs, rhs, op);
 	}
 
 	{ // type conversion implicitly for assignment
@@ -723,6 +738,9 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		}
 		return cgasm_handle_struct_assign(ctx, lhs, rhs);
 	}
+
+	assert(is_integer_type(lhstype) && lhstype->tag != T_LONG_LONG);
+	assert(is_integer_type(rhstype) && rhstype->tag != T_LONG_LONG);
 
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
