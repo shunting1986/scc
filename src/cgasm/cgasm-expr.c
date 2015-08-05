@@ -51,14 +51,6 @@ static struct type *query_func_type_by_name(struct cgasm_context *ctx, char *nam
 #endif
 
 void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *pval) {
-#if 0
-	assert(type != NULL);
-#else
-	if (pval->ctype == NULL) {
-		red("cgasm_change_array_func_to_ptr: null type");
-		return;
-	}
-#endif
 	struct type *type = expr_val_get_type(*pval);
 
 	if (type->tag == T_ARRAY) {
@@ -74,7 +66,9 @@ void cgasm_change_array_func_to_ptr(struct cgasm_context *ctx, struct expr_val *
 	}
 
 	if (type->tag == T_FUNC) {
-		assert((pval->type & EXPR_VAL_FLAG_DEREF) == 0);
+		// the following assertion is not correct becaues of this caes
+		//   f(*st->func_ptr)
+		// assert((pval->type & EXPR_VAL_FLAG_DEREF) == 0); 
 		*pval = cgasm_handle_ampersand(ctx, *pval);
 		return;
 	}
