@@ -36,6 +36,7 @@ int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbo
 void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 int cgasm_get_temp_var_offset(struct cgasm_context *ctx, struct temp_var temp);
 char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf);
+const char *size_to_suffix(int size);
 
 #ifdef __cplusplus
 }

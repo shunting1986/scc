@@ -11,7 +11,7 @@ const char *suff_table[] = {
 	[4] = "l",
 };
 
-static const char *size_to_suffix(int size) {
+const char *size_to_suffix(int size) {
 	if (size >= sizeof(suff_table) / sizeof(*suff_table) || suff_table[size] == NULL) {
 		panic("Invalid size to determine suffix %d", size);
 	}
@@ -415,13 +415,11 @@ struct expr_val cgasm_handle_negate(struct cgasm_context *ctx, struct expr_val o
 
 struct expr_val cgasm_handle_deref_flag(struct cgasm_context *ctx, struct expr_val operand) {
 	if (expr_val_has_deref_flag(operand)) {
-		int reg = REG_EAX;
 		struct type *type = expr_val_get_type(operand);
-
-		// the load operation will handle the existing deref flag
-		cgasm_load_val_to_reg(ctx, operand, reg);
 		struct expr_val temp = cgasm_alloc_temp_var(ctx, type);
-		cgasm_store_reg_to_mem(ctx, reg, temp);
+		int reg = REG_EAX;
+		cgasm_load_addr_to_reg(ctx, operand, reg);
+		cgasm_copy_bytes_to_temp(ctx, reg, 0, temp);
 		return temp;
 	} else {
 		return operand;
