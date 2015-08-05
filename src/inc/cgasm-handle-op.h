@@ -9,6 +9,7 @@ extern "C" {
 #include <inc/symtab.h>
 
 struct local_var_symbol;
+struct param_symbol;
 
 struct expr_val cgasm_handle_unary_op(struct cgasm_context *ctx, int tok_tag, struct expr_val operand);
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val);
@@ -33,6 +34,7 @@ struct expr_val cgasm_handle_ampersand(struct cgasm_context *ctx, struct expr_va
 
 struct expr_val cgasm_handle_deref_flag(struct cgasm_context *ctx, struct expr_val operand);
 int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbol *sym);
+int cgasm_get_param_offset(struct cgasm_context *ctx /* unused */, struct param_symbol *sym);
 void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 int cgasm_get_temp_var_offset(struct cgasm_context *ctx, struct temp_var temp);
 char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf);

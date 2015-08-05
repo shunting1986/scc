@@ -47,6 +47,10 @@ static void cgasm_store_reg2_to_ll_sym(struct cgasm_context *ctx, int reg1, int 
 		base_reg = REG_EBP;
 		offset = cgasm_get_local_var_offset(ctx, (struct local_var_symbol *) sym);
 		break;
+	case SYMBOL_PARAM:
+		base_reg = REG_EBP;
+		offset = cgasm_get_param_offset(ctx, (struct param_symbol *) sym);
+		break;
 	default:
 		panic("unsupported sym type %d", sym->type);
 	}
@@ -314,6 +318,9 @@ struct expr_val cgasm_handle_ll_assign_op(struct cgasm_context *ctx, struct expr
 		break;
 	case TOK_ADD_ASSIGN:
 		res = cgasm_handle_binary_op_ll(ctx, TOK_ADD, lhs, rhs);
+		break;
+	case TOK_SUB_ASSIGN:
+		res = cgasm_handle_binary_op_ll(ctx, TOK_SUB, lhs, rhs);
 		break;
 	default:
 		panic("unsupported op %s", token_tag_str(op));

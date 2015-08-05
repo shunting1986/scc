@@ -23,8 +23,11 @@
 	-> DONE next func is MD5Update (3632)
 	-> DONE next func is parse_auth_header (3766)
 	-> DONE next func is print_dir_entry (3999)
+	-> DONE next func is handle_directory_request (4066)
+	-> DONE next func is send_file_data (4118)
+	-> DONE next func is handle_file_request (4139)
 
-	-> next func is handle_directory_request (4066)
+	-> next func is parse_http_request (4194)
 
 	TODO: support oct constant
 

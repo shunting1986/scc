@@ -29,7 +29,7 @@ static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx
 /**********************/
 /* util               */
 /**********************/
-static int cgasm_get_param_offset(struct cgasm_context *ctx /* unused */, struct param_symbol *sym) {
+int cgasm_get_param_offset(struct cgasm_context *ctx /* unused */, struct param_symbol *sym) {
 	return sym->param_ind * 4 + 8;
 }
 
@@ -320,11 +320,16 @@ static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
 	}
 }
 
-static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
-	assert(sym->ctype->size <= 4); // caller should handle cases greater than 4
+// even if we know the expr_val is a symbol, we still pass in the entire expr_val
+// since we may require a type other than symbol type (bacasue of type conversion)
+static void cgasm_push_sym(struct cgasm_context *ctx, struct expr_val val) {
+	assert(val.type == EXPR_VAL_SYMBOL);
+	struct symbol *sym = val.sym;
+	struct type *type = expr_val_get_type(val);
+	assert(type->size <= 4); // caller should handle cases greater than 4
 	int reg = REG_EAX;
 	cgasm_load_sym_to_reg(ctx, sym, reg);
-	cgasm_extend_reg(ctx, reg, sym->ctype);
+	cgasm_extend_reg(ctx, reg, type);
 
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
@@ -388,7 +393,7 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		cgasm_push_str_literal(ctx, val.ind);
 		break;
 	case EXPR_VAL_SYMBOL:
-		cgasm_push_sym(ctx, val.sym);
+		cgasm_push_sym(ctx, val);
 		break;
 	case EXPR_VAL_TEMP:
 		cgasm_push_temp(ctx, val);
