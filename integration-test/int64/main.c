@@ -12,6 +12,7 @@ main(void) {
 		printf("eq %d, ne %d, le %d, ge %d\n", a == b, a != b, a <= b, a >= b);
 		a += b;
 		printf("after += a %lld\n", a);
+		printf("after + const %lld\n", add(a, 4294967298ll));
 	}
 	return 0;
 }

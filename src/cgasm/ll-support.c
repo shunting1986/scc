@@ -7,6 +7,13 @@ void cgasm_push_ll_val(struct cgasm_context *ctx, struct expr_val val) {
 	struct type *type = expr_val_get_type(val);
 	assert(type->tag == T_LONG_LONG);
 
+	if (val.type == EXPR_VAL_CONST_VAL) {
+		long long const_val = val.const_val.const_val.llval;
+		cgasm_println(ctx, "pushl $%u", (unsigned int) ((const_val >> 32) & 0xFFFFFFFFLL));
+		cgasm_println(ctx, "pushl $%u", (unsigned int) ((const_val) & 0xFFFFFFFFLL));
+		return;
+	}
+
 	// int base_reg = REG_EAX; // cgasm_push_bytes already use EAX
 	int base_reg = REG_ESI;
 	cgasm_load_addr_to_reg(ctx, val, base_reg);
