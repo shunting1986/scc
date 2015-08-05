@@ -4,6 +4,7 @@
 #include <inc/cgasm.h>
 
 static void load_int_to_fpstk(struct cgasm_context *ctx, struct expr_val val);
+static void load_ll_to_fpstk(struct cgasm_context *ctx, struct expr_val val);
 
 void cgasm_push_fp_val_to_gstk(struct cgasm_context *ctx, struct expr_val val) {
 	struct type *type = expr_val_get_type(val);
@@ -25,10 +26,20 @@ static void load_val_to_fpstk(struct cgasm_context *ctx, struct expr_val val) {
 	case T_INT:
 		load_int_to_fpstk(ctx, val);
 		break;
+	case T_LONG_LONG:
+		load_ll_to_fpstk(ctx, val);
+		break;
 	default:
 		panic("type %d", type->tag);
 		break;
 	}
+}
+
+static void load_ll_to_fpstk(struct cgasm_context *ctx, struct expr_val val) {
+	assert(expr_val_get_type(val)->tag == T_LONG_LONG);
+	int reg = REG_EAX;
+	cgasm_load_addr_to_reg(ctx, val, reg);
+	cgasm_println(ctx, "fildq (%%%s)", get_reg_str_code(reg));
 }
 
 static void load_int_to_fpstk(struct cgasm_context *ctx, struct expr_val val) {
