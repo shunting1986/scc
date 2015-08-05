@@ -821,8 +821,11 @@ static int get_incdec_step(struct type *type) {
 static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
 	struct type *type = expr_val_get_type(val);
+	if (type->tag != T_INT && type->tag != T_PTR) {
+		panic("only handle int and ptr right now");
+	}
+
 	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, type);
-	assert(type != NULL);
 	int step = get_incdec_step(type);
 
 	cgasm_load_val_to_reg(ctx, val, reg);
@@ -840,15 +843,22 @@ static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struc
 
 static struct expr_val cgasm_handle_pre_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
-	if (val.ctype == NULL || val.ctype->tag != T_INT) {
-		panic("only handle int right now");
+	struct type *type = expr_val_get_type(val);
+	if (type->tag != T_INT && type->tag != T_PTR) {
+		panic("only handle int and ptr right now");
 	}
 
+	int step = get_incdec_step(type);
 	cgasm_load_val_to_reg(ctx, val, reg);
-	cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+
+	if (step == 1) {
+		cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+	} else {
+		cgasm_println(ctx, "%s $%d, %%%s", is_inc ? "addl" : "subl", step, get_reg_str_code(reg));
+	}
+
 	cgasm_store_reg_to_mem(ctx, reg, val);
 	return val;
-
 }
 
 struct expr_val cgasm_handle_pre_inc(struct cgasm_context *ctx, struct expr_val val) {

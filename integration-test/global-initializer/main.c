@@ -77,7 +77,8 @@ struct adv_item adv_list[] = {
 void test_structure_array() {
 	struct adv_item *p;
 	printf("struct list:");
-	for (p = adv_list; p->name; p++) {
+	// for (p = adv_list; p->name; p++) {
+	for (p = adv_list; p->name; ++p) {
 		printf(" %s", p->name);
 	}
 	printf("\n");
