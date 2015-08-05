@@ -78,7 +78,7 @@ all: handy
 mm: rebuild-$(PROG_NAME) mongoose
 
 handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/subarr/main.c
+	./scc integration-test/degen-for/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

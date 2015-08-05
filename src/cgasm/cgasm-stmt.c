@@ -233,7 +233,10 @@ static void cgasm_for_statement(struct cgasm_context *ctx, struct expression_sta
 	cgasm_expression_statement(ctx, expr_stmt1);
 	cgasm_emit_jump_label(ctx, entry_label);
 	cond_expr_val = cgasm_expression_statement(ctx, expr_stmt2);
-	cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
+
+	if (cond_expr_val.type != EXPR_VAL_VOID) {
+		cgasm_goto_ifcond(ctx, cond_expr_val, exit_label, true);
+	}
 
 	cgasm_push_break_label(ctx, exit_label);
 	cgasm_push_continue_label(ctx, continue_label);
