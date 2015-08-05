@@ -151,6 +151,21 @@ union token wrap_ll_const_to_token(long long llval) {
 	return tok;
 }
 
+double const_token_to_double(union token tok) {
+	assert(tok.tok_tag == TOK_CONSTANT_VALUE);
+	int flags = tok.const_val.flags;
+
+	if (flags & CONST_VAL_TOK_INTEGER) {
+		return tok.const_val.ival;
+	} else if (flags & CONST_VAL_TOK_LONG_LONG) {
+		return tok.const_val.llval;
+	} else if (flags & CONST_VAL_TOK_FLOAT) {
+		return tok.const_val.fval;
+	} else {
+		panic("invalid const token");
+	}
+}
+
 union token wrap_to_simple_token(int tag) {
 	union token tok;
 	tok.tok_tag = tag;
