@@ -764,6 +764,14 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 	assert(is_integer_type(lhstype) && lhstype->tag != T_LONG_LONG);
 	assert(is_integer_type(rhstype) && rhstype->tag != T_LONG_LONG);
 
+	if (op == TOK_MUL_ASSIGN) { // give mult a special handling
+		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_STAR, lhs, rhs);
+		return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
+	} else if (op == TOK_DIV_ASSIGN) {
+		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_DIV, lhs, rhs);
+		return cgasm_handle_assign_op(ctx, lhs, res, TOK_ASSIGN);
+	}
+
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
 
 	return cgasm_handle_assign_op_with_reg(ctx, lhs, rhs_reg, op);
