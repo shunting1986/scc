@@ -302,6 +302,11 @@ static void cgasm_push_local_var_addr(struct cgasm_context *ctx, struct local_va
 	cgasm_println(ctx, "pushl %%eax");
 }
 
+static void cgasm_push_param_addr(struct cgasm_context *ctx, struct param_symbol *sym) {
+	cgasm_println(ctx, "leal %d(%%ebp), %%eax", cgasm_get_param_offset(ctx, sym));
+	cgasm_println(ctx, "pushl %%eax");
+}
+
 static void cgasm_push_global_var_addr(struct cgasm_context *ctx, struct global_var_symbol *sym) {
 	assert(sym->ctype != NULL);
 	cgasm_println(ctx, "pushl $%s", sym->name);
@@ -314,6 +319,9 @@ static void cgasm_push_sym_addr(struct cgasm_context *ctx, struct symbol *sym) {
 		break;
 	case SYMBOL_GLOBAL_VAR:
 		cgasm_push_global_var_addr(ctx, (struct global_var_symbol *) sym);
+		break;
+	case SYMBOL_PARAM:
+		cgasm_push_param_addr(ctx, (struct param_symbol *) sym);
 		break;
 	default:
 		panic("ni %d", sym->type);
