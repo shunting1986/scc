@@ -65,9 +65,14 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 	} else if (oldtype->tag == T_PTR && newtype->tag == T_PTR) { // change from one pointer type to another (can cover func ptr case)
 	} else if (oldtype->tag == T_INT && newtype->tag == T_PTR) { // convert from int to ptr
 	} else if (oldtype->tag == T_ARRAY && newtype->tag == T_PTR) {
+		// XXX we'd better have an extra parameter to determine if this is implicit or 
+		// explicit conversion
+	#if 0
 		if (!type_eq(oldtype->subtype, newtype->subtype)) {
-			panic("invalid type conversion from array to ptr");
+			type_dump(oldtype->subtype, 4);
+			type_dump(newtype->subtype, 4);
 		}
+	#endif
 		cgasm_change_array_func_to_ptr(ctx, &val);
 		return val;
 	} else {
