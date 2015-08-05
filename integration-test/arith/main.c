@@ -16,6 +16,8 @@ main(void) {
 		printf("%%=10 %d\n", md);
 		orv |= 7;
 		printf("|=7 %d\n", orv);
+
+		printf("!v %d\n", !v);
 	}
 	return 0;
 }

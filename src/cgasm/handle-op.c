@@ -229,7 +229,16 @@ static void cgasm_load_cc_to_reg(struct cgasm_context *ctx, struct condcode *cc,
 	char buf[128];
 
 	if (cc->op == TOK_EXCLAMATION) {
-		panic("'!' not supported yet");
+		struct expr_val lhs = cc->lhs;
+		free(cc);
+
+		cgasm_goto_ifcond(ctx, lhs, set1_label, 1);
+		cgasm_println(ctx, "movl $0, %%%s", get_reg_str_code(reg));
+		cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
+		cgasm_emit_jump_label(ctx, set1_label);
+		cgasm_println(ctx, "movl $1, %%%s", get_reg_str_code(reg));
+		cgasm_emit_jump_label(ctx, out_label);
+		return;
 	}
 
 	cgasm_goto_ifcond_cc(ctx, cc, set1_label, 0);
@@ -365,6 +374,12 @@ static void cgasm_push_struct(struct cgasm_context *ctx, struct expr_val val) {
 	cgasm_push_bytes(ctx, addr_reg, 0, type_get_size(type));
 }
 
+static void cgasm_push_cc(struct cgasm_context *ctx, struct condcode *cc) {
+	int reg = REG_EAX;
+	cgasm_load_cc_to_reg(ctx, cc, reg);
+	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
+}
+
 void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 	struct type *type = expr_val_get_type(val);
 	if (type->tag == T_LONG_LONG) {
@@ -408,6 +423,9 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		break;
 	case EXPR_VAL_CONST_VAL:
 		cgasm_push_const_val(ctx, val.const_val);
+		break;
+	case EXPR_VAL_CC:
+		cgasm_push_cc(ctx, val.cc);
 		break;
 	default:
 		panic("ni 0x%x", val.type);

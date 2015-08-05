@@ -29,8 +29,9 @@
 	-> DONE next func is parse_http_request (4194)
 	-> DONE next func is handle_cgi_request (4418)
 	-> DONE next func is put_dir (4520)
+	-> DONE next func is add_to_set (5029)
 
-	-> next func is add_to_set (5029)
+	-> next func is handle_proxy_request (5266)
 
 	TODO: support oct constant
 
