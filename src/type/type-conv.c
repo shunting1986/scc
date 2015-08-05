@@ -22,6 +22,26 @@ static struct expr_val type_convert_int_to_ll(struct cgasm_context *ctx, struct 
 	return temp;
 }
 
+// the new type should not be int64 since that has already been handled
+struct expr_val extend_int_type(struct cgasm_context *ctx, struct expr_val val, struct type *newtype) {
+	assert(is_integer_type(newtype));
+	assert(newtype->tag != T_LONG_LONG);
+
+	char buf[256];
+
+	// TODO assume zero extension right now..
+	// TODO if val is already a temp var, we do not need to allocate another one
+	struct expr_val ret = cgasm_alloc_temp_var(ctx, newtype);
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, ret, buf));
+	int reg = REG_EAX;
+	cgasm_load_val_to_reg(ctx, val, reg);
+
+	ret.ctype = val.ctype; // make sure we only copy the part we want
+	cgasm_store_reg_to_mem(ctx, reg, ret); 
+	ret.ctype = newtype;
+	return ret;
+}
+
 // NOTE: caller will handle the type ref for newtype
 struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, struct type *newtype) {
 	assert(val.ctype != NULL);
@@ -35,8 +55,7 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 		} else if (oldtype->tag == T_INT && newtype->tag == T_LONG_LONG) { // TODO int to long long is not supported yet
 			return type_convert_int_to_ll(ctx, val);
 		} else {
-			// XXX need do zero or sign extension
-			panic("ni");
+			return extend_int_type(ctx, val, newtype);
 		}
 	} else if (oldtype->tag == T_INT && is_void_ptr(newtype)) { // int to void *
 		// nothing need to do

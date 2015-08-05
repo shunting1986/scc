@@ -524,6 +524,19 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 		return cgasm_handle_binary_op_const(tok_tag, lhs, rhs);
 	}
 
+	// type convert, assume integer types in following code
+	assert(is_integer_type(lhstype));
+	assert(is_integer_type(rhstype));
+	if (lhstype->tag < rhstype->tag) {
+		lhs = type_convert(ctx, lhs, rhstype);
+		lhstype = lhs.ctype;
+	} else if (rhstype->tag < lhstype->tag) {
+		rhs = type_convert(ctx, rhs, lhstype);
+		rhstype = rhs.ctype;
+	}
+
+	assert(lhstype->tag == rhstype->tag);
+
 	switch (tok_tag) {
 	case TOK_ADD: 
 		LOAD_TO_REG();
