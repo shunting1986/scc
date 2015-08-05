@@ -4,6 +4,7 @@
 #include <inc/ll-support.h>
 
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt);
+static const char *get_asm_label_from_clabel(struct cgasm_context *ctx, char *buf, const char *clabel);
 
 static void cgasm_return_statement(struct cgasm_context *ctx, struct expression *expr) {
 	if (expr != NULL) {
@@ -43,6 +44,17 @@ static void cgasm_continue_statement(struct cgasm_context *ctx) {
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(label, buf));
 }
 
+/*
+ * In C, different function can define the same label, but in asm, labels should
+ * be unique in the entire file. GCC solve this problem by renaming C label with a 
+ * global counter. The C label with the same name in different functions will get
+ * different counter value. We solve this problem by prepending the function name.
+ */
+static void cgasm_goto_statement(struct cgasm_context *ctx, const char *clabel) {
+	char buf[256];
+	cgasm_println(ctx, "jmp %s", get_asm_label_from_clabel(ctx, buf, clabel));
+}
+
 static void cgasm_jump_statement(struct cgasm_context *ctx, struct jump_statement *stmt) {
 	switch (stmt->init_tok_tag) {
 	case TOK_RETURN:
@@ -53,6 +65,9 @@ static void cgasm_jump_statement(struct cgasm_context *ctx, struct jump_statemen
 		break;
 	case TOK_CONTINUE:
 		cgasm_continue_statement(ctx);
+		break;
+	case TOK_GOTO:
+		cgasm_goto_statement(ctx, stmt->goto_label);
 		break;
 	default:
 		panic("ni %s", token_tag_str(stmt->init_tok_tag));
@@ -321,6 +336,27 @@ static void cgasm_selection_statement(struct cgasm_context *ctx, struct selectio
 	}
 }
 
+static const char *get_asm_label_from_clabel(struct cgasm_context *ctx, char *buf, const char *clabel) {
+	assert(buf != NULL);
+	assert(ctx->func_ctx != NULL);
+	sprintf(buf, "%s_%s", ctx->func_ctx->name, clabel);
+	return buf;
+}
+
+static void cgasm_labeled_statement(struct cgasm_context *ctx, struct labeled_statement *stmt) {
+	char buf[256];
+
+	switch (stmt->init_tok) {
+	case TOK_IDENTIFIER:
+		cgasm_println_noind(ctx, "%s:", get_asm_label_from_clabel(ctx, buf, stmt->label_str));
+		break;
+		
+	default:
+		panic("ni %s", token_tag_str(stmt->init_tok));
+	}
+	cgasm_statement(ctx, stmt->stmt);
+}
+
 static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *stmt) {
 	switch (stmt->nodeType) {
 	case EXPRESSION_STATEMENT:
@@ -334,6 +370,9 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
 		break;
 	case SELECTION_STATEMENT:
 		cgasm_selection_statement(ctx, (struct selection_statement *) stmt);
+		break;
+	case LABELED_STATEMENT:
+		cgasm_labeled_statement(ctx, (struct labeled_statement *) stmt);
 		break;
 	case COMPOUND_STATEMENT:
 		cgasm_push_symtab(ctx);
