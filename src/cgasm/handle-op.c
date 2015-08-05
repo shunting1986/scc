@@ -509,6 +509,9 @@ struct expr_val cgasm_handle_binary_op(struct cgasm_context *ctx, int tok_tag, s
 	cgasm_store_reg_to_mem(ctx, lhs_reg, res); \
 } while (0)
 
+	cgasm_change_array_func_to_ptr(ctx, &lhs);
+	cgasm_change_array_func_to_ptr(ctx, &rhs);
+
 	struct type *lhstype = expr_val_get_type(lhs);
 	struct type *rhstype = expr_val_get_type(rhs);
 	if (lhstype->tag == T_PTR || rhstype->tag == T_PTR) {
