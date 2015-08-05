@@ -104,7 +104,7 @@ char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, ch
 /************************/
 /* sign/zero extension  */
 /************************/
-static void cgasm_extend_reg(struct cgasm_context *ctx, int reg, struct type *type) {
+void cgasm_extend_reg(struct cgasm_context *ctx, int reg, struct type *type) {
 	// XXX hard code to sign extension right now, should use sign/zero extension 
 	// based on signness of type
 	int size = type->size;
@@ -327,9 +327,11 @@ static void cgasm_push_sym(struct cgasm_context *ctx, struct symbol *sym) {
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
 
-static void cgasm_push_temp(struct cgasm_context *ctx, struct temp_var temp) {
+static void cgasm_push_temp(struct cgasm_context *ctx, struct expr_val temp) {
+	assert(temp.type == EXPR_VAL_TEMP);
 	int reg = REG_EAX;
-	cgasm_load_temp_to_reg(ctx, temp, reg);
+	cgasm_load_temp_to_reg(ctx, temp.temp_var, reg);
+	cgasm_extend_reg(ctx, reg, temp.ctype);
 	cgasm_println(ctx, "pushl %%%s", get_reg_str_code(reg));
 }
 
@@ -368,7 +370,7 @@ void cgasm_push_val(struct cgasm_context *ctx, struct expr_val val) {
 		cgasm_push_sym(ctx, val.sym);
 		break;
 	case EXPR_VAL_TEMP:
-		cgasm_push_temp(ctx, val.temp_var);
+		cgasm_push_temp(ctx, val);
 		break;
 	case EXPR_VAL_CONST_VAL:
 		cgasm_push_const_val(ctx, val.const_val);

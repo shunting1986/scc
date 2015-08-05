@@ -151,12 +151,16 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type);
 		cgasm_store_reg2_to_ll_temp(ctx, REG_EAX, REG_EDX, retval);
 		return retval;
-	} else if (ret_type->size == 4) {
+	} else if (ret_type->size <= 4) {
 		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type); 
+
+		// even if we return a short, we can copy the entire EAX. The high order bytes
+		// will be cleared later
 		cgasm_store_reg_to_mem(ctx, REG_EAX, retval); 
 		return retval;
 	} else {
-		panic("unsupported return type");
+		type_dump(ret_type, 4);
+		panic("unsupported return type, %s", funcname == NULL ? "(nil)" : funcname);
 	}
 }
 

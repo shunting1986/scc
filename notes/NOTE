@@ -16,9 +16,10 @@
 	-> DONE next func is mg_read (2957)
 	-> DONE next func is mg_write (3002)
 	-> DONE next func is url_decode (3025)
-	
-	-> next func is get_document_root (3112)
+	-> DONE next func is get_document_root (3112)
 
+
+	-> next func is mg_connect (3143)
 
 
 	TODO: support fp
