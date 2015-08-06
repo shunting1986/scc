@@ -1,7 +1,11 @@
+  plan to use util.s first
+
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 
-	2. build manually with orig C
+	2. [DONE] build manually with orig C
+
 	3. parse and dump C back
+	  
 	4. build with dumpped C
 	5. create .s
 	6. build with .s

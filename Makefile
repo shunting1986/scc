@@ -78,6 +78,7 @@ PROG_NAME := scc
 all: handy
 
 mm: rebuild-$(PROG_NAME) mongoose
+cc: rebuild-$(PROG_NAME) memcached
 
 handy: rebuild-$(PROG_NAME) 
 	./scc integration-test/isdir/main.c
@@ -113,3 +114,4 @@ btest:
 	@integration-test/batch-test.sh $(TLIST)
 
 include mongoose/Makefile
+include memcached/Makefile
