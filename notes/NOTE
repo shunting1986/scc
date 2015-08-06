@@ -32,16 +32,15 @@
 	-> DONE next func is add_to_set (5029)
 	-> DONE next func is handle_proxy_request (5266)
 	-> DONE next func is master_thread (5460)
+	-> DONE next func is mg_start (5540)
 
-	-> next func is mg_start (5540)
-
-	TODO: support oct constant
+	TODO: support oct constant <==
 
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
 	  DONE: 2.1 compile main.c to .s 
+		DONE 2.2 compile mongoose.c to .s (GOOD)
 
-		2.2 compile mongoose.c to .s
 	  3. assemble .s to .o
 	  4. link
 	  5. run
