@@ -24,12 +24,16 @@ func_type *fplist[] = {
 	div,
 };
 
+int doop(int a, int b, func_type *op) {
+	return op(a, b);
+}
+
 int
 main(void) {
 	int i, a, b;
 	while (scanf("%d%d", &a, &b) != EOF) {
 		for (i = 0; i < sizeof(fplist) / sizeof(*fplist); i++) {
-			printf("%d ", fplist[i](a, b));
+			printf("%d ", doop(a, b, fplist[i]));
 		}
 		printf("\n");
 	}

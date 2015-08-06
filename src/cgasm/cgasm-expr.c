@@ -90,17 +90,24 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 	int i;
 	char *funcname;
 
-	if (func.type == EXPR_VAL_SYMBOL) {
+	bool func_sym = func.type == EXPR_VAL_SYMBOL && func.sym->ctype->tag == T_FUNC;
+
+	if (func_sym) {
 		funcname = func.sym->name;
 	}
 
 	// get func type
 	struct type *func_type = expr_val_get_type(func);
+	assert(func_type != NULL); // does not support undeclared func right now
+
 	struct type *ret_type = NULL;
+	#if 0
 	if (func_type == NULL) {
 		red("function %s not declared", funcname);
 		ret_type = get_int_type(); // the default
-	} else {
+	} else  
+	#endif
+	{
 		if (func_type->tag == T_PTR) { // handle func ptr
 			func_type = func_type->subtype;
 		}
@@ -130,7 +137,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 	}
 
 	// emit call 
-	if (func.type == EXPR_VAL_SYMBOL) {
+	if (func_sym) {
 		cgasm_println(ctx, "call %s", func.sym->name);
 	} else {
 		int reg = REG_EAX;
