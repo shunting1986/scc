@@ -181,6 +181,7 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 
 void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse) {
 	char buf[128];
+	bool nonzero;
 	(void) buf;
 
 	switch (condval.type) {
@@ -191,6 +192,12 @@ void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int g
 		cgasm_goto_ifcond_cc(ctx, 
 			condcode_expr(TOK_NE, condval, int_const_expr_val(0), NULL).cc,
 			goto_label, inverse);
+		break;
+	case EXPR_VAL_CONST_VAL: 
+		nonzero = const_token_is_nonzero(condval.const_val);
+		if ((!inverse && nonzero) || (inverse && !nonzero)) {
+			cgasm_println(ctx, "jmp %s", get_jump_label_str(goto_label, buf));
+		}
 		break;
 	default:
 		panic("ni 0x%x", condval.type);

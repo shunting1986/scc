@@ -30,8 +30,9 @@
 	-> DONE next func is handle_cgi_request (4418)
 	-> DONE next func is put_dir (4520)
 	-> DONE next func is add_to_set (5029)
+	-> DONE next func is handle_proxy_request (5266)
 
-	-> next func is handle_proxy_request (5266)
+	-> next func is master_thread (5460)
 
 	TODO: support oct constant
 
