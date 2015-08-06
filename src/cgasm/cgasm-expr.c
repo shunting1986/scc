@@ -124,11 +124,14 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 	}
 #endif
 
+	// TODO does not support implicit type convertsion yet!! This may cause error
+	int arg_space_size = 0;
 	DYNARR_FOREACH_BEGIN(argu_expr_list->list, assignment_expression, each);
 		pval = mallocz(sizeof(*pval));
 		*pval = cgasm_assignment_expression(ctx, each);
 		cgasm_change_array_func_to_ptr(ctx, pval);
 		dynarr_add(argu_val_list, pval);
+		arg_space_size += type_get_size(expr_val_get_type(*pval));
 	DYNARR_FOREACH_END();
 
 	// push arguments in reverse order
@@ -146,7 +149,7 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 	}
 
 	// pop
-	cgasm_println(ctx, "addl $%d, %%esp", dynarr_size(argu_val_list) * 4); // XXX assume each argument takes 4 bytes right now
+	cgasm_println(ctx, "addl $%d, %%esp", arg_space_size); 
 
 	// cleanup
 	DYNARR_FOREACH_BEGIN(argu_val_list, expr_val, each);
