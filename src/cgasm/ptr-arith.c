@@ -76,7 +76,7 @@ static struct expr_val cgasm_handle_ptr_sub(struct cgasm_context *ctx, struct ex
 		rhs.ctype = get_int_type();
 		struct expr_val res = cgasm_handle_binary_op(ctx, TOK_SUB, lhs, rhs);
 		int elem_size = type_get_size(elem_type);
-		if (elem_size != 1) {
+		if (elem_type->tag != T_VOID && elem_size != 1) {
 			res = cgasm_handle_binary_op(ctx, TOK_DIV, res, int_const_expr_val(elem_size));
 		}
 		return res;

@@ -80,7 +80,7 @@ all: handy
 mm: rebuild-$(PROG_NAME) mongoose
 
 handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/dump-complex-struct/main.c
+	./scc integration-test/isdir/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
