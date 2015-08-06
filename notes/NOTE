@@ -34,16 +34,14 @@
 	-> DONE next func is master_thread (5460)
 	-> DONE next func is mg_start (5540)
 
-	TODO: support oct constant <==
-
 	TODO: next step is mongoose !!
 	  DONE. manual build mongoose using gcc
 	  DONE: 2.1 compile main.c to .s 
 		DONE 2.2 compile mongoose.c to .s (GOOD)
+	  DONE. assemble .s to .o
+	  DONE. link
 
-	  3. assemble .s to .o
-	  4. link
-	  5. run
+	  5. run <== segfault right now!!
 
 NOTE:
 	TODO: consider type when do operation

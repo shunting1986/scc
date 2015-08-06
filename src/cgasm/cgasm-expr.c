@@ -260,7 +260,8 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 	} else if (expr->sizeof_expr) {
 		// TODO we should not interp the expression. Retrieve the type is enough
 		struct expr_val val = cgasm_unary_expression(ctx, expr->sizeof_expr);
-		return int_const_expr_val(type_get_size(val.ctype));
+		struct type *type = expr_val_get_type(val);
+		return int_const_expr_val(type_get_size(type));
 	} else if (expr->sizeof_type) {
 		struct type *type = cgasm_type_name(ctx, expr->sizeof_type);
 		int type_size = type_get_size(type);
