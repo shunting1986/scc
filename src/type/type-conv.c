@@ -77,6 +77,9 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 		return val;
 	} else if (is_floating_type(oldtype) || is_floating_type(newtype)) {
 		return fp_type_convert(ctx, val, newtype);
+	} else if (oldtype->tag == T_FUNC && is_func_ptr(newtype)) { // func to func ptr
+		cgasm_change_array_func_to_ptr(ctx, &val);	
+		// the following code will set the func ptr type
 	} else {
 		type_dump(oldtype, 4);
 		type_dump(newtype, 4);
