@@ -1,6 +1,3 @@
-   TODO: add esp after function call has issue 
-	 TODO: does not emit '.globl' for static func
-	
 	== Achievement ==
 	./ The dumped back C files (with several monor changes) can be used to build a valid executable ==> this means we lexical and syntax analysis are GOOD
 	./ main.s is GOOD

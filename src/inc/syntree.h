@@ -28,6 +28,7 @@ struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_
 int add_return_cond(struct compound_statement *compound_stmt);
 int has_typedef(struct declaration_specifiers *decl_specifiers);
 int has_extern(struct declaration_specifiers *decl_specifiers);
+int has_static(struct declaration_specifiers *decl_specifiers);
 bool is_abstract_declarator(struct declarator *declarator);
 
 #ifdef __cplusplus

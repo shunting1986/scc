@@ -103,3 +103,13 @@ int has_extern(struct declaration_specifiers *decl_specifiers) {
 	DYNARR_FOREACH_END();
 	return false;
 }
+
+int has_static(struct declaration_specifiers *decl_specifiers) {
+	DYNARR_FOREACH_BEGIN(decl_specifiers->darr, syntreebasenode, each);
+		struct storage_class_specifier *scspec;
+		if (each->nodeType == STORAGE_CLASS_SPECIFIER && (scspec = (void *) each)->tok_tag == TOK_STATIC) {
+			return true;
+		}
+	DYNARR_FOREACH_END();
+	return false;
+}

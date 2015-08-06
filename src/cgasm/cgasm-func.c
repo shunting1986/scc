@@ -34,13 +34,15 @@ static void cgasm_dump_buffered_code(struct cgasm_context *ctx, struct cgasm_fun
 /*
  * create function context
  */
-void cgasm_enter_function(struct cgasm_context *ctx, char *fname) {
+void cgasm_enter_function(struct cgasm_context *ctx, char *fname, bool is_static) {
 	if (ctx->func_ctx != NULL) {
 		panic("nested function definition not allowed");
 	}
 
 	cgasm_println(ctx, ".text");
-	cgasm_println_noind(ctx, ".global %s", fname); 
+	if (!is_static) {
+		cgasm_println_noind(ctx, ".global %s", fname); 
+	}
  	cgasm_println_noind(ctx, "%s:", fname);
 
 	ctx->func_ctx = func_context_init(fname);
@@ -118,6 +120,7 @@ static void register_parameters(struct cgasm_context *ctx, struct dynarr *suff_l
 void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_specifiers *decl_specifiers, struct declarator *func_def_declarator, struct compound_statement *compound_stmt) {	
 	char *fname = NULL;
 	struct type *func_type = parse_type_from_decl_specifiers(ctx, decl_specifiers);
+	bool is_static = has_static(decl_specifiers);
 	func_type = parse_type_from_declarator(ctx, func_type, func_def_declarator, &fname);
 
 	if (fname == NULL) {
@@ -129,8 +132,7 @@ void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_spe
 	// register function declaration
 	cgasm_add_decl_sym(ctx, fname, func_type);
 
-
-	cgasm_enter_function(ctx, fname);
+	cgasm_enter_function(ctx, fname, is_static);
 
 	// handle parameters
 	register_parameters(ctx, func_def_declarator->direct_declarator->suff_list);
