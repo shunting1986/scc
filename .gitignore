@@ -12,3 +12,7 @@ scc
 
 /mongoose/mongoose/
 /mongoose/build/
+
+/memcached/memcached-1.4.17/
+/memcached/orig-build/
+/memcached/build/

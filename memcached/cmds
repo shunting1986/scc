@@ -1,0 +1,11 @@
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/memcached.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/cache.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/items.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/hash.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/assoc.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/thread.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/slabs.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/stats.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/util.c
+gcc -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/daemon.c
+gcc assoc.o cache.o daemon.o hash.o items.o memcached.o thread.o slabs.o stats.o util.o -levent -lpthread
