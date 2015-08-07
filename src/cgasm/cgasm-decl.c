@@ -133,8 +133,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		}
 
 		// register symbol id with type 'final_type'
-		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type);
-		sym->flags = symbol_flags; // TODO verify the flags for function redeclare
+		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type, symbol_flags);
 
 		if (ctx->func_ctx != NULL) { 
 			// handle initializer (XXX does not support struct initializer yet)

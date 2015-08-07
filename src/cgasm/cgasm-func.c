@@ -130,7 +130,7 @@ void cgasm_function_definition(struct cgasm_context *ctx, struct declaration_spe
 		panic("requires function type");
 	}
 	// register function declaration
-	cgasm_add_decl_sym(ctx, fname, func_type);
+	cgasm_add_decl_sym(ctx, fname, func_type, 0);
 
 	cgasm_enter_function(ctx, fname, is_static);
 

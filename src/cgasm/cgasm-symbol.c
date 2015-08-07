@@ -97,13 +97,13 @@ struct symbol *cgasm_add_struct_type(struct cgasm_context *ctx, const char *name
 	return ret;
 }
 
-struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type) {
+struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type, int symbol_flags) {
 	struct cgasm_func_context *func_ctx =  ctx->func_ctx;	
 	struct symbol *ret;
 
-	if (type->tag == T_FUNC) { // redeclare function is OK
-		ret = symtab_lookup_norec(ctx->top_stab, id);
-		if (ret != NULL) {
+	ret = symtab_lookup_norec(ctx->top_stab, id);
+	if (ret != NULL) {
+		if (type->tag == T_FUNC) {
 			// TODO verify function declaration
 			// use the pass in type
 			struct type *old_type = ret->ctype;
@@ -111,9 +111,20 @@ struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct ty
 			type_put(old_type);
 			return ret;
 		}
-	} else {
-		cgasm_check_sym_redef(ctx, id);
+
+		// check week/strong declaration
+		if ((ret->flags & SYMBOL_FLAG_EXTERN) == 0 &&
+				(symbol_flags & SYMBOL_FLAG_EXTERN) == 0) {
+			panic("symbol redefinition: %s", id);
+		}
+
+		if ((symbol_flags & SYMBOL_FLAG_EXTERN) == 0) {
+			ret->flags = symbol_flags;
+		}
+		// TODO verify that the types in the 2 declarations match
+		return ret;
 	}
+
 	if (func_ctx == NULL) {
 		assert(ctx->top_stab->enclosing == NULL);
 		symtab_add(ctx->top_stab, ret = symtab_new_global_var(id, type));
@@ -121,6 +132,7 @@ struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct ty
 		assert(ctx->top_stab->enclosing != NULL);	
 		symtab_add(ctx->top_stab, ret = symtab_new_local_var(id, func_alloc_space(func_ctx, type->size), type)); // idx start from 0
 	}
+	ret->flags = symbol_flags;
 
 #if DEBUG
 	fprintf(stderr, "\033[31mDump the type of declared symbol %s\033[0m\n", id);

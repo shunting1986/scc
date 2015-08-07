@@ -155,6 +155,9 @@ static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *
 void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer) {
 	// no need to allocate space for typedef/extern symbol
 	if (sym->flags & (SYMBOL_FLAG_TYPEDEF | SYMBOL_FLAG_EXTERN)) {
+		if (initializer != NULL) {
+			panic("typedef or extern variable can not have initializer");
+		}
 		return;
 	}
 

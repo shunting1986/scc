@@ -70,7 +70,7 @@ void cgasm_println(struct cgasm_context *ctx, const char *fmt, ...);
 void cgasm_println_noind(struct cgasm_context *ctx, const char *fmt, ...);
 
 // cgasm-symbol.c
-struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type);
+struct symbol *cgasm_add_decl_sym(struct cgasm_context *ctx, char *id, struct type *type, int symbol_flags);
 void cgasm_add_param_sym(struct cgasm_context *ctx, char *id, struct type *type);
 struct symbol *cgasm_lookup_sym(struct cgasm_context *ctx, char *id);
 struct symbol *cgasm_lookup_sym_noabort(struct cgasm_context *ctx, char *id);
