@@ -18,23 +18,24 @@ struct compound_statement *parse_compound_statement(struct parser *parser) {
 
 	// look one token ahead to determing if this is a declaration or statement or empty block
 	union token tok = lexer_next_token(parser->lexer);
-	struct dynarr *declList = dynarr_init();
-	struct dynarr *stmtList = dynarr_init();
+	struct dynarr *decl_or_stmt_list = dynarr_init();
 	while (tok.tok_tag != TOK_RBRACE) {
 		if (initiate_declaration(tok)) {
+			#if 0	
 			if (dynarr_size(stmtList) > 0) {
 				panic("encounter declaration after statement");
 			}
+			#endif
 			lexer_put_back(parser->lexer, tok);
-			dynarr_add(declList, parse_declaration(parser));
+			dynarr_add(decl_or_stmt_list, parse_declaration(parser));
 		} else { // initiate a statement
 			lexer_put_back(parser->lexer, tok);
-			dynarr_add(stmtList, parse_statement(parser));
+			dynarr_add(decl_or_stmt_list, parse_statement(parser));
 		}
 		tok = lexer_next_token(parser->lexer);
 	}
 	lexer_pop_typedef_tab(parser->lexer);
-	return compound_statement_init(declList, stmtList);
+	return compound_statement_init(decl_or_stmt_list);
 }
 
 static int initiate_iteration_statement(union token tok) {

@@ -396,12 +396,13 @@ static void cgasm_statement(struct cgasm_context *ctx, struct syntreebasenode *s
  * afterwards
  */
 void cgasm_compound_statement(struct cgasm_context *ctx, struct compound_statement *compound_stmt) {
-	DYNARR_FOREACH_BEGIN(compound_stmt->declList, declaration, each);
-		cgasm_declaration(ctx, each->decl_specifiers, each->init_declarator_list);
-	DYNARR_FOREACH_END();
-	
-	DYNARR_FOREACH_BEGIN(compound_stmt->stmtList, syntreebasenode, each);
-		cgasm_statement(ctx, each);
+	DYNARR_FOREACH_BEGIN(compound_stmt->decl_or_stmt_list, syntreebasenode, each);
+		if (each->nodeType == DECLARATION) {
+			struct declaration *decl = (struct declaration *) each;
+			cgasm_declaration(ctx, decl->decl_specifiers, decl->init_declarator_list);
+		} else {
+			cgasm_statement(ctx, each);
+		}
 	DYNARR_FOREACH_END();
 }
 

@@ -241,11 +241,16 @@ struct jump_statement *jump_statement_init(int init_tok_tag);
 
 struct compound_statement {
 	int nodeType;
+
+	/*
 	struct dynarr *declList;
-	struct dynarr *stmtList;
+	struct dynarr *stmtList; 
+	 */
+	struct dynarr *decl_or_stmt_list;
 };
 
-struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+// struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList);
+struct compound_statement *compound_statement_init(struct dynarr *decl_or_stmt_list);
 
 struct equality_expression {
 	int nodeType;

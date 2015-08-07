@@ -22,7 +22,7 @@ static int is_return_stmt(struct syntreebasenode *stmt) {
  * return 1 if return statement is added
  */
 int add_return_cond(struct compound_statement *compound_stmt) {
-	struct dynarr *stmtList = compound_stmt->stmtList;
+	struct dynarr *stmtList = compound_stmt->decl_or_stmt_list;
 	int ret = 0;
 	if (dynarr_size(stmtList) == 0 || !is_return_stmt(dynarr_last(stmtList))) {
 		dynarr_add(stmtList, jump_statement_init(TOK_RETURN));

@@ -56,11 +56,10 @@ struct jump_statement *jump_statement_init(int init_tok_tag) {
 	return stmt;
 }
 
-struct compound_statement *compound_statement_init(struct dynarr *declList, struct dynarr *stmtList) {
+struct compound_statement *compound_statement_init(struct dynarr *decl_or_stmt_list) {
 	struct compound_statement *stmt = mallocz(sizeof(*stmt));
 	stmt->nodeType = COMPOUND_STATEMENT;
-	stmt->declList = declList;
-	stmt->stmtList = stmtList;
+	stmt->decl_or_stmt_list = decl_or_stmt_list;
 	return stmt;
 }
 

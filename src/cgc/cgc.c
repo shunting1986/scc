@@ -88,12 +88,14 @@ void cgc_compound_statement(struct cgc_context *ctx, struct compound_statement *
 	cgc_indent(ctx); cgc_print(ctx, "{\n");
 
 	ctx->indent += ctx->step;
-	DYNARR_FOREACH_BEGIN(compound_stmt->declList, declaration, each);
-		cgc_declaration(ctx, each->decl_specifiers, each->init_declarator_list);
-	DYNARR_FOREACH_END();
 
-	DYNARR_FOREACH_BEGIN(compound_stmt->stmtList, syntreebasenode, each);
-		cgc_statement(ctx, each);
+	DYNARR_FOREACH_BEGIN(compound_stmt->decl_or_stmt_list, syntreebasenode, each);
+		if (each->nodeType == DECLARATION) {
+			struct declaration *decl = (struct declaration *) each;
+			cgc_declaration(ctx, decl->decl_specifiers, decl->init_declarator_list);
+		} else {
+			cgc_statement(ctx, each);
+		}
 	DYNARR_FOREACH_END();
 
 	ctx->indent -= ctx->step;
