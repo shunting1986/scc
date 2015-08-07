@@ -236,6 +236,9 @@ void token_to_cstr(union token tok, struct cbuf *cbuf) {
 	case TOK_IDENTIFIER:
 		cbuf_add_str(cbuf, tok.id.s);
 		break;
+	case TOK_TYPE_NAME:
+		cbuf_add_str(cbuf, tok.id.s);
+		break;
 	case TOK_CONSTANT_VALUE:
 		const_val_to_cstr(tok, cbuf);
 		break;

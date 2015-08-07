@@ -7,6 +7,6 @@ memcached:
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/util.c
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/daemon.c
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/cache.c
-	./scc -E -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/thread.c
+	./scc -E -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/slabs.c
 
 .PHONY: memcached
