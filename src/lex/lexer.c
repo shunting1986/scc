@@ -474,6 +474,7 @@ parse_id:
 
 		token_tag = check_keyword_token(s);
 		int peek_tok;
+		(void) peek_tok;
 		if (token_tag != TOK_UNDEF) {
 			tok.tok_tag = token_tag;
 			free(s);
@@ -485,7 +486,8 @@ parse_id:
 check_id_token:
 		// below check_id_token, use tok.id.s instead of s since s is not always valid
 		// from all the paths
-		if (lexer_is_typedef(lexer, tok.id.s) && (peek_tok = lexer_peek_token(lexer)) != TOK_COMMA && peek_tok != TOK_SEMICOLON) {
+		// if (lexer_is_typedef(lexer, tok.id.s) && (peek_tok = lexer_peek_token(lexer)) != TOK_COMMA && peek_tok != TOK_SEMICOLON) { // in func decl, param type which is a typedef may be followed by ','
+		if (lexer_is_typedef(lexer, tok.id.s) && (peek_tok = lexer_peek_token(lexer)) != TOK_SEMICOLON) { // XXX this is a temporary trick
 			tok.tok_tag = TOK_TYPE_NAME;
 		} else if (try_expand_macro(lexer, tok.id.s)) {
 			// this is a macro

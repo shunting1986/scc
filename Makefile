@@ -81,7 +81,7 @@ mm: rebuild-$(PROG_NAME) mongoose
 cc: rebuild-$(PROG_NAME) memcached
 
 handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/isdir/main.c
+	./scc integration-test/syntax-typedef/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 
