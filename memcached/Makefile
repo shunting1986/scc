@@ -6,6 +6,7 @@ memcached-rebuild: rebuild-$(PROG_NAME) memcached
 memcached:
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/util.c
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/daemon.c
-	./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/cache.c
+	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/cache.c
+	./scc -E -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/hash.c
 
 .PHONY: memcached

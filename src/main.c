@@ -4,18 +4,30 @@
 #include <inc/cgc.h>
 #include <inc/pp.h>
 
+static int only_pp = 0;
+
 void parse_options(struct lexer *lexer, int argc, char **argv) {
 	int i;
 	for (i = 1; i < argc - 1; i++) {
 		char *s = argv[i];
 
-		if (s[0] != '-' || s[1] != 'D') {
-			panic("only support -D right now");
+		if (s[0] != '-') {
+			panic("invalid option");
 		}
-		if (!valid_id_str(s + 2)) {
-			panic("require id after -D");
+
+		if (s[1] == 'D') {
+			if (!valid_id_str(s + 2)) {
+				panic("require id after -D");
+			}
+			pp_cmdline_define(lexer, s + 2);
+		} else if (s[1] == 'E') {
+			if (s[2] != '\0') {
+				panic("invalid -E option");
+			}
+			only_pp = 1;
+		} else {
+			panic("invalid option");
 		}
-		pp_cmdline_define(lexer, s + 2);
 	}
 }
 
@@ -36,13 +48,11 @@ main(int argc, char **argv) {
 
 	struct syntree *tree = parse(parser);
 
-#if 0
-	{
+	if (only_pp) {
 		struct cgc_context *cgctx = cgc_context_init(stderr, 4);
 		cgc_tree(cgctx, tree);
 		panic("halt");
 	}
-#endif
 
 	// syntree_dump(tree);
 	cgasm_tree(tree);

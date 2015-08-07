@@ -2,11 +2,13 @@ gcc -m32 -c valid/util.s
 gcc -m32 -c valid/daemon.s
 gcc -m32 -c valid/cache.s
 
-gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/memcached.c
-gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/items.c
+gcc -m32 -c valid/assoc.c
+gcc -m32 -c valid/stats.c
+
 gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/hash.c
-gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/assoc.c
+gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/items.c
 gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/thread.c
 gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/slabs.c
-gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/stats.c
+gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/memcached.c
+
 gcc -m32 assoc.o cache.o daemon.o hash.o items.o memcached.o thread.o slabs.o stats.o util.o -levent -lpthread
