@@ -38,6 +38,7 @@ static int pred_table[] = {
 	[TOK_LE] = 50,
 
 	[TOK_EQ] = 30,
+	[TOK_NE] = 30,
 
 	[TOK_LOGIC_AND] = 20,
 
@@ -53,7 +54,7 @@ static int pred_table[] = {
 static inline int pp_get_op_pred(unsigned int op) {
 	int pred;
 	if (op >= TOK_TOTAL_NUM || (pred = pred_table[op]) <= 0) {
-		assert(false); // TODO
+		// assert(false); // TODO
 		panic("invalid op %s", token_tag_str(op));
 	}
 	return pred;

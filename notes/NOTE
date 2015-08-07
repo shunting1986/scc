@@ -1,4 +1,5 @@
   plan to use util.s first
+	1. fix a type def issue (func-ptr can cover this)
 
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 

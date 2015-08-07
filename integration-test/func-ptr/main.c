@@ -16,15 +16,17 @@ int div(int a, int b) {
 	return a / b;
 }
 
-typedef int func_type(int a, int b);
-func_type *fplist[] = {
+typedef int (*func_type)(int a, int b);
+func_type fplist[] = {
 	add,
 	sub,
 	mul,
 	div,
 };
 
-int doop(int a, int b, func_type *op) {
+int doop(func_type, int a, int b);
+
+int doop(func_type op, int a, int b) {
 	return op(a, b);
 }
 
@@ -33,7 +35,7 @@ main(void) {
 	int i, a, b;
 	while (scanf("%d%d", &a, &b) != EOF) {
 		for (i = 0; i < sizeof(fplist) / sizeof(*fplist); i++) {
-			printf("%d ", doop(a, b, fplist[i]));
+			printf("%d ", doop(fplist[i], a, b));
 		}
 		printf("\n");
 	}
