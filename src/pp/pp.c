@@ -81,7 +81,9 @@ static void pp_skip(struct lexer *lexer, int mode) {
 			case TOK_IDENTIFIER:
 				if (strcmp("include_next", tok.id.s) == 0) {
 					break;
-				} 
+				}  else if (strcmp("pragma", tok.id.s) == 0) {
+					break;
+				}
 				// else full thru to default
 			default:
 				token_dump(tok);

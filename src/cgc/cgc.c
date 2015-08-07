@@ -401,7 +401,11 @@ void cgc_if_statement(struct cgc_context *ctx, struct expression *expr, struct s
 }
 
 void cgc_switch_statement(struct cgc_context *ctx, struct expression *expr, struct statement *stmt) {
-	panic("ni");
+	cgc_indent(ctx);
+	cgc_print(ctx, "switch (");
+	cgc_expression(ctx, expr);
+	cgc_print(ctx, ")\n");
+	cgc_indent_statement(ctx, stmt);
 }
 
 void cgc_selection_statement(struct cgc_context *ctx, struct selection_statement *stmt) {
@@ -425,9 +429,17 @@ void cgc_labeled_statement(struct cgc_context *ctx, struct labeled_statement *la
 		cgc_statement(ctx, labeled_stmt->stmt);
 		break;
 	case TOK_CASE:
-		panic("case");
+		cgc_indent(ctx);
+		cgc_print(ctx, "case ");
+		cgc_constant_expression(ctx, labeled_stmt->case_expr);
+		cgc_println(ctx, ":");
+		cgc_indent_statement(ctx, labeled_stmt->stmt);
+		break;
 	case TOK_DEFAULT:
-		panic("default");
+		cgc_indent(ctx);
+		cgc_println(ctx, "default:");
+		cgc_indent_statement(ctx, labeled_stmt->stmt);
+		break;
 	default:
 		panic("can not reach here, %s", token_tag_str(labeled_stmt->nodeType));
 	}

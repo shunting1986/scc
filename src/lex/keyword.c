@@ -23,6 +23,9 @@ static const char *keyword_str_list[] = {
 
 	[TOK_IF] = "if",
 	[TOK_ELSE] = "else",
+	[TOK_SWITCH] = "switch",
+	[TOK_CASE] = "case",
+	[TOK_DEFAULT] = "default",
 	[TOK_TYPEDEF] = "typedef",
 	[TOK_SIZEOF] = "sizeof",
 	[TOK_SIGNED] = "signed",

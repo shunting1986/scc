@@ -156,7 +156,18 @@ static int initiate_selection_statement(union token tok) {
 }
 
 static struct selection_statement *parse_switch_statement(struct parser *parser) {
-	panic("ni");
+	struct expression *expr;
+	struct selection_statement *selstmt = selection_statement_init(SEL_TYPE_SWITCH);
+	struct statement *stmt;
+
+	expect(parser->lexer, TOK_LPAREN);
+	expr = parse_expression(parser);
+	expect(parser->lexer, TOK_RPAREN);
+	stmt = parse_statement(parser);
+
+	selstmt->switch_stmt.expr = expr;
+	selstmt->switch_stmt.stmt = stmt;
+	return selstmt;
 }
 
 static struct selection_statement *parse_if_statement(struct parser *parser) {
