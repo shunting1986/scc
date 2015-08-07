@@ -109,6 +109,14 @@ void pp_define(struct lexer *lexer) {
 	lexer_pop_config(lexer, want_sharp, old_want_sharp);
 }
 
+void pp_cmdline_define(struct lexer *lexer, const char *id) {
+	struct dynarr *darr = dynarr_init();
+	union token int_const_tok = wrap_int_const_to_token(1);
+	dynarr_add(darr, token_shallow_dup(&int_const_tok));
+	struct macro *macro = obj_macro_init(darr);
+	define_macro(lexer, id, macro);
+}
+
 void pp_undef(struct lexer *lexer) {
 	union token idtok = expect(lexer, TOK_IDENTIFIER);
 	undef_macro(lexer, idtok.id.s);

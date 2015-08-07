@@ -414,6 +414,21 @@ int lexer_peek_token(struct lexer *lexer) {
 	return tag;
 }
 
+bool valid_id_str(const char *s) {
+	if (isalpha(*s) || *s == '_') {
+		s++;
+		while (*s) {
+			if (isdigit(*s) || isalpha(*s) || *s == '_') {
+				s++;
+			} else {
+				break;
+			}
+		}
+		return *s == '\0';
+	}
+	return false;
+}
+
 union token lexer_next_token(struct lexer *lexer) {
 	int ch;
 	union token tok;

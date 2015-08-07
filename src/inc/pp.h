@@ -56,6 +56,7 @@ int pp_expr(struct lexer *lexer, bool until_newline);
 
 // pp-define.c
 void pp_define(struct lexer *lexer);
+void pp_cmdline_define(struct lexer *lexer, const char *id);
 void pp_undef(struct lexer *lexer);
 
 // macro-expand.c

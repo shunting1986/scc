@@ -2,17 +2,36 @@
 #include <inc/parser.h>
 #include <inc/cgasm.h>
 #include <inc/cgc.h>
+#include <inc/pp.h>
+
+void parse_options(struct lexer *lexer, int argc, char **argv) {
+	int i;
+	for (i = 1; i < argc - 1; i++) {
+		char *s = argv[i];
+
+		if (s[0] != '-' || s[1] != 'D') {
+			panic("only support -D right now");
+		}
+		if (!valid_id_str(s + 2)) {
+			panic("require id after -D");
+		}
+		pp_cmdline_define(lexer, s + 2);
+	}
+}
 
 int
 main(int argc, char **argv) {
-	if (argc != 2) {
-		panic("Usage: %s [file to compile]");
+	if (argc < 2) {
+		panic("Usage: %s [file to compile]", argv[0]);
 	} 
-	struct file_reader *fr = file_reader_init(argv[1]);
+
+	struct file_reader *fr = file_reader_init(argv[argc - 1]);
 	if (fr == NULL) {
-		panic("file not found %s", argv[1]);
+		panic("file not found %s", argv[argc - 1]);
 	}
+
 	struct lexer *lexer = lexer_init(fr);
+	parse_options(lexer, argc, argv);
 	struct parser *parser = parser_init(lexer);
 
 	struct syntree *tree = parse(parser);

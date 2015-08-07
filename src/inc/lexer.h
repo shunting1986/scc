@@ -68,6 +68,7 @@ void lexer_dump_remaining(struct lexer *lexer);
 char *parse_string_literal(struct lexer *lexer, int term_tag);
 void lexer_discard_line(struct lexer *lexer);
 void normalize_expanded_token_list(struct lexer *lexer);
+bool valid_id_str(const char *s);
 
 /* typedef.c */
 int lexer_is_typedef(struct lexer *lexer, const char *s);
