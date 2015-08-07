@@ -1,5 +1,5 @@
 MEMCACHED_SRC_ROOT=memcached/memcached-1.4.17
-OUT_DIR=memcached/build
+MEMCACHED_OUT_DIR=memcached/build
 
 memcached-rebuild: rebuild-$(PROG_NAME) memcached
 

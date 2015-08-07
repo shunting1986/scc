@@ -36,7 +36,7 @@ main(int argc, char **argv) {
 
 	struct syntree *tree = parse(parser);
 
-#if 1
+#if 0
 	{
 		struct cgc_context *cgctx = cgc_context_init(stderr, 4);
 		cgc_tree(cgctx, tree);

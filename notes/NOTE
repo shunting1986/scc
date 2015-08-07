@@ -1,6 +1,5 @@
-  plan to use util.s first
-	-> [DONE] next step memcached.h L492
-	-> next step memcached.h L496
+  can use util.c now 
+  next step is to use util.s first
 
 
 
