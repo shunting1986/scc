@@ -4,6 +4,7 @@ MEMCACHED_OUT_DIR=memcached/build
 memcached-rebuild: rebuild-$(PROG_NAME) memcached
 
 memcached:
-	./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/util.c
+	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/util.c
+	./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/daemon.c
 
 .PHONY: memcached

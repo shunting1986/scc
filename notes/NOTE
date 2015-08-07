@@ -1,6 +1,8 @@
   ACHIEVEMENT:
 	1. [DONE] util.c
 
+	next step is daemon.c
+
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 
 	2. [DONE] build manually with orig C
