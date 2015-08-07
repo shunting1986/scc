@@ -323,7 +323,7 @@ static void cgasm_ifelse_statement(struct cgasm_context *ctx, struct expression 
 }
 
 static void cgasm_switch_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
-	panic("ni");
+	cgasm_emit_abort(ctx); // TODO we don't support switch yet
 }
 
 static void cgasm_selection_statement(struct cgasm_context *ctx, struct selection_statement *stmt) {
