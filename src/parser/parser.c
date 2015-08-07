@@ -75,7 +75,8 @@ static int initiate_storage_class_specifier(union token tok) {
 		|| tok.tok_tag == TOK_EXTERN
 		|| tok.tok_tag == TOK_STATIC
 		|| tok.tok_tag == TOK_AUTO
-		|| tok.tok_tag == TOK_REGISTER;
+		|| tok.tok_tag == TOK_REGISTER
+		|| tok.tok_tag == TOK_INLINE;
 }
 
 static bool initiate_abstract_declarator(union token tok) {
