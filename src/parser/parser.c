@@ -438,6 +438,31 @@ struct declaration *parse_declaration(struct parser *parser) {
 	return declaration_init(decl_specifiers, init_declarator_list);
 }
 
+// Mark parameter as not typedef is the key to work correctly is a parameter overrides
+// a typedef
+static void register_func_parameter_for_typedef(struct parser *parser, struct parameter_declaration *decl) {
+	// decl->declarator is null for f(void)
+	if (decl->declarator != NULL) {
+		const char *id = extract_id_from_declarator(decl->declarator);
+		if (id != NULL) { 
+			lexer_register_typedef(parser->lexer, id, false); 
+		}
+	}
+}
+
+// The declarator is for function
+static void register_func_parameters_for_typedef(struct parser *parser, struct declarator *declarator) {
+	struct dynarr *suff_list = declarator->direct_declarator->suff_list;
+	assert(dynarr_size(suff_list) == 1);
+	struct direct_declarator_suffix *suff = dynarr_get(suff_list, 0);
+	assert(suff->empty_paren || suff->param_type_list != NULL);
+	if (suff->param_type_list != NULL) {
+		DYNARR_FOREACH_BEGIN(suff->param_type_list->param_decl_list, parameter_declaration, each);
+			register_func_parameter_for_typedef(parser, each);
+		DYNARR_FOREACH_END();
+	}
+}
+
 // assume no EOF found; 
 static struct external_declaration *parse_external_decl(struct parser *parser) {
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
@@ -459,8 +484,13 @@ static struct external_declaration *parse_external_decl(struct parser *parser) {
 
 		tok = lexer_next_token(parser->lexer);	
 		if (tok.tok_tag == TOK_LBRACE) {
+			lexer_push_typedef_tab(parser->lexer);
+			register_func_parameters_for_typedef(parser, declarator);
+
 			lexer_put_back(parser->lexer, tok);
 			compound_stmt = parse_compound_statement(parser);
+
+	 		lexer_pop_typedef_tab(parser->lexer);
 		
 			// set external decl
 			external_decl->func_def_declarator = declarator;

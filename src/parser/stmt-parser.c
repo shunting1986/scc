@@ -12,9 +12,10 @@ static int initiate_compound_statement(union token tok) {
 	return tok.tok_tag == TOK_LBRACE;
 }
 
+// the caller should push and pop the typedef table
 struct compound_statement *parse_compound_statement(struct parser *parser) {
 	expect(parser->lexer, TOK_LBRACE);
-	lexer_push_typedef_tab(parser->lexer);
+	// lexer_push_typedef_tab(parser->lexer);
 
 	// look one token ahead to determing if this is a declaration or statement or empty block
 	union token tok = lexer_next_token(parser->lexer);
@@ -34,7 +35,7 @@ struct compound_statement *parse_compound_statement(struct parser *parser) {
 		}
 		tok = lexer_next_token(parser->lexer);
 	}
-	lexer_pop_typedef_tab(parser->lexer);
+	// lexer_pop_typedef_tab(parser->lexer);
 	return compound_statement_init(decl_or_stmt_list);
 }
 
@@ -253,8 +254,12 @@ struct syntreebasenode *parse_statement(struct parser *parser) {
 	union token tok = lexer_next_token(parser->lexer);
 	if (initiate_compound_statement(tok)) {
 		lexer_put_back(parser->lexer, tok);
-		return (struct syntreebasenode *)
+
+		lexer_push_typedef_tab(parser->lexer);
+		struct syntreebasenode *ret = (struct syntreebasenode *)
 			parse_compound_statement(parser);
+	 	lexer_pop_typedef_tab(parser->lexer);
+		return ret;
 	} else if (initiate_iteration_statement(tok)) {
 		lexer_put_back(parser->lexer, tok);
 		return (struct syntreebasenode *)

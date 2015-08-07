@@ -9,7 +9,7 @@ struct typedef_tab {
 
 // NOTE: besides register typedef id, we should register non-typedef ids as well.
 // Because non-typedef id may override typedef id
-void lexer_register_typedef(struct lexer *lexer, char *id, int is_typedef) {
+void lexer_register_typedef(struct lexer *lexer, const char *id, int is_typedef) {
 	htab_insert(lexer->typedef_tab->htab, id, (void *) (long) is_typedef);
 }
 

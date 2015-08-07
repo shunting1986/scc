@@ -25,6 +25,7 @@ void syntree_destroy(struct syntree *tree);
 // syntree-check.c
 int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarator_list);
 struct dynarr *extract_id_list_from_init_declarator_list(struct init_declarator_list *init_declarator_list);
+char *extract_id_from_declarator(struct declarator *declarator);
 int add_return_cond(struct compound_statement *compound_stmt);
 int has_typedef(struct declaration_specifiers *decl_specifiers);
 int has_extern(struct declaration_specifiers *decl_specifiers);

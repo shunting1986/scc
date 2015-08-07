@@ -59,7 +59,7 @@ int is_func_decl_init_declarator_list(struct init_declarator_list *init_declarat
 	return init_declarator->initializer == NULL && is_func_decl_declarator(init_declarator->declarator);
 }
 
-static char *extract_id_from_declarator(struct declarator *declarator) {
+char *extract_id_from_declarator(struct declarator *declarator) {
 	struct direct_declarator *dd = declarator->direct_declarator;
 	if (dd->id != NULL) {
 		return dd->id;
