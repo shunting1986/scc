@@ -289,8 +289,8 @@ union token expect(struct lexer *lexer, int tok_tag) {
 	if (tok.tok_tag != tok_tag) {
 		file_reader_dump_remaining(lexer->cstream); // TODO
 		token_dump(tok);
-		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
 		assert(false); // TODO
+		panic("expect %s, was %s", token_tag_str(tok_tag), token_tag_str(tok.tok_tag));
 	}
 	return tok;
 }

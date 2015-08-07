@@ -1,4 +1,8 @@
   plan to use util.s first
+	-> [DONE] next step memcached.h L492
+	-> next step memcached.h L496
+
+
 
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 

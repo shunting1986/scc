@@ -185,9 +185,18 @@ static int initiate_declarator(union token tok) {
 
 // TODO support abstract_declarator
 static struct parameter_declaration *parse_parameter_declaration(struct parser *parser) {
+	int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 0);
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
 
+	// to support item *item, which item is a type name
+	// we need disable typedef after we get decl specifiers
+	//
+	// To support the case that the declarator recursively contains type (func ptr as 
+	// parameter), we enable typedef at the beginning
+
+	(void) lexer_push_config(parser->lexer, disable_typedef, 1);
 	union token tok = lexer_next_token(parser->lexer);
+
 	struct declarator *declarator = NULL;
 	if (initiate_declarator(tok)) {
 		lexer_put_back(parser->lexer, tok);
@@ -195,6 +204,8 @@ static struct parameter_declaration *parse_parameter_declaration(struct parser *
 	} else {
 		lexer_put_back(parser->lexer, tok);
 	}
+
+	lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
 	return parameter_declaration_init(decl_specifiers, declarator);
 }
 
