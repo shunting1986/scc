@@ -577,6 +577,7 @@ void cgc_initializer_list(struct cgc_context *ctx, struct initializer_list *init
 
 void cgc_initializer(struct cgc_context *ctx, struct initializer *initializer) {
 	if (initializer->expr != NULL) {
+		assert(initializer->name == NULL); // TODO
 		cgc_assignment_expression(ctx, initializer->expr);
 	} else {
 		cgc_initializer_list(ctx, initializer->initz_list);

@@ -65,7 +65,9 @@ struct initializer_list *initializer_list_init(struct dynarr *list);
 struct initializer {
 	int nodeType;
 
+	const char *name;
 	struct assignment_expression *expr; // the assignment expression
+
 	struct initializer_list *initz_list;
 };
 

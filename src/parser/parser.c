@@ -362,8 +362,16 @@ static struct initializer *parse_initializer(struct parser *parser) {
 	if (tok.tok_tag == TOK_LBRACE) {
 		initializer->initz_list = parse_initializer_list(parser);
 	} else {
-		lexer_put_back(parser->lexer, tok);
+		const char *name = NULL;
+		if (tok.tok_tag == TOK_DOT) {
+			union token idtok = expect(parser->lexer, TOK_IDENTIFIER);
+			name = idtok.id.s;
+			expect(parser->lexer, TOK_ASSIGN);
+		} else {
+			lexer_put_back(parser->lexer, tok);
+		}
 		initializer->expr = parse_assignment_expression(parser);
+		initializer->name = name;
 	}
 	return initializer;
 }

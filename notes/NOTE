@@ -3,6 +3,9 @@
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)
 	3. [DONE] cache.c
 
+	TODO: cgasm support named initializer (both local and global cases)
+	TODO: check that the dumpped memcached.c has named initializer correctly dumped
+
   KEYSTEPS: check cmds
 
   TODO: next step is support build memcached :)
