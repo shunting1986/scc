@@ -419,10 +419,11 @@ struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *na
 	return field;
 }
 
-static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_struct, struct struct_declaration *decl, struct dynarr *field_list, int offset) {
+static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_struct, struct struct_declaration *decl, struct dynarr *field_list, int offset, bool last_decl) {
 	struct type *type = parse_type_from_specifier_qualifier_list(ctx, decl->sqlist);
 	int size = 0;
 	char *id;
+	int i;
 	(void) type;
 
 	if (!is_struct) {
@@ -443,7 +444,7 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 		register_type_ref(ctx, type);
 	}
 
-	DYNARR_FOREACH_BEGIN(decl->declarator_list, struct_declarator, each);
+	DYNARR_FOREACH_ITR_BEGIN(decl->declarator_list, struct_declarator, each, i);
 		struct type *final_type;
 
 		if (each->declarator == NULL) {
@@ -457,13 +458,21 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 		// id can be NULL if the struct declaration contains no declarator like
 		// unsigned int  : 16;
 
+		int fieldsize;
 		if (final_type->size < 0) {
-			panic("The size of symbol is undefined: %s", id ? id : "<nil>");
+			if (is_struct && last_decl && i == dynarr_size(decl->declarator_list) - 1
+					&& final_type->tag == T_ARRAY && final_type->subtype->size >= 0) {
+				// this is flexiable arraymember 
+				fieldsize = 0;
+			} else {
+				panic("The size of symbol is undefined: %s", id ? id : "<nil>");
+			}
+		} else {
+			fieldsize = final_type->size;
 		}
  
 		if (is_struct) { // only consider alignment for struct right now
 			if (is_integer_type(final_type)) { // XXX only support alignment for integer type right now. 'struct stat' requires padding
-				int fieldsize = type_get_size(final_type);
 				int padsize = (offset + fieldsize - 1) / fieldsize * fieldsize - offset;
 				offset += padsize;
 				size += padsize;
@@ -478,8 +487,8 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 		}
 
 		if (is_struct) {
-			offset += final_type->size;
-			size += final_type->size;
+			offset += fieldsize;
+			size += fieldsize;
 		} else {
 			size = max(size, final_type->size);
 		}
@@ -492,10 +501,12 @@ static struct dynarr *parse_struct_field_list_by_decl_list(struct cgasm_context 
 	struct dynarr *field_list = dynarr_init();
 	int offset;
 	int delta;
+	int i;
+	int listsize = dynarr_size(decl_list->decl_list);
 
-	DYNARR_FOREACH_BEGIN(decl_list->decl_list, struct_declaration, each);
+	DYNARR_FOREACH_ITR_BEGIN(decl_list->decl_list, struct_declaration, each, i);
 		offset = is_struct ? size : 0;
-		delta = parse_struct_field_list_by_decl(ctx, is_struct, each, field_list, offset);
+		delta = parse_struct_field_list_by_decl(ctx, is_struct, each, field_list, offset, i == listsize - 1);
 		if (is_struct) {
 			size += delta;
 		} else {

@@ -29,6 +29,11 @@ void dynarr_clear(struct dynarr *darr);
 	for (_i = 0; _i < dynarr_size(darr); _i++) { \
 		each = dynarr_get(darr, _i)
 
+#define DYNARR_FOREACH_ITR_BEGIN(darr, type, each, itr) do { \
+	struct type *each; \
+	for (itr = 0; itr < dynarr_size(darr); itr++) { \
+		each = dynarr_get(darr, itr)
+
 #define DYNARR_FOREACH_BEGIN(darr, type, each) do { \
 	int _i; \
 	struct type *each; \
