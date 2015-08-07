@@ -462,6 +462,9 @@ void cgc_statement(struct cgc_context *ctx, struct syntreebasenode *stmt) {
 	case LABELED_STATEMENT:
 		cgc_labeled_statement(ctx, (struct labeled_statement *) stmt);
 		break;
+	case COMPOUND_STATEMENT:
+		cgc_compound_statement(ctx, (struct compound_statement *) stmt);
+		break;
 	default:
 		panic("unexpected node type %s", node_type_str(stmt->nodeType));
 	}
