@@ -326,11 +326,13 @@ static struct dynarr *parse_pointer(struct parser *parser) {
  * Parse either declarator or abstract declarator
  */
 struct declarator *parse_declarator(struct parser *parser) {
+	int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 1);
 	struct dynarr *ptr_list = parse_pointer(parser);
 	struct direct_declarator *direct_declarator = parse_direct_declarator(parser);
 	struct declarator *declarator = declarator_init();
 	declarator->ptr_list = ptr_list;
 	declarator->direct_declarator = direct_declarator;
+	lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
 	return declarator;
 }
 
@@ -443,7 +445,6 @@ struct declaration *parse_declaration(struct parser *parser) {
 	// see comments for parse_parameter_declaration
 	int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 0);
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
-	(void) lexer_push_config(parser->lexer, disable_typedef, 1);
 
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
 	lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
@@ -511,9 +512,7 @@ static struct external_declaration *parse_external_decl(struct parser *parser) {
 			external_decl->compound_stmt = compound_stmt;
 		} else {
 			lexer_put_back(parser->lexer, tok);
-			int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 1);
 			init_declarator_list = parse_init_declarator_list_with_la(parser, declarator);
-			lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
 
 			// set external decl
 			external_decl->init_declarator_list = init_declarator_list;

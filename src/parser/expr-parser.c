@@ -29,6 +29,7 @@ static struct primary_expression *parse_primary_expression(struct parser *parser
 		prim_expr->expr = expr;
 	} else {
 		file_reader_dump_remaining(parser->lexer->cstream);
+		assert(0);
 		// we may destroy primary expression first
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
