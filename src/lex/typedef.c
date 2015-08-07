@@ -2,15 +2,15 @@
 #include <inc/util.h>
 #include <inc/htab.h>
 
-static void *static_val = (void *) 1;
-
 struct typedef_tab {
 	struct typedef_tab *enclosing;
 	struct hashtab *htab;
 };
 
-void lexer_register_typedef(struct lexer *lexer, char *id) {
-	htab_insert(lexer->typedef_tab->htab, id, static_val);
+// NOTE: besides register typedef id, we should register non-typedef ids as well.
+// Because non-typedef id may override typedef id
+void lexer_register_typedef(struct lexer *lexer, char *id, int is_typedef) {
+	htab_insert(lexer->typedef_tab->htab, id, (void *) (long) is_typedef);
 }
 
 void lexer_push_typedef_tab(struct lexer *lexer) {
@@ -45,7 +45,7 @@ int lexer_is_typedef(struct lexer *lexer, const char *s) {
 	void *ret;
 	struct typedef_tab *tab = lexer->typedef_tab;
 	while (tab) {
-		if ((ret = htab_query(tab->htab, s)) != NULL) {
+		if ((ret = htab_query(tab->htab, s)) != NULL) { // either 0 or NULL will be treated as non-typedef
 			break;
 		}
 		tab = tab->enclosing;

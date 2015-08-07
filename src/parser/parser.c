@@ -420,10 +420,11 @@ static struct init_declarator_list *parse_init_declarator_list_with_la(struct pa
 }
 
 static void register_potential_typedefs(struct parser *parser, struct declaration_specifiers *decl_specifiers, struct init_declarator_list *init_declarator_list) {
-	if (has_typedef(decl_specifiers) && init_declarator_list != NULL) {
+	bool is_typedef = has_typedef(decl_specifiers);
+	if (init_declarator_list != NULL) {
 		struct dynarr *idlist = extract_id_list_from_init_declarator_list(init_declarator_list);
 		DYNARR_FOREACH_PLAIN_BEGIN(idlist, char *, each);
-			lexer_register_typedef(parser->lexer, each);
+			lexer_register_typedef(parser->lexer, each, is_typedef);
 		DYNARR_FOREACH_END();
 
 		dynarr_destroy(idlist);

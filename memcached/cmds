@@ -5,10 +5,10 @@ gcc -m32 -c valid/cache.s
 gcc -m32 -c valid/assoc.c
 gcc -m32 -c valid/stats.c
 gcc -m32 -c valid/hash.c
-
-gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/items.c
+gcc -m32 -c valid/items.c
 
 gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/thread.c
+
 gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/slabs.c
 gcc -m32 -c -std=gnu99 -DHAVE_CONFIG_H ../memcached-1.4.17/memcached.c
 

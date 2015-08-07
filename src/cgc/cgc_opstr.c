@@ -20,6 +20,7 @@ static const char *op_str_table[] = {
 	[TOK_SUB_ASSIGN] = "-=",
 	[TOK_MUL_ASSIGN] = "*=",
 	[TOK_OR_ASSIGN] = "|=",
+	[TOK_AND_ASSIGN] = "&=",
 	[TOK_XOR_ASSIGN] = "^=",
 	[TOK_LSHIFT_ASSIGN] = "<<=",
 	[TOK_RSHIFT_ASSIGN] = ">>=",
