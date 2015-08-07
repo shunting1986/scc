@@ -42,15 +42,20 @@ int lexer_is_typedef(struct lexer *lexer, const char *s) {
 	if (lexer->disable_typedef) {
 		return false;
 	}
-	void *ret;
+	struct hashtab_item *item = NULL;
 	struct typedef_tab *tab = lexer->typedef_tab;
 	while (tab) {
-		if ((ret = htab_query(tab->htab, s)) != NULL) { // either 0 or NULL will be treated as non-typedef
+		if ((item = htab_query_item(tab->htab, s)) != NULL) { // either 0 or NULL will be treated as non-typedef
 			break;
 		}
 		tab = tab->enclosing;
 	}
-	return ret != NULL;
+
+	if (item == NULL) {
+		return false; // not found 
+	} else {
+		return (int) (long) item->val;
+	}
 }
 
 

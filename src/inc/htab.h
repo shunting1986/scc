@@ -17,9 +17,18 @@ struct hashtab {
 	htab_val_free_fn_type *val_free_fn;
 };
 
+// When destroying the table, the hashtab_item and the internal key, val should be
+// freed
+struct hashtab_item {
+	const char *key;
+	void *val;
+	struct hashtab_item *next;
+};
+
 struct hashtab *htab_init();
 void htab_destroy(struct hashtab *tab);
 void *htab_query(struct hashtab *htab, const char *key);
+struct hashtab_item *htab_query_item(struct hashtab *htab, const char *key);
 void htab_insert(struct hashtab *htab, const char *key, void *val);
 int htab_delete(struct hashtab *htab, const char *key);
 void htab_iter(struct hashtab *htab, void *ctx, htab_iter_fn_type *func);

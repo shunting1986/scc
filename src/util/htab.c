@@ -7,14 +7,6 @@
 
 #define INIT_TABLE_SIZE 1024
 
-// When destroying the table, the hashtab_item and the internal key, val should be
-// freed
-struct hashtab_item {
-	const char *key;
-	void *val;
-	struct hashtab_item *next;
-};
-
 static struct hashtab_item *alloc_item(const char *key, void *val) {
 	struct hashtab_item *item = mallocz(sizeof(*item));
 	item->key = strdup(key);
@@ -84,14 +76,19 @@ void htab_iter(struct hashtab *tab, void *ctx, htab_iter_fn_type *func) {
 	assert(num == tab->nitem);
 }
 
-void *htab_query(struct hashtab *htab, const char *key) {
+struct hashtab_item *htab_query_item(struct hashtab *htab, const char *key) {
 	struct hashtab_item *head = htab->buckets[hash_fn((unsigned char *) key) % htab->nbucket];
 	for (; head != NULL; head = head->next) {
 		if (strcmp(key, head->key) == 0) {
-			return head->val;
+			return head;
 		}
 	}
 	return NULL;
+}
+
+void *htab_query(struct hashtab *htab, const char *key) {
+	struct hashtab_item *head = htab_query_item(htab, key);
+	return head == NULL ? NULL : head->val;
 }
 
 /* 
