@@ -1,7 +1,5 @@
-  can use util.c now 
-  next step is to use util.s first
-
-
+  ACHIEVEMENT:
+	1. [DONE] util.c
 
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 
