@@ -1,0 +1,5 @@
+echo "get a" | nc localhost 11211
+echo -n "set a 0 0 3\r\nabc\r\n" | nc localhost 11211
+echo "get a" | nc localhost 11211
+echo "delete a" | nc localhost 11211
+echo "get a" | nc localhost 11211

@@ -717,6 +717,9 @@ void cgc_storage_class_specifier(struct cgc_context *ctx, struct storage_class_s
 	case TOK_REGISTER:
 		cgc_print(ctx, "register");
 		break;
+	case TOK_INLINE:
+		cgc_print(ctx, "inline");
+		break;
 	default:
 		panic("ni %s", token_tag_str(sc->tok_tag));
 	}
