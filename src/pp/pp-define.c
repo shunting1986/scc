@@ -80,7 +80,13 @@ static void pp_define_func_macro(struct lexer *lexer, const char *name) {
 }
 
 void pp_define(struct lexer *lexer) {
+	// want_pp_keyword is set to 1 by caller (pp_entry). We should set it to 0 so the 
+	// following case can be correctly handled:
+	//   #define f(i) { if (i) { ... }}
+	// Otherwisek, 'if' may be interpreted as PP_TOK_IF
+
 	int old_want_sharp = lexer_push_config(lexer, want_sharp, 1);
+	int old_want_pp_keyword = lexer_push_config(lexer, want_pp_keyword, 0);
 
 	// must enable want_space befoer get id token since parsing id will peek
 	int old_want_space = lexer_push_config(lexer, want_space, 1);
@@ -106,6 +112,7 @@ void pp_define(struct lexer *lexer) {
 		pp_define_object_macro(lexer, idtok.id.s);
 	}
 	token_destroy(idtok);
+	lexer_pop_config(lexer, want_pp_keyword, old_want_pp_keyword);
 	lexer_pop_config(lexer, want_sharp, old_want_sharp);
 }
 

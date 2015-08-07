@@ -81,7 +81,7 @@ mm: rebuild-$(PROG_NAME) mongoose
 cc: rebuild-$(PROG_NAME) memcached
 
 handy: rebuild-$(PROG_NAME) 
-	./scc integration-test/flexible-array-member/main.c
+	./scc integration-test/doublesharp/main.c
 
 rebuild-$(PROG_NAME): clean $(PROG_NAME)
 

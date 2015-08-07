@@ -153,9 +153,11 @@ static void pp_endif(struct lexer *lexer) {
 }
 
 void pp_entry(struct lexer *lexer) {
-	int old_in_pp_context = lexer_push_config(lexer, in_pp_context, 1);
 	int old_want_newline = push_want_newline(lexer, 1);
 	int old_no_expand_macro = lexer_push_config(lexer, no_expand_macro, 1);
+
+	int old_in_pp_context = lexer_push_config(lexer, in_pp_context, 1);
+	int old_want_pp_keyword = lexer_push_config(lexer, want_pp_keyword, 1);
 
 	union token tok = lexer_next_token(lexer);
 
@@ -194,8 +196,9 @@ void pp_entry(struct lexer *lexer) {
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
 
-	lexer_pop_config(lexer, no_expand_macro, old_no_expand_macro);
+	lexer_pop_config(lexer, want_pp_keyword, old_want_pp_keyword);
 	lexer_pop_config(lexer, in_pp_context, old_in_pp_context);
+	lexer_pop_config(lexer, no_expand_macro, old_no_expand_macro);
 	pop_want_newline(lexer, old_want_newline);
 }
 

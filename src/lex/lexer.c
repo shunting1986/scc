@@ -478,7 +478,7 @@ parse_id:
 		s = cbuf_transfer(cbuf);
 		cbuf_destroy(cbuf);
 
-		if (lexer->in_pp_context) {
+		if (lexer->want_pp_keyword) {
 			token_tag = check_pp_keyword(s);	
 			if (token_tag != TOK_UNDEF) {
 				tok.tok_tag = token_tag;

@@ -31,6 +31,7 @@ struct lexer {
 	// int typedef_disabled;
 
 	int in_pp_context; // indicate if we are in preprocessor context
+	int want_pp_keyword;
 	int want_newline;
 	int want_space;
 	int want_quotation;
