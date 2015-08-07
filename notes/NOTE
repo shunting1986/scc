@@ -2,7 +2,9 @@
 	1. [DONE] util.c
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)
 
-
+	next step is cache.c
+	- the dumped cache.c works
+	- try out cache.s
 
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 

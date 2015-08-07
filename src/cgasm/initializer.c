@@ -6,6 +6,16 @@
 
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *type, struct initializer *initializer);
 
+static void cgasm_initialize_global_ll(struct cgasm_context *ctx, struct initializer *initializer) {
+	struct assignment_expression *expr = initializer->expr;
+	if (expr == NULL) {
+		panic("inavlid initializer");
+	}
+	struct expr_val val = cgasm_assignment_expression(ctx, expr);
+	long long const_val = cgasm_get_ll_const_from_expr(ctx, val);
+	cgasm_println(ctx, ".quad %lld", const_val);
+}
+
 static void cgasm_initialize_global_vint(struct cgasm_context *ctx, struct initializer *initializer, const char *directive) {
 	struct assignment_expression *expr = initializer->expr;
 	if (expr == NULL) {
@@ -115,6 +125,9 @@ static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *
 	}
 
 	switch (type->tag) {
+	case T_LONG_LONG:
+		cgasm_initialize_global_ll(ctx, initializer);
+		break;
 	case T_INT:
 		cgasm_initialize_global_vint(ctx, initializer, ".long");
 		break;

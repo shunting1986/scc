@@ -13,6 +13,19 @@
 static struct expr_val cgasm_conditional_expression(struct cgasm_context *ctx, struct conditional_expression *expr);
 static struct expr_val cgasm_cast_expression(struct cgasm_context *ctx, struct cast_expression *expr);
 
+long long cgasm_get_ll_const_from_expr(struct cgasm_context *ctx, struct expr_val val) {
+	if (val.type != EXPR_VAL_CONST_VAL) {
+		panic("constant value required");
+	}
+
+	union token const_tok = val.const_val;
+	assert(const_tok.tok_tag == TOK_CONSTANT_VALUE);
+	if (!(const_tok.const_val.flags & CONST_VAL_TOK_LONG_LONG)) {
+		panic("long long constant required");
+	}
+	return const_tok.const_val.llval;
+}
+
 int cgasm_get_int_const_from_expr(struct cgasm_context *ctx, struct expr_val val) {
 	if (val.type != EXPR_VAL_CONST_VAL) {
 		panic("constant value required");

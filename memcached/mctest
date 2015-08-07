@@ -7,3 +7,5 @@ echo " === "
 echo "delete a" | nc localhost 11211
 echo " === "
 echo "get a" | nc localhost 11211
+echo " === "
+echo "stats" | nc localhost 11211 | head -30
