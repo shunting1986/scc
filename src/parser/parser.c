@@ -432,8 +432,14 @@ static void register_potential_typedefs(struct parser *parser, struct declaratio
 }
 
 struct declaration *parse_declaration(struct parser *parser) {
+	// see comments for parse_parameter_declaration
+	int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 0);
 	struct declaration_specifiers *decl_specifiers = parse_declaration_specifiers(parser);
+	(void) lexer_push_config(parser->lexer, disable_typedef, 1);
+
 	struct init_declarator_list *init_declarator_list = parse_init_declarator_list(parser);
+	lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
+
 	register_potential_typedefs(parser, decl_specifiers, init_declarator_list);
 	return declaration_init(decl_specifiers, init_declarator_list);
 }
@@ -497,7 +503,9 @@ static struct external_declaration *parse_external_decl(struct parser *parser) {
 			external_decl->compound_stmt = compound_stmt;
 		} else {
 			lexer_put_back(parser->lexer, tok);
+			int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 1);
 			init_declarator_list = parse_init_declarator_list_with_la(parser, declarator);
+			lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
 
 			// set external decl
 			external_decl->init_declarator_list = init_declarator_list;
