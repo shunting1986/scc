@@ -290,7 +290,6 @@ static struct expr_val cgasm_unary_expression(struct cgasm_context *ctx, struct 
 	} else if (expr->dec_unary) {
 		struct expr_val val = cgasm_unary_expression(ctx, expr->dec_unary);
 		struct expr_val ret = cgasm_handle_pre_dec(ctx, val);
-		type_put(val.ctype);
 		return ret;
 	} else {
 		panic("ni");

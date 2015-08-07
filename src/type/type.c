@@ -828,6 +828,7 @@ struct type *type_get_elem_type(struct type *parent_type) {
 struct type *type_deref(struct type *type) {
 	assert(type != NULL);
 	CHECK_MAGIC(type);
+
 	assert(type->tag == T_PTR);
 	return type->subtype;
 }
