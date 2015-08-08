@@ -15,6 +15,8 @@ main(void) {
 		printf("after + const %lld\n", add(a, 4294967298ll));
 		printf("a++ %lld\n", a++);
 		printf("a after post ++ %lld\n", a);
+		printf("++a %lld\n", ++a);
+		printf("a after pre ++ %lld\n", a);
 	}
 	return 0;
 }

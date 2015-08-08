@@ -254,6 +254,21 @@ static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, 
 	return res;
 }
 
+struct expr_val cgasm_handle_pre_incdec_ll(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
+	struct type *type = expr_val_get_type(val);
+	int reg1 = REG_EAX, reg2 = REG_ECX;
+
+	assert(type->tag == T_LONG_LONG);
+	cgasm_load_ll_val_to_reg2(ctx, val, reg1, reg2);
+
+	cgasm_println(ctx, "%s $1, %%%s", is_inc ? "addl" : "subl", get_reg_str_code(reg1));
+	cgasm_println(ctx, "%s $0, %%%s", is_inc ? "adcl" : "sbbl", get_reg_str_code(reg2));
+
+	int mask = (1 << reg1) | (1 << reg2);
+	cgasm_store_reg2_to_ll_mem(ctx, reg1, reg2, val, mask);
+	return val;
+}
+
 struct expr_val cgasm_handle_post_incdec_ll(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	struct type *type = expr_val_get_type(val);
 	assert(type->tag == T_LONG_LONG);
@@ -268,7 +283,7 @@ struct expr_val cgasm_handle_post_incdec_ll(struct cgasm_context *ctx, struct ex
 	cgasm_println(ctx, "%s $1, %%%s", is_inc ? "addl" : "subl", get_reg_str_code(reg1));
 	cgasm_println(ctx, "%s $0, %%%s", is_inc ? "adcl" : "sbbl", get_reg_str_code(reg2));
 
-	int mask = (1 << REG_EAX) | (1 << REG_ECX);
+	int mask = (1 << reg1) | (1 << reg2);
 	cgasm_store_reg2_to_ll_mem(ctx, reg1, reg2, val, mask);
 	return temp_var;
 }

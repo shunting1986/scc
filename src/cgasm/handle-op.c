@@ -879,6 +879,10 @@ static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struc
 static struct expr_val cgasm_handle_pre_incdec(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
 	int reg = REG_EAX;
 	struct type *type = expr_val_get_type(val);
+
+	if (type->tag == T_LONG_LONG) {
+		return cgasm_handle_pre_incdec_ll(ctx, val, is_inc);
+	}
 	if (type->tag != T_INT && type->tag != T_PTR) {
 		panic("only handle int and ptr right now");
 	}
