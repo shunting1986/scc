@@ -450,9 +450,12 @@ repeat:
 	}
 
 	if (tok.tok_tag != TOK_UNDEF) {
-		if (tok.tok_tag != TOK_IDENTIFIER) {
+		if (tok.tok_tag != TOK_IDENTIFIER && tok.tok_tag != TOK_TYPE_NAME) {
 			goto out;
 		} else {
+			// even if the token is once treated as type name, we do a typedef check again
+			// since the disable_typedef may be set at this time.
+			tok.tok_tag = TOK_IDENTIFIER; // override the possible type name to id and then do the typedef check
 			goto check_id_token; // handle typedef or recursive expanding macro
 		}
 	}

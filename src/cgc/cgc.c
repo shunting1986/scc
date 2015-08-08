@@ -577,9 +577,15 @@ void cgc_initializer_list(struct cgc_context *ctx, struct initializer_list *init
 
 void cgc_initializer(struct cgc_context *ctx, struct initializer *initializer) {
 	if (initializer->expr != NULL) {
-		assert(initializer->name == NULL); // TODO
+		if (dynarr_size(initializer->namelist) > 0) {
+			DYNARR_FOREACH_PLAIN_BEGIN(initializer->namelist, char *, name);
+				cgc_print(ctx, ".%s", name);
+			DYNARR_FOREACH_END();
+			cgc_print(ctx, " = ");
+		}
 		cgc_assignment_expression(ctx, initializer->expr);
 	} else {
+		assert(dynarr_size(initializer->namelist) == 0); 
 		cgc_initializer_list(ctx, initializer->initz_list);
 	}
 }

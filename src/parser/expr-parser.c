@@ -84,7 +84,12 @@ static struct postfix_expression *parse_postfix_expression(struct parser *parser
 			dynarr_add(post_expr->suff_list, suff);
 		} else if (tok.tok_tag == TOK_PTR_OP) {
 			struct postfix_expression_suffix *suff = mallocz(sizeof(*suff));
+
+			// disable typedef when parsing identifier
+			int old_disable_typedef = lexer_push_config(parser->lexer, disable_typedef, 1);
 			union token tok = expect(parser->lexer, TOK_IDENTIFIER);
+			lexer_pop_config(parser->lexer, disable_typedef, old_disable_typedef);
+
 			suff->ptr_id = tok.id.s;
 			dynarr_add(post_expr->suff_list, suff);
 		} else if (tok.tok_tag == TOK_LBRACKET) {

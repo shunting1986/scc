@@ -377,6 +377,7 @@ struct initializer_list *initializer_list_init(struct dynarr *list) {
 struct initializer *initializer_init() {
 	struct initializer *initializer = mallocz(sizeof(*initializer));
 	initializer->nodeType = INITIALIZER;
+	initializer->namelist = dynarr_init();
 	return initializer;
 }
 
