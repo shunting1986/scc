@@ -3,11 +3,11 @@
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)
 	3. [DONE] cache.c
 
-	NOTE: with a modfied version of mecached.c we can use .s or dumped C file to build a.out. The a.out has one problem: stat command is not correct. check tomorrow...
+  HERE: assoc.c
+
+
 
 	TODO: support 'for (int ...)'
-
-	NOTE: we right now use a modified memcached.c
 
 	TODO: cgasm support named initializer (both local and global cases)
 	TODO: check that the dumpped memcached.c has named initializer correctly dumped
@@ -16,6 +16,7 @@
 	TODO: support specify index to initialize array
 
   KEYSTEPS: check cmds
+	TODO: we right now use a modified memcached.c. avoid it at last
 
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 

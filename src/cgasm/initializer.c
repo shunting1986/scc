@@ -83,6 +83,38 @@ static void cgasm_initialize_global_array(struct cgasm_context *ctx, struct type
 	}
 }
 
+static void cgasm_initialize_global_union(struct cgasm_context *ctx, struct type *type, struct initializer *initializer) {
+	assert(type->tag == T_UNION);
+	assert(type->size >= 0);
+	if (initializer->initz_list == NULL) {
+		panic("Invalid union initializer");
+	}
+
+	int specified_size = 0;
+	struct dynarr *init_list = initializer->initz_list->list;
+	struct dynarr *field_list = type->field_list;
+
+	if (dynarr_size(init_list) > 1) {
+		panic("Invalid union initializer"); // only allow single item
+	} else if (dynarr_size(init_list) == 1) {
+		if (dynarr_size(field_list) == 0) {
+			panic("too many initializers");
+		}
+		struct initializer *field_init = dynarr_get(init_list, 0);
+		struct struct_field *field = dynarr_get(field_list, 0);
+
+		if (dynarr_size(field_init->namelist) > 0) {
+			panic("union does not support named initializer yet");
+		}
+		cgasm_initialize_global_var(ctx, field->type, field_init);
+		specified_size = field->type->size;
+	}
+
+	if (specified_size < type->size) {
+		cgasm_println(ctx, ".zero %d", type->size - specified_size);
+	}
+}
+
 static void cgasm_initialize_global_struct(struct cgasm_context *ctx, struct type *type, struct initializer *initializer) {
 	assert(type->tag == T_STRUCT);
 	assert(type->size >= 0);
@@ -97,17 +129,27 @@ static void cgasm_initialize_global_struct(struct cgasm_context *ctx, struct typ
 
 	int i;
 	int tot_size_inited = 0;
+	int accum = 0;
 
 	// XXX alignment is not handled yet
 	for (i = 0; i < dynarr_size(init_list); i++) {
 		struct initializer *field_init = dynarr_get(init_list, i);
+
+		if (dynarr_size(field_init->namelist) > 0) {
+			panic("not support named initializer for struct yet");
+		}
+
 		struct struct_field *field = dynarr_get(field_list, i);
 		if (field->width != 0) {
 			panic("struct field width is not supported yet");
 		}
 		struct type *field_type = field->type;
 		tot_size_inited += field_type->size;
+		if (field->offset != accum) {
+			panic("not support initializer padding in struct yet");
+		}
 		cgasm_initialize_global_var(ctx, field_type, field_init);
+		accum += field_type->size;
 	}
 
 	if (tot_size_inited < type->size) {
@@ -145,6 +187,9 @@ static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *
 		break;
 	case T_STRUCT:
 		cgasm_initialize_global_struct(ctx, type, initializer);
+		break;
+	case T_UNION:
+		cgasm_initialize_global_union(ctx, type, initializer);
 		break;
 	default:
 		cgc_dump(initializer, initializer);

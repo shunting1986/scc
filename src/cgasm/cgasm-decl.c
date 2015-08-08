@@ -136,10 +136,13 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type, symbol_flags);
 
 		if (ctx->func_ctx != NULL) { 
-			// handle initializer (XXX does not support struct initializer yet)
 			struct initializer *initializer = each->initializer;
-			if (initializer != NULL && initializer->expr != NULL) {
-				(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
+			if (initializer != NULL) {
+				if (initializer->expr != NULL) {
+					(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
+				} else {
+					panic("local struct initializer");
+				}
 			} 
 		} else {
 			// global variable
