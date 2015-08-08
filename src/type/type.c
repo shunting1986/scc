@@ -472,8 +472,15 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 		}
  
 		if (is_struct) { // only consider alignment for struct right now
-			if (is_integer_type(final_type)) { // XXX only support alignment for integer type right now. 'struct stat' requires padding
-				int padsize = (offset + fieldsize - 1) / fieldsize * fieldsize - offset;
+			int allign = -1;
+			if (is_integer_type(final_type)) { // support alignment for integer type right now. 'struct stat' requires padding
+				allign = fieldsize;
+			} else if (final_type->tag == T_ARRAY) {
+				allign = 4;
+			}
+
+			if (allign > 0) {
+				int padsize = (offset + allign - 1) / allign * allign - offset;
 				offset += padsize;
 				size += padsize;
 			}

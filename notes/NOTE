@@ -8,6 +8,7 @@
 
 
 	TODO: support 'for (int ...)'
+	TODO: fprintf( char) may have problem, the 'add esp' will only count 1 for the char.
 
 	TODO: cgasm support named initializer (both local and global cases)
 	TODO: check that the dumpped memcached.c has named initializer correctly dumped
