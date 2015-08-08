@@ -6,8 +6,6 @@
 	5. [DONE] stats.c
 	6. [DONE] hash.c
 
-	TODO support union struct member with no field name
-  
 	next thread.c
 
 	TODO: we right now use a modified memcached.c. avoid it at last

@@ -841,7 +841,7 @@ void cgasm_handle_ret(struct cgasm_context *ctx) {
 /*******************************/
 static int get_incdec_step(struct type *type) {
 	int step = -1;
-	if (type->tag == T_INT) {
+	if (is_integer_type(type)) {
 		step = 1;
 	} else if (type->tag == T_PTR) {
 		step = type->subtype->size;
@@ -859,8 +859,8 @@ static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struc
 	if (type->tag == T_LONG_LONG) {
 		return cgasm_handle_post_incdec_ll(ctx, val, is_inc);
 	}
-	if (type->tag != T_INT && type->tag != T_PTR) {
-		panic("only handle int and ptr right now");
+	if (!is_integer_type(type) && type->tag != T_PTR) {
+		panic("only handle integer and ptr right now");
 	}
 
 	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, type);
@@ -868,11 +868,12 @@ static struct expr_val cgasm_handle_post_incdec(struct cgasm_context *ctx, struc
 
 	cgasm_load_val_to_reg(ctx, val, reg);
 	cgasm_store_reg_to_mem(ctx, reg, temp_var);
+	int size = type_get_size(type);
 
 	if (step == 1) {
-		cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+		cgasm_println(ctx, "%s%s %%%s", is_inc ? "inc" : "dec", size_to_suffix(size), get_reg_str_code_size(reg, size));
 	} else {
-		cgasm_println(ctx, "%s $%d, %%%s", is_inc ? "addl" : "subl", step, get_reg_str_code(reg));
+		cgasm_println(ctx, "%s%s $%d, %%%s", is_inc ? "add" : "sub", size_to_suffix(size), step, get_reg_str_code_size(reg, size));
 	}
 
 	cgasm_store_reg_to_mem(ctx, reg, val);
@@ -886,17 +887,19 @@ static struct expr_val cgasm_handle_pre_incdec(struct cgasm_context *ctx, struct
 	if (type->tag == T_LONG_LONG) {
 		return cgasm_handle_pre_incdec_ll(ctx, val, is_inc);
 	}
-	if (type->tag != T_INT && type->tag != T_PTR) {
-		panic("only handle int and ptr right now");
+	if (!is_integer_type(type) && type->tag != T_PTR) {
+		panic("only handle integer and ptr right now");
 	}
 
 	int step = get_incdec_step(type);
 	cgasm_load_val_to_reg(ctx, val, reg);
 
+	int size = type_get_size(type);
+
 	if (step == 1) {
-		cgasm_println(ctx, "%s %%%s", is_inc ? "incl" : "decl", get_reg_str_code(reg));
+		cgasm_println(ctx, "%s%s %%%s", is_inc ? "inc" : "dec", size_to_suffix(size), get_reg_str_code_size(reg, size));
 	} else {
-		cgasm_println(ctx, "%s $%d, %%%s", is_inc ? "addl" : "subl", step, get_reg_str_code(reg));
+		cgasm_println(ctx, "%s%s $%d, %%%s", is_inc ? "add" : "sub", size_to_suffix(size), step, get_reg_str_code_size(reg, size));
 	}
 
 	cgasm_store_reg_to_mem(ctx, reg, val);
