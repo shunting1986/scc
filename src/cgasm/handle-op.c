@@ -740,6 +740,9 @@ static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx
 	case TOK_OR_ASSIGN:
 		cgasm_println(ctx, "or%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
 		break;
+	case TOK_XOR_ASSIGN:
+		cgasm_println(ctx, "xor%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
+		break;
 	default:
 		panic("ni %s", token_tag_str(op));
 	}
