@@ -254,6 +254,25 @@ static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, 
 	return res;
 }
 
+struct expr_val cgasm_handle_post_incdec_ll(struct cgasm_context *ctx, struct expr_val val, int is_inc) {
+	struct type *type = expr_val_get_type(val);
+	assert(type->tag == T_LONG_LONG);
+
+	int reg1 = REG_EAX, reg2 = REG_ECX;
+	struct expr_val temp_var = cgasm_alloc_temp_var(ctx, type);
+	cgasm_load_ll_val_to_reg2(ctx, val, reg1, reg2);
+	cgasm_store_reg2_to_ll_temp(ctx, reg1, reg2, temp_var);
+
+	// alter val
+	// We have to use addl rather than incl here since incl does not affect the CF
+	cgasm_println(ctx, "%s $1, %%%s", is_inc ? "addl" : "subl", get_reg_str_code(reg1));
+	cgasm_println(ctx, "%s $0, %%%s", is_inc ? "adcl" : "sbbl", get_reg_str_code(reg2));
+
+	int mask = (1 << REG_EAX) | (1 << REG_ECX);
+	cgasm_store_reg2_to_ll_mem(ctx, reg1, reg2, val, mask);
+	return temp_var;
+}
+
 struct expr_val cgasm_handle_binary_op_ll(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
 	struct type *lhstype = expr_val_get_type(lhs);
 	struct type *rhstype = expr_val_get_type(rhs);

@@ -13,6 +13,8 @@ main(void) {
 		a += b;
 		printf("after += a %lld\n", a);
 		printf("after + const %lld\n", add(a, 4294967298ll));
+		printf("a++ %lld\n", a++);
+		printf("a after post ++ %lld\n", a);
 	}
 	return 0;
 }
