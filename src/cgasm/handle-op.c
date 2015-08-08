@@ -740,6 +740,9 @@ static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx
 	case TOK_OR_ASSIGN:
 		cgasm_println(ctx, "or%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
 		break;
+	case TOK_AND_ASSIGN:
+		cgasm_println(ctx, "and%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
+		break;
 	case TOK_XOR_ASSIGN:
 		cgasm_println(ctx, "xor%s %%%s, %s", size_to_suffix(size), get_reg_str_code_size(rhs_reg, size), lhs_asm_code);
 		break;
@@ -999,8 +1002,10 @@ struct expr_val cgasm_handle_conditional(struct cgasm_context *ctx, struct expr_
 /* handle ptr op          */
 /**************************/
 struct expr_val cgasm_handle_ptr_op(struct cgasm_context *ctx, struct expr_val stptr, const char *name) {
+	cgasm_change_array_func_to_ptr(ctx, &stptr);
 	struct type *stptr_type = expr_val_get_type(stptr);
 	if (stptr_type->tag != T_PTR) {
+		red("field name %s", name);
 		panic("struct pointer required");
 	}
 	struct type *st_type = stptr_type->subtype;

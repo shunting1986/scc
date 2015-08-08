@@ -4,9 +4,9 @@
 	3. [DONE] cache.c
 	4. [DONE] assoc.c
 	5. [DONE] stats.c
-
+	6. [DONE] hash.c
   
-	next hash.c
+	next thread.c
 
 	TODO: we right now use a modified memcached.c. avoid it at last
 

@@ -37,6 +37,7 @@ int perform_int_bin_op(int lhs, int rhs, int op) {
 	case TOK_NE: val = lhs != rhs; break;
 	case TOK_SUB: val = lhs - rhs; break;
 	case TOK_ADD: val = lhs + rhs; break;
+	case TOK_VERT_BAR: val = lhs | rhs; break;
 	case TOK_STAR: val = lhs * rhs; break;
 	case TOK_LSHIFT: val = lhs << rhs; break;
 	case TOK_RSHIFT: val = lhs >> rhs; break;

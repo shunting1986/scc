@@ -7,10 +7,10 @@ gcc -g -m32 -c valid/cache.s
 gcc -g -m32 -c valid/assoc.s
 gcc -g -m32 -c valid/stats.s
 gcc -g -m32 -c valid/hash.s
-
-gcc -g -m32 -c valid/items.c
+gcc -g -m32 -c valid/items.s
 
 gcc -g -m32 -c valid/thread.c
+
 gcc -g -m32 -c valid/slabs.c
 gcc -g -m32 -c valid/memcached-shunting.c
 
