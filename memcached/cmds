@@ -2,7 +2,9 @@ gcc -m32 -c valid/util.s
 gcc -m32 -c valid/daemon.s
 gcc -m32 -c valid/cache.s
 
-gcc -m32 -c valid/assoc.c
+gcc -m32 -c stage/assoc.s
+# gcc -m32 -c valid/assoc.c
+
 gcc -m32 -c valid/stats.c
 gcc -m32 -c valid/hash.c
 gcc -m32 -c valid/items.c

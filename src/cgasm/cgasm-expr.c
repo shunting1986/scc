@@ -20,10 +20,15 @@ long long cgasm_get_ll_const_from_expr(struct cgasm_context *ctx, struct expr_va
 
 	union token const_tok = val.const_val;
 	assert(const_tok.tok_tag == TOK_CONSTANT_VALUE);
-	if (!(const_tok.const_val.flags & CONST_VAL_TOK_LONG_LONG)) {
+	long long ret;
+	if (const_tok.const_val.flags & CONST_VAL_TOK_LONG_LONG) {
+		ret = const_tok.const_val.llval;
+	} else if (const_tok.const_val.flags & CONST_VAL_TOK_INTEGER) {
+		ret = (long long) const_tok.const_val.ival;
+	} else {
 		panic("long long constant required");
 	}
-	return const_tok.const_val.llval;
+	return ret;
 }
 
 int cgasm_get_int_const_from_expr(struct cgasm_context *ctx, struct expr_val val) {

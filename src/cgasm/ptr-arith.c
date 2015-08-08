@@ -5,7 +5,9 @@
 static struct expr_val cgasm_handle_ptr_cmp(struct cgasm_context *ctx, int tok_tag, struct expr_val lhs, struct expr_val rhs) {
 	lhs = cgasm_handle_deref_flag(ctx, lhs);
 	rhs = cgasm_handle_deref_flag(ctx, rhs);
-	if (lhs.ctype->tag != T_PTR || rhs.ctype->tag != T_PTR) {
+
+	// allow pointer to compare with integer
+	if ((lhs.ctype->tag != T_PTR && lhs.ctype->tag != T_INT) || (rhs.ctype->tag != T_PTR && rhs.ctype->tag != T_INT)) {
 		panic("pointer required");
 	}
 	lhs.ctype = get_int_type(); // convert to int type

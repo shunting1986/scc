@@ -41,7 +41,7 @@ void cgasm_enter_function(struct cgasm_context *ctx, char *fname, bool is_static
 
 	cgasm_println(ctx, ".text");
 	if (!is_static) {
-		cgasm_println_noind(ctx, ".global %s", fname); 
+		cgasm_println(ctx, ".global %s", fname); 
 	}
  	cgasm_println_noind(ctx, "%s:", fname);
 

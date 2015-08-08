@@ -212,6 +212,11 @@ void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symb
 	}
 
 	cgasm_println(ctx, ".data");
+
+	if (!(sym->flags & SYMBOL_FLAG_STATIC)) {
+		cgasm_println(ctx, ".global %s", sym->name);
+	}
+
 	if (initializer == NULL) {
 		cgasm_println(ctx, ".comm %s, %d, %d", sym->name, sym->ctype->size, 4); // XXX hardcode to 4 byte alignment right now
 		return;

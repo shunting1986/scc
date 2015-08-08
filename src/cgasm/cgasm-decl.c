@@ -116,6 +116,9 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 		if (has_extern(decl_specifiers)) {
 			symbol_flags |= SYMBOL_FLAG_EXTERN;
 		}
+		if (has_static(decl_specifiers)) {
+			symbol_flags |= SYMBOL_FLAG_STATIC;
+		}
 
 		if (id == NULL) {
 			panic("declarator requires id");

@@ -32,6 +32,7 @@ enum {
 
 #define SYMBOL_FLAG_TYPEDEF 1
 #define SYMBOL_FLAG_EXTERN 2
+#define SYMBOL_FLAG_STATIC 4
 
 // NOTE: we will apply storage_class_specifier to symbol
 struct symbol {
