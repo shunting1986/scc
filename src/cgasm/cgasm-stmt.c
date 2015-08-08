@@ -339,8 +339,112 @@ static void cgasm_ifelse_statement(struct cgasm_context *ctx, struct expression 
 	cgasm_emit_jump_label(ctx, exit_label);
 }
 
+// TODO check for duplicate case expression
+static void cgasm_switch_statement_decl_stmt_list(struct cgasm_context *ctx, struct dynarr *decl_stmt_list, struct dynarr *case_val_list, struct dynarr *case_label_list, int *ret_default_label) {
+	int ind = 0;
+	int default_label = -1;
+	while (ind < dynarr_size(decl_stmt_list)) {
+		struct syntreebasenode *node = dynarr_get(decl_stmt_list, ind);
+		if (node->nodeType == DECLARATION) {
+			struct declaration *decl = (struct declaration *) node;
+			cgasm_declaration(ctx, decl->decl_specifiers, decl->init_declarator_list);
+			ind++;
+			continue;
+		}
+
+		if (node->nodeType == LABELED_STATEMENT) {
+			struct labeled_statement *lstmt = (struct labeled_statement *) node;
+			if (lstmt->init_tok == TOK_CASE) {
+				// XXX assume int const right now
+				int val = cgasm_interpret_const_expr(ctx, lstmt->case_expr);
+				int nlbl = cgasm_new_label_no(ctx);
+
+				cgasm_emit_jump_label(ctx, nlbl);
+				dynarr_add(case_val_list, (void  *) (long) val);
+				dynarr_add(case_label_list, (void *) (long) nlbl);
+
+				dynarr_set(decl_stmt_list, ind, lstmt->stmt);
+
+				// no change ind
+				continue;
+			} else if (lstmt->init_tok == TOK_DEFAULT) {
+				if (default_label >= 0) {
+					panic("duplicate default label");
+				}
+				default_label = cgasm_new_label_no(ctx);
+				cgasm_emit_jump_label(ctx, default_label);
+
+				dynarr_set(decl_stmt_list, ind, lstmt->stmt);
+
+				// no change ind
+				continue;
+			}
+
+			// fall thru
+		}
+		cgasm_statement(ctx, node);
+		ind++;
+	}
+	*ret_default_label = default_label;
+}
+
+// fall thru will lead to the exit label
+static void cgasm_switch_statement_cmp(struct cgasm_context *ctx, struct expr_val cond, struct dynarr *case_val_list, struct dynarr *case_label_list, int default_label) {
+	int i;
+	int reg = REG_EAX;
+	struct type *type = expr_val_get_type(cond);
+	char buf[256];
+	assert(type->tag == T_INT); // assume int right now
+
+	cgasm_load_val_to_reg(ctx, cond, reg);
+	for (i = 0; i < dynarr_size(case_val_list); i++) {
+		int case_val = (int) (long) dynarr_get(case_val_list, i);
+		int case_label = (int) (long) dynarr_get(case_label_list, i);
+
+		cgasm_println(ctx, "cmpl $%d, %%%s", case_val, get_reg_str_code(reg));
+		cgasm_println(ctx, "je %s", get_jump_label_str(case_label, buf));
+	}
+	if (default_label >= 0) {
+		cgasm_println(ctx, "jmp %s", get_jump_label_str(default_label, buf));
+	}
+}
+
+// In SCC, we only allow case or default label at the top of switch body. This is enough
+// for most applications.
 static void cgasm_switch_statement(struct cgasm_context *ctx, struct expression *expr, struct statement *stmt) {
-	panic("ni");
+	struct expr_val cond = cgasm_expression(ctx, expr);
+	char buf[256];
+
+	int exit_label = cgasm_new_label_no(ctx);
+	int cmp_label = cgasm_new_label_no(ctx);
+
+	cgasm_push_break_label(ctx, exit_label);
+
+	struct dynarr *decl_stmt_list = NULL;
+	struct dynarr *case_val_list = dynarr_init();
+	struct dynarr *case_label_list = dynarr_init();
+	int default_label = -1;
+
+	if (stmt->nodeType != COMPOUND_STATEMENT) {
+		decl_stmt_list = dynarr_init();
+		dynarr_add(decl_stmt_list, stmt);
+	} else {
+		cgasm_push_symtab(ctx);
+		decl_stmt_list = dynarr_shallow_dup(((struct compound_statement *) stmt)->decl_or_stmt_list);
+		cgasm_pop_symtab(ctx);
+	}
+	cgasm_println(ctx, "jmp %s", get_jump_label_str(cmp_label, buf));
+	cgasm_switch_statement_decl_stmt_list(ctx, decl_stmt_list, case_val_list, case_label_list, &default_label);
+	assert(cgasm_pop_break_label(ctx) == exit_label);
+
+	// handle the comparision
+	cgasm_emit_jump_label(ctx, cmp_label);
+	cgasm_switch_statement_cmp(ctx, cond, case_val_list, case_label_list, default_label);
+	cgasm_emit_jump_label(ctx, exit_label);
+
+	dynarr_destroy(decl_stmt_list);
+	dynarr_destroy(case_val_list);
+	dynarr_destroy(case_label_list);
 }
 
 static void cgasm_selection_statement(struct cgasm_context *ctx, struct selection_statement *stmt) {

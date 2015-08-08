@@ -64,3 +64,11 @@ void dynarr_destroy(struct dynarr *darr) {
 void dynarr_clear(struct dynarr *darr) {
 	darr->size = 0;
 }
+
+struct dynarr *dynarr_shallow_dup(struct dynarr *darr) {
+	struct dynarr *ret = dynarr_init();
+	DYNARR_FOREACH_PLAIN_BEGIN(darr, void *, each);
+		dynarr_add(ret, each);
+	DYNARR_FOREACH_END();
+	return ret;
+}

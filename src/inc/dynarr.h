@@ -21,6 +21,7 @@ void dynarr_add(struct dynarr *darr, void *item);
 void *dynarr_first(struct dynarr *darr);
 void *dynarr_last(struct dynarr *darr);
 void dynarr_clear(struct dynarr *darr);
+struct dynarr *dynarr_shallow_dup(struct dynarr *darr);
 
 /* NO append struct to the type */
 #define DYNARR_FOREACH_PLAIN_BEGIN(darr, type, each) do { \

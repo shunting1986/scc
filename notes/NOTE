@@ -4,6 +4,7 @@
 	3. [DONE] cache.c
 	4. [DONE] assoc.c
 	5. [DONE] stats.c
+
   
 	next hash.c
 
@@ -39,7 +40,7 @@ NOTE:
 	struct union, enum share a name space; typedef, func, var share one. 
 	func is special. 1. it can have multiple declaration in one scope; 2. inner scope can not have different specification to outer one
 
-	TODO: switch (and break inside switch), (we only allow case statement at the top level of switch body right now)
+	TODO how to handle statements before any label inside switch, should they be interprected before the cond expr of after that?
 
 - NOTE: the only external resource I refer is the grammar of C language
 - TODO: let the make file support dependency on header file
