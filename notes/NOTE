@@ -2,9 +2,9 @@
 	1. [DONE] util.c
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)
 	3. [DONE] cache.c
-
-  HERE: assoc.c
-
+	4. [DONE} assoc.c
+  
+	next stats.c
 
 
 	TODO: support 'for (int ...)'
