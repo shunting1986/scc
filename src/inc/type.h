@@ -52,6 +52,7 @@ struct symtab;
 struct struct_field {
 	const char *name; // no need to free name when destroying this struct, since the name
 		// will finally get released when we destroy the syntax tree
+		// XXX: name is null for anonymouse union field
 	struct type *type;
 	int offset;
 	int width; 

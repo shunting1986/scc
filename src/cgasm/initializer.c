@@ -124,13 +124,17 @@ static void cgasm_initialize_global_struct(struct cgasm_context *ctx, struct typ
 	struct dynarr *init_list = initializer->initz_list->list;
 	struct dynarr *field_list = type->field_list;
 	if (dynarr_size(field_list) < dynarr_size(init_list)) {
-		assert(0);
 		panic("too many fields specified in struct initializer");
 	}
 
 	int i;
 	int tot_size_inited = 0;
 	int accum = 0;
+	int start_offset = 0; // this may not be zero for anonymouse struct/union member
+
+	if (dynarr_size(field_list) > 0) {
+		start_offset = ((struct struct_field *) dynarr_get(field_list, 0))->offset;
+	}
 
 	// XXX alignment is not handled yet
 	for (i = 0; i < dynarr_size(init_list); i++) {
@@ -146,7 +150,8 @@ static void cgasm_initialize_global_struct(struct cgasm_context *ctx, struct typ
 		}
 		struct type *field_type = field->type;
 		tot_size_inited += field_type->size;
-		if (field->offset != accum) {
+		if (field->offset - start_offset != accum) {
+			red("field offset %d name %s, accum %d", field->offset, field->name, accum);
 			panic("not support initializer padding in struct yet");
 		}
 		cgasm_initialize_global_var(ctx, field_type, field_init);

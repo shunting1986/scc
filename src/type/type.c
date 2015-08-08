@@ -371,12 +371,23 @@ struct struct_field *get_struct_field(struct type *type, const char *name) {
 	assert(type != NULL && (type->tag == T_STRUCT || type->tag == T_UNION) && type->field_list != NULL);
 	assert(name != NULL);
 	CHECK_MAGIC(type);
+	struct struct_field *ret = NULL;
 	DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
-		if (strcmp(name, each->name) == 0) {
-			return each;
+		if (each->name != NULL) {
+			if (strcmp(name, each->name) == 0) {
+				ret = each;
+				goto out;
+			}
+		} else {
+			struct struct_field *sub = get_struct_field(each->type, name);
+			if (sub != NULL) {
+				ret = sub;
+				goto out;
+			}
 		}
 	DYNARR_FOREACH_END();
-	return NULL;
+out:
+	return ret;
 }
 
 // this method will free the field itself
@@ -426,9 +437,11 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 	int i;
 	(void) type;
 
+#if 0
 	if (!is_struct) {
-		assert(offset == 0);
+		assert(offset == 0); // can be nested union
 	}
+#endif
 	/* TODO handle the special case like:
 	 * struct st {
 	 *   int a;
@@ -441,7 +454,18 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 	// for type without declarator, we should register it so that the memory
 	// can be reclaimed
 	if (dynarr_size(decl->declarator_list) == 0) {
-		register_type_ref(ctx, type);
+		if (type->tag != T_STRUCT && type->tag != T_UNION) {
+			panic("anonymouse field can only has type struct or union");
+		}
+
+		// adjust offsets
+		DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
+			each->offset += offset;
+		DYNARR_FOREACH_END();
+
+		struct struct_field *field = struct_field_init(ctx, NULL, type, offset);
+		dynarr_add(field_list, field);
+		size = type->size;
 	}
 
 	DYNARR_FOREACH_ITR_BEGIN(decl->declarator_list, struct_declarator, each, i);
