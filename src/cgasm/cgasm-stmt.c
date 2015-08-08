@@ -146,8 +146,23 @@ void cgasm_goto_ifcond_cc(struct cgasm_context *ctx, struct condcode *ccexpr, in
 		}
 	}
 
+	// we convert both lhs and rhs to int. This will make case like 
+	//   (int) a != (char) b 
+	// simple
+	struct type *lhstype = expr_val_get_type(lhs);
+	struct type *rhstype = expr_val_get_type(rhs);
+	if ((!is_integer_type(lhstype) && lhstype->tag != T_PTR) ||
+			(!is_integer_type(rhstype) && rhstype->tag != T_PTR)) {
+		panic("only support int an ptr right now");
+	}
+	if (lhstype->tag == T_LONG_LONG || rhstype->tag == T_LONG_LONG) {
+		panic("not support long long right now");
+	}
+	
 	cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
+	cgasm_extend_reg(ctx, lhs_reg, lhstype);
 	cgasm_load_val_to_reg(ctx, rhs, rhs_reg);
+	cgasm_extend_reg(ctx, rhs_reg, rhstype);
 	switch (op) {
 	case TOK_EQ:
 		cgasm_println(ctx, "cmpl %%%s, %%%s", get_reg_str_code(rhs_reg), get_reg_str_code(lhs_reg));

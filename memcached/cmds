@@ -1,15 +1,15 @@
-gcc -m32 -c valid/util.s
-gcc -m32 -c valid/daemon.s
-gcc -m32 -c valid/cache.s
+gcc -g -m32 -c valid/util.s
+gcc -g -m32 -c valid/daemon.s
+gcc -g -m32 -c valid/cache.s
 
-gcc -m32 -c stage/assoc.s
-# gcc -m32 -c valid/assoc.c
+gcc -g -m32 -c stage/assoc.s
+# gcc -g -m32 -c valid/assoc.c
 
-gcc -m32 -c valid/stats.c
-gcc -m32 -c valid/hash.c
-gcc -m32 -c valid/items.c
-gcc -m32 -c valid/thread.c
-gcc -m32 -c valid/slabs.c
-gcc -m32 -c valid/memcached-shunting.c
+gcc -g -m32 -c valid/stats.c
+gcc -g -m32 -c valid/hash.c
+gcc -g -m32 -c valid/items.c
+gcc -g -m32 -c valid/thread.c
+gcc -g -m32 -c valid/slabs.c
+gcc -g -m32 -c valid/memcached-shunting.c
 
-gcc -m32 assoc.o cache.o daemon.o hash.o items.o memcached-shunting.o thread.o slabs.o stats.o util.o -levent -lpthread
+gcc -g -m32 assoc.o cache.o daemon.o hash.o items.o memcached-shunting.o thread.o slabs.o stats.o util.o -levent -lpthread
