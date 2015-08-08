@@ -2,10 +2,10 @@
 	1. [DONE] util.c
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)
 	3. [DONE] cache.c
-	4. [DONE} assoc.c
+	4. [DONE] assoc.c
+	5. [DONE] stats.c
   
-	next stats.c
-
+	next hash.c
 
 	TODO: support 'for (int ...)'
 	TODO: fprintf( char) may have problem, the 'add esp' will only count 1 for the char.

@@ -5,10 +5,10 @@ gcc -g -m32 -c valid/util.s
 gcc -g -m32 -c valid/daemon.s
 gcc -g -m32 -c valid/cache.s
 gcc -g -m32 -c valid/assoc.s
-
-gcc -g -m32 -c valid/stats.c
+gcc -g -m32 -c valid/stats.s
 
 gcc -g -m32 -c valid/hash.c
+
 gcc -g -m32 -c valid/items.c
 gcc -g -m32 -c valid/thread.c
 gcc -g -m32 -c valid/slabs.c
