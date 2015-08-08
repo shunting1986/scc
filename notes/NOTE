@@ -5,6 +5,8 @@
 	4. [DONE] assoc.c
 	5. [DONE] stats.c
 	6. [DONE] hash.c
+
+	TODO support union struct member with no field name
   
 	next thread.c
 

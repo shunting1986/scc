@@ -124,6 +124,7 @@ static void cgasm_initialize_global_struct(struct cgasm_context *ctx, struct typ
 	struct dynarr *init_list = initializer->initz_list->list;
 	struct dynarr *field_list = type->field_list;
 	if (dynarr_size(field_list) < dynarr_size(init_list)) {
+		assert(0);
 		panic("too many fields specified in struct initializer");
 	}
 
