@@ -17,7 +17,6 @@ main(void) {
 			printf("three or four\n");
 			break;
 		}
-
 		printf("switch 2\n");
 		switch (v) {
 		case 1:
@@ -29,6 +28,18 @@ main(void) {
 		case 2:
 			printf("two\n");
 			break;
+		}
+
+		printf("switch 3\n");
+		switch (v) { 
+		default:
+			printf("catch all\n");
+			break;
+		}
+
+		printf("switch 4\n");
+		switch (v) {
+			// empty body
 		}
 	}
 	return 0;

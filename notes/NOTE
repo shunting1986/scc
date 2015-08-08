@@ -7,17 +7,14 @@
   
 	next hash.c
 
-	TODO: support 'for (int ...)'
+	TODO: we right now use a modified memcached.c. avoid it at last
+
 	TODO: fprintf( char) may have problem, the 'add esp' will only count 1 for the char.
 
+	TODO: support 'for (int ...)'
 	TODO: cgasm support named initializer (both local and global cases)
-	TODO: check that the dumpped memcached.c has named initializer correctly dumped
 	NOTE: name in named initializer can have multiple nesting level: a.b.c = 1;
-
-	TODO: support specify index to initialize array
-
-  KEYSTEPS: check cmds
-	TODO: we right now use a modified memcached.c. avoid it at last
+	TODO: support specifying index to initialize array
 
   TODO: next step is support build memcached :)
 	1. [DONE] build with memcached orig makefile 
@@ -42,7 +39,7 @@ NOTE:
 	struct union, enum share a name space; typedef, func, var share one. 
 	func is special. 1. it can have multiple declaration in one scope; 2. inner scope can not have different specification to outer one
 
-	TODO: switch (and break inside switch), 
+	TODO: switch (and break inside switch), (we only allow case statement at the top level of switch body right now)
 
 - NOTE: the only external resource I refer is the grammar of C language
 - TODO: let the make file support dependency on header file
