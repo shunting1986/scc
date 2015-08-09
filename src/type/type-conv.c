@@ -64,6 +64,7 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 	} else if (newtype->tag == T_VOID) { // (void), discard value
 	} else if (oldtype->tag == T_PTR && newtype->tag == T_PTR) { // change from one pointer type to another (can cover func ptr case)
 	} else if (oldtype->tag == T_INT && newtype->tag == T_PTR) { // convert from int to ptr
+	} else if (oldtype->tag == T_PTR && newtype->tag == T_INT) { // convert from ptr to int
 	} else if (oldtype->tag == T_ARRAY && newtype->tag == T_PTR) {
 		// XXX we'd better have an extra parameter to determine if this is implicit or 
 		// explicit conversion

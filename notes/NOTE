@@ -11,7 +11,11 @@
 	last one: orig memcached-shunting.c
 	- [DONE] next func state_text (L648) 
 	- [DONE] next func complete_incr_bin (L1066)
-	- next func append_bin_stats (L1407)
+	- [DONE] next func append_bin_stats (L1407)
+	- [DONE] next func process_bin_complete_sasl_auth (L1734)
+	- [DONE] next func try_read_command (L3489)
+	- [DONE] next func drive_machine (L3847)
+	- next func server_socket (L4272)
 
 	final one: support memcached.c
 

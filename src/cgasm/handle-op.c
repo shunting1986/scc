@@ -759,8 +759,8 @@ static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx
 struct expr_val cgasm_handle_struct_assign(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs) {
 	struct type *lhstype = expr_val_get_type(lhs);
 	struct type *rhstype = expr_val_get_type(rhs);
-	assert(lhstype->tag == T_STRUCT);
-	assert(rhstype->tag == T_STRUCT);
+	assert(lhstype->tag == T_STRUCT || lhstype->tag == T_UNION);
+	assert(rhstype->tag == lhstype->tag);
 	assert(type_eq(lhstype, rhstype));
 
 	int from_base_reg = REG_EAX;
@@ -806,7 +806,7 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		return cgasm_handle_ll_assign_op(ctx, lhs, rhs, op);
 	}
 
-	if (lhstype->tag == T_STRUCT) {
+	if (lhstype->tag == T_STRUCT || lhstype->tag == T_UNION) {
 		if (op != TOK_ASSIGN) {
 			panic("struct only allow plain assign");
 		}

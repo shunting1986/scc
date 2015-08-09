@@ -33,7 +33,8 @@ long long cgasm_get_ll_const_from_expr(struct cgasm_context *ctx, struct expr_va
 
 int cgasm_get_int_const_from_expr(struct cgasm_context *ctx, struct expr_val val) {
 	if (val.type != EXPR_VAL_CONST_VAL) {
-		panic("constant value required");
+		assert(0);
+		panic("constant value required %d", val.type);
 	}
 
 	union token const_tok = val.const_val;
