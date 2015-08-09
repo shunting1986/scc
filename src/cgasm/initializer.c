@@ -290,17 +290,32 @@ static void cgasm_initialize_local_struct(struct cgasm_context *ctx, int base_re
 	}
 	struct dynarr *init_list = initializer->initz_list->list;
 	struct dynarr *field_list = type->field_list;
+
+	#if 0
+	// this check is not valid if we used named initializer
 	if (dynarr_size(field_list) < dynarr_size(init_list)) {
 		panic("too many fields specified in struct initializer");
 	}
+	#endif
 
-	int i;
+	int i, fieldind = 0;
+	struct struct_field *field;
 	for (i = 0; i < dynarr_size(init_list); i++) {
 		struct initializer *subinit = dynarr_get(init_list, i);
-		struct struct_field *field = dynarr_get(field_list, i);
 		if (dynarr_size(subinit->namelist) > 0) {
-			panic("not support named initializer for struct yet");
+			assert(dynarr_size(subinit->namelist) == 1); // only support 1 level
+			char *name = dynarr_get(subinit->namelist, 0);
+			fieldind = get_struct_field_index(type, name);
+			if (fieldind < 0) {
+				panic("invalid struct field %s", name);
+			}
+		} 
+		if (fieldind >= dynarr_size(field_list)) {
+			panic("too many fields specified in struct initializer");
 		}
+		field = dynarr_get(field_list, fieldind);
+		fieldind++;
+
 		cgasm_initialize_local_var(ctx, base_reg, offset + field->offset, field->type, subinit);
 	}
 }

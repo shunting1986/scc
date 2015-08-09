@@ -367,6 +367,24 @@ static struct type *create_struct_type(bool is_struct, int size, struct dynarr *
 	return ret;
 }
 
+// NOTE: this method does not consider anonymous struct/union member
+int get_struct_field_index(struct type *type, const char *name) {
+	assert(type != NULL && (type->tag == T_STRUCT || type->tag == T_UNION) && type->field_list != NULL);
+	assert(name != NULL);
+	CHECK_MAGIC(type);
+	int ind = -1;
+	int i;
+	DYNARR_FOREACH_ITR_BEGIN(type->field_list, struct_field, each, i);
+		if (each->name != NULL) {
+			if (strcmp(name, each->name) == 0) {
+				ind = i;
+				break;
+			}
+		} 
+	DYNARR_FOREACH_END();
+	return ind;
+}
+
 /* 
  * XXX: Use linear scan since the list suppose to be relatively short
  */

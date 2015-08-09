@@ -122,6 +122,7 @@ void verify_type_memory_release();
 void type_dump(struct type *type, int ind);
 
 struct struct_field *get_struct_field(struct type *type, const char *name);
+int get_struct_field_index(struct type *type, const char *name);
 
 /* type-conv.c */
 struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, struct type *newtype);
