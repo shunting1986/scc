@@ -12,6 +12,8 @@ main(void) {
 		printf("!= %d\n", a != b / 3.0);
 		printf("< %d\n", a < b / 3.0);
 		printf(">= %d\n", a >= b / 3.0);
+		a *= 2.5;
+		printf("a %d\n", a);
 	}
 	return 0;
 }

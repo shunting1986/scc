@@ -780,6 +780,10 @@ struct expr_val cgasm_handle_assign_op(struct cgasm_context *ctx, struct expr_va
 		return cgasm_handle_ptr_assign(ctx, lhs, rhs, op);
 	}
 
+	if (is_floating_type(lhstype) || is_floating_type(rhstype)) {
+		return cgasm_handle_assign_op_fp(ctx, lhs, rhs, op);
+	}
+
 	{ // type conversion implicitly for assignment
 		if (is_integer_type(lhstype) && is_integer_type(rhstype)) {
 			rhs = type_convert(ctx, rhs, lhstype);

@@ -271,5 +271,21 @@ bool is_cmp_tok(int tok_tag) {
 		|| tok_tag == TOK_LE || tok_tag == TOK_GT || tok_tag == TOK_GE;
 }
 
+int get_arith_from_complex_assign(int op) {
+	switch (op) {
+	case TOK_MUL_ASSIGN: return TOK_STAR;
+	case TOK_DIV_ASSIGN: return TOK_DIV;
+	case TOK_MOD_ASSIGN: return TOK_MOD;
+	case TOK_ADD_ASSIGN: return TOK_ADD;
+	case TOK_SUB_ASSIGN: return TOK_SUB;
+	case TOK_LSHIFT_ASSIGN: return TOK_LSHIFT;
+	case TOK_RSHIFT_ASSIGN: return TOK_RSHIFT;
+	case TOK_AND_ASSIGN: return TOK_AMPERSAND;
+	case TOK_OR_ASSIGN: return TOK_VERT_BAR;
+	case TOK_XOR_ASSIGN: return TOK_XOR;
+	default:
+		panic("invalid op %s", token_tag_str(op));
+	}
+}
 
 

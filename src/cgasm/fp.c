@@ -76,15 +76,18 @@ static void load_int_to_fpstk(struct cgasm_context *ctx, struct expr_val val) {
 	cgasm_println(ctx, "fildl (%%%s)", get_reg_str_code(reg));
 }
 
+// If dst is integer type, this method will pop the double value, convert it to integer
+// and then stored to dst.
 static void pop_fpstk_to_lval(struct cgasm_context *ctx, struct expr_val dst) {
 	struct type *type = dst.ctype;
-	assert(is_floating_type(type));
 	char buf[256];
 	cgasm_get_lval_asm_code(ctx, dst, buf);
 	if (type->tag == T_FLOAT) {
 		cgasm_println(ctx, "fstps %s", buf);
 	} else if (type->tag == T_DOUBLE) {
 		cgasm_println(ctx, "fstpl %s", buf);
+	} else if (type->tag == T_INT) {
+		cgasm_println(ctx, "fistpl %s", buf);
 	} else {
 		panic("unsupported type %d", type->tag);
 	}
@@ -95,7 +98,8 @@ struct expr_val fp_type_convert(struct cgasm_context *ctx, struct expr_val val, 
 	struct type *oldtype = val.ctype;
 	assert(is_floating_type(oldtype) || is_floating_type(newtype));
 
-	if (is_integer_type(oldtype) && is_floating_type(newtype)) {
+	if ((is_integer_type(oldtype) && is_floating_type(newtype)) ||
+			(is_floating_type(oldtype) && is_integer_type(newtype))) {
 		load_val_to_fpstk(ctx, val);
 		struct expr_val temp = cgasm_alloc_temp_var(ctx, newtype);
 		pop_fpstk_to_lval(ctx, temp);
@@ -160,4 +164,24 @@ struct expr_val cgasm_handle_binary_op_fp(struct cgasm_context *ctx, int tok_tag
 	return resval;
 }
 
+// NOTE: if we are doing:
+// i *= f
+// we can not convert f to integer immediately. We must do the floating point
+// operation (i * f) first and than store the floating point value back to i
+struct expr_val cgasm_handle_assign_op_fp(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op) {
+	struct type *lhstype = expr_val_get_type(lhs);
+	struct type *rhstype = expr_val_get_type(rhs);
+	assert(is_floating_type(lhstype) || is_floating_type(rhstype));
+
+	struct expr_val res = rhs;
+	if (op != TOK_ASSIGN) {
+		int arith_op = get_arith_from_complex_assign(op);
+		res = cgasm_handle_binary_op_fp(ctx, arith_op, lhs, rhs);
+	}
+
+	// handle the simple assign: we push res to fpstk and pop the top to lhs
+	load_val_to_fpstk(ctx, res);
+	pop_fpstk_to_lval(ctx, lhs);
+	return lhs;
+}
 

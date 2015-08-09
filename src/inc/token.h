@@ -64,6 +64,7 @@ void token_to_cstr(union token tok, struct cbuf *cbuf);
 bool const_token_is_nonzero(union token tok);
 bool is_cmp_tok(int tok_tag);
 const char *cmp_tok_to_jmp_suffix(int tok_tag, bool unsig);
+int get_arith_from_complex_assign(int op);
 
 #ifdef __cplusplus
 }
