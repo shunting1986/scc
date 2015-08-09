@@ -111,6 +111,7 @@ struct type *get_array_type(struct type *elem_type, int dim);
 void complete_array_dim(struct type *type, int dim);
 struct type *get_noparam_func_type(struct type *retype);
 struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, bool has_ellipsis);
+struct type *get_implicit_func_type();
 int type_get_tag(struct type *type);
 struct type *type_get(struct type *type);
 void type_put(struct type *type);

@@ -209,7 +209,10 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
 			return ret;
 		}
 
-		panic("symbol undefined: %s", expr->id);
+		// return an undef symbol for undeclared func. Caller will have more check
+		struct symbol *undef = symtab_new_undef(expr->id);
+		symtab_add(ctx->top_stab, undef);
+		return symbol_expr_val(undef);
 	} else if (expr->const_val_tok.tok_tag != TOK_UNDEF) {
 		return const_expr_val(expr->const_val_tok);
 	} else if (expr->expr != NULL) {
@@ -223,18 +226,36 @@ static struct expr_val cgasm_primary_expression(struct cgasm_context *ctx, struc
  * XXX this method only handle several special cases right now.
  */
 static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struct postfix_expression *expr) {
-	#if 0
-	struct postfix_expression_suffix *suff;
-	char *id;
-	// function call TODO unify this into the general processing
-	if ((id = expr->prim_expr->id) != NULL && dynarr_size(expr->suff_list) == 1 && (suff = dynarr_get(expr->suff_list, 0))->arg_list != NULL) {
-		return cgasm_function_call(ctx, id, suff->arg_list);
-	}
-	#endif
+#define check_undef_sym() do { \
+	if (result_val.type == EXPR_VAL_SYMBOL) { \
+		struct symbol *sym = result_val.sym; \
+		if (sym->type == SYMBOL_UNDEF) { \
+			panic("symbol undefined %s", sym->name); \
+		} \
+	} \
+} while (0)
 
 	// first, we get expr_val from the primary expression
 	struct expr_val result_val = cgasm_primary_expression(ctx, expr->prim_expr);
+
+	if (dynarr_size(expr->suff_list) == 0) {
+		check_undef_sym();
+	}
+
 	DYNARR_FOREACH_BEGIN(expr->suff_list, postfix_expression_suffix, each);
+		if (each->arg_list == NULL) {
+			check_undef_sym();
+		} else {
+			// give undef symbol a func type
+			if (result_val.type == EXPR_VAL_SYMBOL) {
+				struct symbol *sym = result_val.sym;
+				if (sym->type == SYMBOL_UNDEF) {
+					result_val.ctype = sym->ctype = type_get(get_implicit_func_type());
+					sym->type = ctx->func_ctx ? SYMBOL_LOCAL_VAR : SYMBOL_GLOBAL_VAR;
+				}
+			}
+		}
+
 		if (each->is_inc) {
 			result_val = cgasm_handle_post_inc(ctx, result_val);
 		} else if (each->is_dec) {
@@ -253,6 +274,7 @@ static struct expr_val cgasm_postfix_expression(struct cgasm_context *ctx, struc
 			panic("can not reach here");
 		}
 	DYNARR_FOREACH_END();
+#undef check_undef_sym
 	return result_val;
 }
 

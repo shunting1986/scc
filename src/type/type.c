@@ -344,6 +344,10 @@ struct type *get_noparam_func_type(struct type *retype) {
 	return get_func_type(retype, dynarr_init(), false);
 }
 
+struct type *get_implicit_func_type() {
+	return get_func_type(get_int_type(), dynarr_init(), false);
+}
+
 struct type *get_func_type(struct type *retype, struct dynarr *param_type_list, bool has_ellipsis) {
 	assert(!has_ellipsis || dynarr_size(param_type_list) > 0);
 	struct type *ret = alloc_type(T_FUNC, -1);
