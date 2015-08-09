@@ -62,6 +62,8 @@ union token wrap_to_str_literal_token(char *s);
 void token_list_to_cstr(struct dynarr *toklist, struct cbuf *cbuf);
 void token_to_cstr(union token tok, struct cbuf *cbuf);
 bool const_token_is_nonzero(union token tok);
+bool is_cmp_tok(int tok_tag);
+const char *cmp_tok_to_jmp_suffix(int tok_tag, bool unsig);
 
 #ifdef __cplusplus
 }

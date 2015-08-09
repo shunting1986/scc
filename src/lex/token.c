@@ -247,5 +247,29 @@ void token_to_cstr(union token tok, struct cbuf *cbuf) {
 	}
 }
 
+const char *cmp_tok_to_jmp_suffix(int tok_tag, bool unsig) {
+	switch (tok_tag) {
+	case TOK_EQ:
+		return "e";
+	case TOK_NE:
+		return "ne";
+	case TOK_LT:
+		return unsig ? "b" : "l";
+	case TOK_GT:
+		return unsig ? "a" : "g";
+	case TOK_LE:
+		return unsig ? "be" : "le";
+	case TOK_GE:
+		return unsig ? "ae" : "ge";
+	default:
+		panic("invalid cmp tok");
+	}
+}
+
+bool is_cmp_tok(int tok_tag) {
+	return tok_tag == TOK_EQ || tok_tag == TOK_NE || tok_tag == TOK_LT 
+		|| tok_tag == TOK_LE || tok_tag == TOK_GT || tok_tag == TOK_GE;
+}
+
 
 
