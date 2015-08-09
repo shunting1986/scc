@@ -135,6 +135,11 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 			panic("The size of symbol is undefined: %s", id);
 		}
 
+		// complete array dimension
+		if (final_type->tag == T_ARRAY && final_type->dim == -1 && each->initializer != NULL && each->initializer->expr == NULL) {
+			complete_array_dim(final_type, dynarr_size(each->initializer->initz_list->list));
+		}
+
 		// register symbol id with type 'final_type'
 		struct symbol *sym = cgasm_add_decl_sym(ctx, id, final_type, symbol_flags);
 
@@ -144,7 +149,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 				if (initializer->expr != NULL) {
 					(void) cgasm_handle_assign_op(ctx, symbol_expr_val(sym), cgasm_assignment_expression(ctx, initializer->expr), TOK_ASSIGN);
 				} else {
-					panic("local struct initializer");
+					cgasm_initialize_local_symbol(ctx, (struct local_var_symbol *) sym, initializer);
 				}
 			} 
 		} else {

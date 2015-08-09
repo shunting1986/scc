@@ -8,7 +8,9 @@
 	7. [DONE] thread.c
 	8. [DONE] slabs.c
 
-	last one: memcached-shunting.c
+	last one: orig memcached-shunting.c
+	- next func state_text (L648)
+
 	final one: support memcached.c
 
 

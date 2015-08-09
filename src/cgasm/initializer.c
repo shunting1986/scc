@@ -5,6 +5,7 @@
 #include <inc/cgc.h>
 
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *type, struct initializer *initializer);
+static void cgasm_initialize_local_var(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer);
 
 static void cgasm_initialize_global_ll(struct cgasm_context *ctx, struct initializer *initializer) {
 	struct assignment_expression *expr = initializer->expr;
@@ -232,3 +233,50 @@ void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symb
 	cgasm_println_noind(ctx, "%s:", sym->name);
 	cgasm_initialize_global_var(ctx, sym->ctype, initializer);
 }
+
+static void cgasm_initialize_local_array(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
+	assert(type->tag == T_ARRAY);
+	struct dynarr *initz_list = initializer->initz_list->list;
+	struct type *subtype = type->subtype;
+	int compsize = type_get_size(subtype);
+
+	DYNARR_FOREACH_BEGIN(initz_list, initializer, each);
+		cgasm_initialize_local_var(ctx, base_reg, offset, subtype, each);
+		offset += compsize;
+	DYNARR_FOREACH_END();
+}
+
+static void cgasm_initialize_local_ptr(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
+	assert(initializer->expr != NULL);
+	struct expr_val val = cgasm_assignment_expression(ctx, initializer->expr);
+	val = type_convert(ctx, val, type);
+	int reg = find_avail_reg(1 << base_reg);
+	cgasm_load_val_to_reg(ctx, val, reg);
+	cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg), offset, get_reg_str_code(base_reg));
+}
+
+static void cgasm_initialize_local_var(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
+	switch (type->tag) {
+	case T_ARRAY:
+		cgasm_initialize_local_array(ctx, base_reg, offset, type, initializer);
+		break;
+	case T_PTR:
+		cgasm_initialize_local_ptr(ctx, base_reg, offset, type, initializer);
+		break;
+	default:
+		panic("local initializer, type %d", type->tag);
+	}
+}
+
+void cgasm_initialize_local_symbol(struct cgasm_context *ctx, struct local_var_symbol *sym, struct initializer *initializer) {
+	assert(initializer->expr == NULL);
+	struct type *type = sym->ctype;
+	int offset = cgasm_get_local_var_offset(ctx, sym);
+	cgasm_clear_range(ctx, REG_EBP, offset, type_get_size(type));
+
+	assert(type->size >= 0);
+	int base_reg = REG_EBP;
+
+	cgasm_initialize_local_var(ctx, base_reg, offset, type, initializer);
+}
+

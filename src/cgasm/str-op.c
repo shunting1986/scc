@@ -1,5 +1,20 @@
 #include <inc/cgasm.h>
 
+// Take care that this methods will override some hard-coded registers
+void cgasm_clear_range(struct cgasm_context *ctx, int base_reg, int start_off, int size) {
+	// set start address
+	cgasm_println(ctx, "leal %d(%%%s), %%edi", start_off, get_reg_str_code(base_reg));
+
+	// set count
+	cgasm_println(ctx, "movl $%d, %%ecx", size);
+
+	// set the value
+	cgasm_println(ctx, "xorl %%eax, %%eax");
+
+	// do the  writing
+	cgasm_println(ctx, "rep stosb");
+}
+
 // TODO use string operation as a optimization
 void cgasm_push_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int size) {
 	int end = from_start_off + (size + 3) / 4 * 4;
