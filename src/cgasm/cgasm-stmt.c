@@ -394,7 +394,9 @@ static void cgasm_switch_statement_cmp(struct cgasm_context *ctx, struct expr_va
 	int reg = REG_EAX;
 	struct type *type = expr_val_get_type(cond);
 	char buf[256];
-	assert(type->tag == T_INT); // assume int right now
+
+	assert(is_integer_type(type) && type->tag != T_LONG_LONG); // not support long long yet
+	cond = type_convert(ctx, cond, get_int_type());
 
 	cgasm_load_val_to_reg(ctx, cond, reg);
 	for (i = 0; i < dynarr_size(case_val_list); i++) {
