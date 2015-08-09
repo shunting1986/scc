@@ -1,3 +1,6 @@
+  =========== the only thing left is to reduce the number of changes made on memcached.c
+
+
   ACHIEVEMENT:
 	1. [DONE] util.c
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)
@@ -17,7 +20,8 @@
 	- [DONE] next func drive_machine (L3847)
 	- [DONE] next func server_socket (L4272)
 	- [DONE] next func clock_handler (L4546)
-	- next func main (L4868)
+	- [DONE] next func main (L4868)
+	------- can get asm from memcached-shunting.c now :) <++++++++++++++++++++++++ it works !!!!
 
 	final one: support memcached.c
 
