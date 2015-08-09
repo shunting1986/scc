@@ -37,7 +37,7 @@ int cgasm_get_local_var_offset(struct cgasm_context *ctx, struct local_var_symbo
 int cgasm_get_param_offset(struct cgasm_context *ctx /* unused */, struct param_symbol *sym);
 void cgasm_load_addr_to_reg(struct cgasm_context *ctx, struct expr_val val, int reg);
 int cgasm_get_temp_var_offset(struct cgasm_context *ctx, struct temp_var temp);
-char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf);
+char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf, int *pmask);
 const char *size_to_suffix(int size);
 void cgasm_extend_reg(struct cgasm_context *ctx, int reg, struct type *type);
 

@@ -101,10 +101,10 @@ static void cgasm_ll_neg(struct cgasm_context *ctx, struct expr_val diff, struct
 
 	cgasm_println(ctx, "cmpl $0, 4(%%%s)", get_reg_str_code(addr_reg));
 	cgasm_println(ctx, "jge %s", get_jump_label_str(set0_label, buf));
-	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
 	cgasm_emit_jump_label(ctx, set0_label);
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
@@ -121,10 +121,10 @@ static void cgasm_ll_nonneg(struct cgasm_context *ctx, struct expr_val diff, str
 
 	cgasm_println(ctx, "cmpl $0, 4(%%%s)", get_reg_str_code(addr_reg));
 	cgasm_println(ctx, "jge %s", get_jump_label_str(set1_label, buf));
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
 	cgasm_emit_jump_label(ctx, set1_label);
-	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
@@ -143,10 +143,10 @@ static void cgasm_ll_zero(struct cgasm_context *ctx, struct expr_val diff, struc
 	cgasm_println(ctx, "jne %s", get_jump_label_str(set0_label, buf));
 	cgasm_println(ctx, "cmpl $0, (%%%s)", get_reg_str_code(addr_reg));
 	cgasm_println(ctx, "jne %s", get_jump_label_str(set0_label, buf));
-	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
 	cgasm_emit_jump_label(ctx, set0_label);
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
@@ -165,10 +165,10 @@ static void cgasm_ll_nonzero(struct cgasm_context *ctx, struct expr_val diff, st
 	cgasm_println(ctx, "jne %s", get_jump_label_str(set1_label, buf));
 	cgasm_println(ctx, "cmpl $0, (%%%s)", get_reg_str_code(addr_reg));
 	cgasm_println(ctx, "jne %s", get_jump_label_str(set1_label, buf));
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
 	cgasm_emit_jump_label(ctx, set1_label);
-	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
@@ -191,11 +191,11 @@ static void cgasm_ll_pos(struct cgasm_context *ctx, struct expr_val diff, struct
 	cgasm_println(ctx, "je %s", get_jump_label_str(set0_label, buf));
 
 	cgasm_emit_jump_label(ctx, set1_label);
-	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
 	cgasm_emit_jump_label(ctx, set0_label);
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
@@ -218,11 +218,11 @@ static void cgasm_ll_nonpos(struct cgasm_context *ctx, struct expr_val diff, str
 	cgasm_println(ctx, "je %s", get_jump_label_str(set1_label, buf));
 
 	cgasm_emit_jump_label(ctx, set0_label);
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 
 	cgasm_println(ctx, "jmp %s", get_jump_label_str(out_label, buf));
 	cgasm_emit_jump_label(ctx, set1_label);
-	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf));
+	cgasm_println(ctx, "movl $1, %s", cgasm_get_lval_asm_code(ctx, res, buf, NULL));
 	cgasm_emit_jump_label(ctx, out_label);
 }
 

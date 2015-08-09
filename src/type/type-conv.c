@@ -33,7 +33,7 @@ struct expr_val extend_int_type(struct cgasm_context *ctx, struct expr_val val, 
 	// TODO assume zero extension right now..
 	// TODO if val is already a temp var, we do not need to allocate another one
 	struct expr_val ret = cgasm_alloc_temp_var(ctx, newtype);
-	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, ret, buf));
+	cgasm_println(ctx, "movl $0, %s", cgasm_get_lval_asm_code(ctx, ret, buf, NULL));
 	int reg = REG_EAX;
 	cgasm_load_val_to_reg(ctx, val, reg);
 

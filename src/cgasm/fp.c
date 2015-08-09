@@ -79,9 +79,10 @@ static void load_int_to_fpstk(struct cgasm_context *ctx, struct expr_val val) {
 // If dst is integer type, this method will pop the double value, convert it to integer
 // and then stored to dst.
 static void pop_fpstk_to_lval(struct cgasm_context *ctx, struct expr_val dst) {
-	struct type *type = dst.ctype;
+	struct type *type = expr_val_get_type(dst);
 	char buf[256];
-	cgasm_get_lval_asm_code(ctx, dst, buf);
+	int mask = 0;
+	cgasm_get_lval_asm_code(ctx, dst, buf, &mask);
 	if (type->tag == T_FLOAT) {
 		cgasm_println(ctx, "fstps %s", buf);
 	} else if (type->tag == T_DOUBLE) {

@@ -12,6 +12,7 @@ memcached:
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/hash.c
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/items.c
 	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/thread.c
-	./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/slabs.c
+	@#./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/slabs.c
+	./scc -DHAVE_CONFIG_H $(MEMCACHED_SRC_ROOT)/memcached-shunting.c
 
 .PHONY: memcached

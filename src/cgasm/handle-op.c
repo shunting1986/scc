@@ -81,13 +81,25 @@ static void cgasm_get_lval_temp_asm_code(struct cgasm_context *ctx, struct temp_
 
 // this funtion will report error if val is not an lval.
 // we also use this method to get the asm code for temp var
-char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf) {
+char *cgasm_get_lval_asm_code(struct cgasm_context *ctx, struct expr_val val, char *buf, int *pmask) {
 	if (buf == NULL) {
 		buf = mallocz(128); // caller should free it
 	}
-	assert((val.type & EXPR_VAL_FLAG_DEREF) == 0 && "this function does not support deref");
 
-	// val = cgasm_handle_deref_flag(ctx, val); 
+	if (val.type & EXPR_VAL_FLAG_DEREF) {
+		assert(pmask);
+		int mask = *pmask;
+		int reg = find_avail_reg(mask);
+		*pmask = mask | (1 << reg);
+
+		val.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
+		cgasm_load_val_to_reg(ctx, val, reg);
+		val.type |= EXPR_VAL_FLAG_DEREF; 
+
+		sprintf(buf, "(%%%s)", get_reg_str_code_size(reg, 4));
+		return buf;
+	} 
+
 	switch (val.type) {
 	case EXPR_VAL_SYMBOL:
 		cgasm_get_lval_sym_asm_code(ctx, val.sym, buf);
@@ -715,17 +727,9 @@ static struct expr_val cgasm_handle_assign_op_with_reg(struct cgasm_context *ctx
 	char lhs_asm_code[128];
 	struct type *lhstype = expr_val_get_type(lhs);
 	int size = type_get_size(lhstype);
-	if (lhs.type & EXPR_VAL_FLAG_DEREF) {
-		int lhs_reg = rhs_reg == REG_EAX ? REG_ECX : REG_EAX; // use reg other than rhs_reg
 
-		lhs.type &= ~EXPR_VAL_FLAG_DEREF; // clear the flag so that we can get the addr
-		cgasm_load_val_to_reg(ctx, lhs, lhs_reg);
-		lhs.type |= EXPR_VAL_FLAG_DEREF; 
-
-		snprintf(lhs_asm_code, sizeof(lhs_asm_code), "(%%%s)", get_reg_str_code_size(lhs_reg, 4));
-	} else {
-		cgasm_get_lval_asm_code(ctx, lhs, lhs_asm_code);
-	}
+	int mask = 1 << rhs_reg;
+	cgasm_get_lval_asm_code(ctx, lhs, lhs_asm_code, &mask);
 
 	switch (op) {
 	case TOK_ASSIGN:

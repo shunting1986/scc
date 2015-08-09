@@ -6,8 +6,11 @@
 	5. [DONE] stats.c
 	6. [DONE] hash.c
 	7. [DONE] thread.c
+	8. [DONE] slabs.c
 
-	next slabs.c
+	last one: memcached-shunting.c
+	final one: support memcached.c
+
 
 	TODO: we right now use a modified memcached.c. avoid it at last
 
