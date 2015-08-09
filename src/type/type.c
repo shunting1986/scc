@@ -430,6 +430,38 @@ struct struct_field *struct_field_init(struct cgasm_context *ctx, const char *na
 	return field;
 }
 
+// return -1 if can not decide or no need to align
+static int alignOf(struct type *type) {
+	int align = -1;
+
+	if (type->tag == T_LONG_LONG || type->tag == T_FLOAT || type->tag == T_DOUBLE) {
+		// NOTE: gcc align long long to 4 bytes bounday inside struct!! Although
+		// __alignof__(long long) returns 8
+		align = 4;
+	} else if (is_integer_type(type)) { // integer type other than long long
+		align = type->size;
+	} else if (type->tag == T_ARRAY) {
+		align = 4; // XXX align for array is always 4?
+	} else if (type->tag == T_PTR) {
+		align = 4;
+	} else if (type->tag == T_STRUCT) {	
+		if (dynarr_size(type->field_list) > 0) {
+			struct struct_field *field = dynarr_first(type->field_list);
+			align = alignOf(field->type);
+		}
+	} else if (type->tag == T_UNION) {
+		// return the max one
+		DYNARR_FOREACH_BEGIN(type->field_list, struct_field, each);
+			align = max(align, alignOf(each->type));
+		DYNARR_FOREACH_END();
+	} else {
+		red("alignof not decided");
+		type_dump(type, 8);
+		panic("ni");
+	}
+	return align;
+}
+
 static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_struct, struct struct_declaration *decl, struct dynarr *field_list, int offset, bool last_decl) {
 	struct type *type = parse_type_from_specifier_qualifier_list(ctx, decl->sqlist);
 	int size = 0;
@@ -496,15 +528,10 @@ static int parse_struct_field_list_by_decl(struct cgasm_context *ctx, int is_str
 		}
  
 		if (is_struct) { // only consider alignment for struct right now
-			int allign = -1;
-			if (is_integer_type(final_type)) { // support alignment for integer type right now. 'struct stat' requires padding
-				allign = fieldsize;
-			} else if (final_type->tag == T_ARRAY) {
-				allign = 4;
-			}
+			int align = alignOf(final_type);
 
-			if (allign > 0) {
-				int padsize = (offset + allign - 1) / allign * allign - offset;
+			if (align > 0) {
+				int padsize = (offset + align - 1) / align * align - offset;
 				offset += padsize;
 				size += padsize;
 			}

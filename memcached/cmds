@@ -8,12 +8,10 @@ gcc -g -m32 -c valid/assoc.s
 gcc -g -m32 -c valid/stats.s
 gcc -g -m32 -c valid/hash.s
 gcc -g -m32 -c valid/items.s
-
-../../scc -DHAVE_CONFIG_H ../memcached-1.4.17/thread.c > stage/thread.s || true
-gcc -g -m32 -c stage/thread.s
-# gcc -g -m32 -c valid/thread.c
+gcc -g -m32 -c valid/thread.s
 
 gcc -g -m32 -c valid/slabs.c
+
 gcc -g -m32 -c valid/memcached-shunting.c
 
 gcc -g -m32 assoc.o cache.o daemon.o hash.o items.o memcached-shunting.o thread.o slabs.o stats.o util.o -levent -lpthread

@@ -5,9 +5,9 @@
 	4. [DONE] assoc.c
 	5. [DONE] stats.c
 	6. [DONE] hash.c
+	7. [DONE] thread.c
 
-	next thread.c
-	- get segfault...
+	next slabs.c
 
 	TODO: we right now use a modified memcached.c. avoid it at last
 
