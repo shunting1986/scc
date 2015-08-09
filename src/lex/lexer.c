@@ -450,13 +450,15 @@ repeat:
 	}
 
 	if (tok.tok_tag != TOK_UNDEF) {
-		if (tok.tok_tag != TOK_IDENTIFIER && tok.tok_tag != TOK_TYPE_NAME) {
-			goto out;
-		} else {
+		if (tok.tok_tag == TOK_STRING_LITERAL) {
+			goto handle_combined_strings;
+		} else if (tok.tok_tag == TOK_IDENTIFIER || tok.tok_tag == TOK_TYPE_NAME) {
 			// even if the token is once treated as type name, we do a typedef check again
 			// since the disable_typedef may be set at this time.
 			tok.tok_tag = TOK_IDENTIFIER; // override the possible type name to id and then do the typedef check
 			goto check_id_token; // handle typedef or recursive expanding macro
+		} else {
+			goto out;
 		}
 	}
 
@@ -695,6 +697,8 @@ check_id_token:
 			tok.str.s = s;
 
 			// handle consecutive string literals
+handle_combined_strings:
+			;
 			union token nxtok = lexer_next_token(lexer);
 			if (nxtok.tok_tag == TOK_STRING_LITERAL) {
 				struct cbuf *cbuf = cbuf_init();
