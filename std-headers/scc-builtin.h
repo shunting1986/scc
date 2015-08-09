@@ -8,6 +8,7 @@
 #define __builtin_va_arg(ap, type) (ap += scc_align_up(sizeof(type), 4), (type) (ap - scc_align_up(sizeof(type), 4)))
 #endif
 
+#define __need_IOV_MAX
 #include <stdint.h>
 
 #undef INT64_MAX
