@@ -15,7 +15,9 @@
 	- [DONE] next func process_bin_complete_sasl_auth (L1734)
 	- [DONE] next func try_read_command (L3489)
 	- [DONE] next func drive_machine (L3847)
-	- next func server_socket (L4272)
+	- [DONE] next func server_socket (L4272)
+	- [DONE] next func clock_handler (L4546)
+	- next func main (L4868)
 
 	final one: support memcached.c
 

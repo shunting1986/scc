@@ -216,8 +216,12 @@ void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int g
 			goto_label, inverse);
 		break;
 	}
+	case EXPR_VAL_STR_LITERAL: // always true
+		nonzero = 1;
+		goto discard_cond;
 	case EXPR_VAL_CONST_VAL: 
 		nonzero = const_token_is_nonzero(condval.const_val);
+discard_cond:
 		if ((!inverse && nonzero) || (inverse && !nonzero)) {
 			cgasm_println(ctx, "jmp %s", get_jump_label_str(goto_label, buf));
 		}

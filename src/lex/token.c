@@ -242,6 +242,11 @@ void token_to_cstr(union token tok, struct cbuf *cbuf) {
 	case TOK_CONSTANT_VALUE:
 		const_val_to_cstr(tok, cbuf);
 		break;
+	case TOK_STRING_LITERAL:
+		cbuf_add(cbuf, '\"');
+		cbuf_add(cbuf, '\"');
+		cbuf_add_str(cbuf, tok.str.s);
+		break;
 	default:	
 		panic("ni %s", token_tag_str(tok.tok_tag));
 	}
