@@ -365,7 +365,6 @@ static struct type *create_struct_type(bool is_struct, int size, struct dynarr *
 
 /* 
  * XXX: Use linear scan since the list suppose to be relatively short
- * TODO handle union
  */
 struct struct_field *get_struct_field(struct type *type, const char *name) {
 	assert(type != NULL && (type->tag == T_STRUCT || type->tag == T_UNION) && type->field_list != NULL);

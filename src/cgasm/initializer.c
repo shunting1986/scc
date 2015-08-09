@@ -246,13 +246,70 @@ static void cgasm_initialize_local_array(struct cgasm_context *ctx, int base_reg
 	DYNARR_FOREACH_END();
 }
 
-static void cgasm_initialize_local_ptr(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
+// handle scalar types like ptr, int, short, byte.
+// long long and floating type are nog handled here
+static void cgasm_initialize_local_scalar(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
 	assert(initializer->expr != NULL);
 	struct expr_val val = cgasm_assignment_expression(ctx, initializer->expr);
 	val = type_convert(ctx, val, type);
 	int reg = find_avail_reg(1 << base_reg);
 	cgasm_load_val_to_reg(ctx, val, reg);
-	cgasm_println(ctx, "movl %%%s, %d(%%%s)", get_reg_str_code(reg), offset, get_reg_str_code(base_reg));
+
+	int size = type_get_size(type);
+	assert(size <= 4);
+	cgasm_println(ctx, "mov%s %%%s, %d(%%%s)", size_to_suffix(size), get_reg_str_code_size(reg, size), offset, get_reg_str_code(base_reg));
+}
+
+static void cgasm_initialize_local_with_named_initializer(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer, int nameind) {
+	struct dynarr *namelist = initializer->namelist;
+	assert(dynarr_size(namelist) > 0);
+	if (nameind == dynarr_size(namelist)) {
+		// not copy namelist
+		struct initializer *copy_initializer = initializer_init();
+		copy_initializer->expr = initializer->expr;
+		copy_initializer->initz_list = initializer->initz_list;
+		cgasm_initialize_local_var(ctx, base_reg, offset, type, initializer);
+
+		dynarr_destroy(copy_initializer->namelist);
+		free(copy_initializer);
+		return;
+	}
+	char *name = dynarr_get(namelist, nameind);
+	struct struct_field *field = get_struct_field(type, name);
+	if (field == NULL) {
+		panic("invalid field name %s", name);
+	}
+	cgasm_initialize_local_with_named_initializer(ctx, base_reg, offset + field->offset, field->type, initializer, nameind + 1);
+}
+
+static void cgasm_initialize_local_union(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
+	assert(type->tag == T_UNION);
+	assert(initializer->initz_list != NULL);
+	struct dynarr *initz_list = initializer->initz_list->list;
+	struct initializer *subini;
+	if (dynarr_size(initz_list) == 0) {
+		return;
+	}
+
+	if (dynarr_size(initz_list) == 1 && dynarr_size((subini = dynarr_get(initz_list, 0))->namelist) == 0) {
+		// not named initializer
+		struct dynarr *field_list = type->field_list;
+		if (dynarr_size(field_list) == 0) {
+			panic("too many fields specified in initializer");
+		}
+		struct struct_field *field = dynarr_get(field_list, 0);
+		cgasm_initialize_local_var(ctx, base_reg, offset, field->type, subini);
+		return;
+	}
+
+	// all named initializer
+	DYNARR_FOREACH_BEGIN(initz_list, initializer, each);
+		struct dynarr *namelist = each->namelist;
+		if (dynarr_size(namelist) == 0) {
+			panic("require named initializer");
+		}
+		cgasm_initialize_local_with_named_initializer(ctx, base_reg, offset, type, each, 0);
+	DYNARR_FOREACH_END();
 }
 
 static void cgasm_initialize_local_var(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
@@ -260,8 +317,11 @@ static void cgasm_initialize_local_var(struct cgasm_context *ctx, int base_reg, 
 	case T_ARRAY:
 		cgasm_initialize_local_array(ctx, base_reg, offset, type, initializer);
 		break;
-	case T_PTR:
-		cgasm_initialize_local_ptr(ctx, base_reg, offset, type, initializer);
+	case T_PTR: case T_INT: case T_SHORT: case T_CHAR:
+		cgasm_initialize_local_scalar(ctx, base_reg, offset, type, initializer);
+		break;
+	case T_UNION:
+		cgasm_initialize_local_union(ctx, base_reg, offset, type, initializer);
 		break;
 	default:
 		panic("local initializer, type %d", type->tag);

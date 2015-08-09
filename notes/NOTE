@@ -10,7 +10,8 @@
 
 	last one: orig memcached-shunting.c
 	- [DONE] next func state_text (L648) 
-	- next func complete_incr_bin (L1066)
+	- [DONE] next func complete_incr_bin (L1066)
+	- next func append_bin_stats (L1407)
 
 	final one: support memcached.c
 
