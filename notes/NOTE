@@ -9,7 +9,8 @@
 	8. [DONE] slabs.c
 
 	last one: orig memcached-shunting.c
-	- next func state_text (L648)
+	- [DONE] next func state_text (L648) 
+	- next func complete_incr_bin (L1066)
 
 	final one: support memcached.c
 

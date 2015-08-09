@@ -226,6 +226,17 @@ static void cgasm_ll_nonpos(struct cgasm_context *ctx, struct expr_val diff, str
 	cgasm_emit_jump_label(ctx, out_label);
 }
 
+void cgasm_goto_ifcond_ll(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse) {
+	assert(condval.type != EXPR_VAL_CC);
+	struct type *type = expr_val_get_type(condval);
+	assert(type->tag == T_LONG_LONG);
+
+	struct expr_val temp = cgasm_alloc_temp_var(ctx, get_int_type());
+	cgasm_ll_nonzero(ctx, condval, temp);
+
+	cgasm_goto_ifcond(ctx, temp, goto_label, inverse);
+}
+
 static struct expr_val cgasm_handle_binary_op_ll_cmp(struct cgasm_context *ctx, int op, struct expr_val lhs, struct expr_val rhs) {
 	struct expr_val diff = cgasm_handle_binary_op_ll(ctx, TOK_SUB, lhs, rhs);
 	struct expr_val res = cgasm_alloc_temp_var(ctx, get_int_type());

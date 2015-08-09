@@ -18,6 +18,7 @@ void cgasm_push_ll_val(struct cgasm_context *ctx, struct expr_val val);
 struct expr_val cgasm_handle_ll_assign_op(struct cgasm_context *ctx, struct expr_val lhs, struct expr_val rhs, int op);
 struct expr_val cgasm_handle_post_incdec_ll(struct cgasm_context *ctx, struct expr_val val, int is_inc);
 struct expr_val cgasm_handle_pre_incdec_ll(struct cgasm_context *ctx, struct expr_val val, int is_ind);
+void cgasm_goto_ifcond_ll(struct cgasm_context *ctx, struct expr_val condval, int goto_label, int inverse);
 
 #ifdef __cplusplus
 }

@@ -199,6 +199,12 @@ void cgasm_goto_ifcond(struct cgasm_context *ctx, struct expr_val condval, int g
 	bool nonzero;
 	(void) buf;
 
+	struct type *type = expr_val_get_type(condval);
+	if (type->tag == T_LONG_LONG && condval.type != EXPR_VAL_CONST_VAL) {
+		cgasm_goto_ifcond_ll(ctx, condval, goto_label, inverse);
+		return;
+	}
+
 	switch (condval.type) {
 	case EXPR_VAL_CC:
 		cgasm_goto_ifcond_cc(ctx, condval.cc, goto_label, inverse);
