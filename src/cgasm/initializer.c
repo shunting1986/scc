@@ -282,6 +282,29 @@ static void cgasm_initialize_local_with_named_initializer(struct cgasm_context *
 	cgasm_initialize_local_with_named_initializer(ctx, base_reg, offset + field->offset, field->type, initializer, nameind + 1);
 }
 
+static void cgasm_initialize_local_struct(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
+	assert(type->tag == T_STRUCT);
+	assert(type->size >= 0);
+	if (initializer->initz_list == NULL) {
+		panic("Invalid structure initializer");
+	}
+	struct dynarr *init_list = initializer->initz_list->list;
+	struct dynarr *field_list = type->field_list;
+	if (dynarr_size(field_list) < dynarr_size(init_list)) {
+		panic("too many fields specified in struct initializer");
+	}
+
+	int i;
+	for (i = 0; i < dynarr_size(init_list); i++) {
+		struct initializer *subinit = dynarr_get(init_list, i);
+		struct struct_field *field = dynarr_get(field_list, i);
+		if (dynarr_size(subinit->namelist) > 0) {
+			panic("not support named initializer for struct yet");
+		}
+		cgasm_initialize_local_var(ctx, base_reg, offset + field->offset, field->type, subinit);
+	}
+}
+
 static void cgasm_initialize_local_union(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
 	assert(type->tag == T_UNION);
 	assert(initializer->initz_list != NULL);
@@ -319,6 +342,9 @@ static void cgasm_initialize_local_var(struct cgasm_context *ctx, int base_reg, 
 		break;
 	case T_PTR: case T_INT: case T_SHORT: case T_CHAR:
 		cgasm_initialize_local_scalar(ctx, base_reg, offset, type, initializer);
+		break;
+	case T_STRUCT:
+		cgasm_initialize_local_struct(ctx, base_reg, offset, type, initializer);
 		break;
 	case T_UNION:
 		cgasm_initialize_local_union(ctx, base_reg, offset, type, initializer);
