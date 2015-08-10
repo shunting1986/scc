@@ -18,6 +18,11 @@ typedef struct _stritem {
       } data[];
     } item;
 
+struct st_type {
+	char ch;
+	char arr[11];
+};
+
 int 
 main(void) {
 	item it;
@@ -26,5 +31,6 @@ main(void) {
 	printf("size %d\n", sizeof(item));
 	printf("nkey off %d\n", (void *) &(ptr->nkey) - vp);
 	printf("data off %d\n", (void *) &(ptr->data) - vp);
+	printf("st_type size %d\n", sizeof(struct st_type));
 	return 0;
 }
