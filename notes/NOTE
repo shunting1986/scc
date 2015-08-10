@@ -1,7 +1,6 @@
-  Fix the mongoose issue...
-	- mongoose.c is modified, change it back
-=================== final
+  Last NOTE: we can support mongoose and memcached now. The next job is make the code more robust and fix the problems below :)
 
+================== 
   TODO: fprintf( char) may have problem, the 'add esp' will only count 1 for the char.
 	TODO: support 'for (int ...)'
 
