@@ -78,7 +78,7 @@ static void load_int_to_fpstk(struct cgasm_context *ctx, struct expr_val val) {
 
 // If dst is integer type, this method will pop the double value, convert it to integer
 // and then stored to dst.
-static void pop_fpstk_to_lval(struct cgasm_context *ctx, struct expr_val dst) {
+void pop_fpstk_to_lval(struct cgasm_context *ctx, struct expr_val dst) {
 	struct type *type = expr_val_get_type(dst);
 	char buf[256];
 	int mask = 0;
@@ -156,6 +156,9 @@ struct expr_val cgasm_handle_binary_op_fp(struct cgasm_context *ctx, int tok_tag
 		break;
 	case TOK_STAR:
 		cgasm_println(ctx, "fmulp");
+		break;
+	case TOK_ADD:
+		cgasm_println(ctx, "faddp");
 		break;
 	default:
 		panic("unsupported fp op %s", token_tag_str(tok_tag));

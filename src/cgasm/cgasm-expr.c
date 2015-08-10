@@ -7,6 +7,7 @@
 #include <inc/type.h>
 #include <inc/symtab.h>
 #include <inc/ll-support.h>
+#include <inc/fp.h>
 
 #define cgasm_constant_expression cgasm_conditional_expression
 
@@ -183,7 +184,11 @@ static struct expr_val cgasm_function_call(struct cgasm_context *ctx, struct exp
 		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type);
 		cgasm_store_reg2_to_ll_temp(ctx, REG_EAX, REG_EDX, retval);
 		return retval;
-	} else if (ret_type->size <= 4) {
+	} else if (is_floating_type(ret_type)) {
+		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type);
+		pop_fpstk_to_lval(ctx, retval);
+		return retval;
+	} else if (is_integer_type(ret_type) || ret_type->tag == T_PTR) {
 		struct expr_val retval = cgasm_alloc_temp_var(ctx, ret_type); 
 
 		// even if we return a short, we can copy the entire EAX. The high order bytes
