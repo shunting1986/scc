@@ -137,7 +137,7 @@ void cgasm_declaration(struct cgasm_context *ctx, struct declaration_specifiers 
 
 		// complete array dimension
 		if (final_type->tag == T_ARRAY && final_type->dim == -1 && each->initializer != NULL && each->initializer->expr == NULL) {
-			complete_array_dim(final_type, dynarr_size(each->initializer->initz_list->list));
+			complete_array_dim(final_type, get_array_dim_from_initializer(ctx, each->initializer));
 		}
 
 		// register symbol id with type 'final_type'

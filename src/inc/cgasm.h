@@ -112,6 +112,7 @@ struct type *parse_type_from_declarator(struct cgasm_context *ctx, struct type *
 // initializer.c
 void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symbol *sym, struct initializer *initializer);
 void cgasm_initialize_local_symbol(struct cgasm_context *ctx, struct local_var_symbol *sym, struct initializer *initializer);
+int get_array_dim_from_initializer(struct cgasm_context *ctx, struct initializer *initializer);
 
 // str-op.c
 void cgasm_push_bytes(struct cgasm_context *ctx, int from_base_reg, int from_start_off, int size);

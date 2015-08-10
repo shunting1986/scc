@@ -375,6 +375,10 @@ static struct initializer *parse_initializer(struct parser *parser) {
 				}
 				assume(tok, TOK_DOT);
 			}
+		} else if (tok.tok_tag == TOK_LBRACKET) {
+			initializer->ind = parse_constant_expression(parser);
+			expect(parser->lexer, TOK_RBRACKET);
+			expect(parser->lexer, TOK_ASSIGN);
 		} else {
 			lexer_put_back(parser->lexer, tok);
 		}

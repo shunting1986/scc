@@ -1,5 +1,3 @@
-  =========== the only thing left is to reduce the number of changes made on memcached.c
-
   ACHIEVEMENT:
 	1. [DONE] util.c
 	2. [DONE] daemon.c (switch is not supported yet. Luckily daemonize is not executed)

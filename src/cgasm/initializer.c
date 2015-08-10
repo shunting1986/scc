@@ -7,6 +7,28 @@
 static void cgasm_initialize_global_var(struct cgasm_context *ctx, struct type *type, struct initializer *initializer);
 static void cgasm_initialize_local_var(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer);
 
+int get_array_dim_from_initializer(struct cgasm_context *ctx, struct initializer *initializer) {
+	assert(initializer->initz_list != NULL);
+	struct dynarr *list = initializer->initz_list->list;
+	int i;
+	int nextind = 0;
+	int maxind = 0;
+
+	for (i = 0; i < dynarr_size(list); i++) {
+		struct initializer *subinit = dynarr_get(list, i);
+		
+		if (subinit->ind != NULL) {
+			nextind = cgasm_interpret_const_expr(ctx, subinit->ind);
+			if (nextind < 0) {
+				panic("Negative array index not allowed");
+			}
+		}
+		maxind = max(maxind, nextind);
+		nextind++;
+	}
+	return maxind + 1;
+}
+
 static void cgasm_initialize_global_ll(struct cgasm_context *ctx, struct initializer *initializer) {
 	struct assignment_expression *expr = initializer->expr;
 	if (expr == NULL) {
@@ -76,7 +98,11 @@ static void cgasm_initialize_global_array(struct cgasm_context *ctx, struct type
 	}
 
 	for (i = 0; i < size; i++) {
-		cgasm_initialize_global_var(ctx, type->subtype, dynarr_get(list, i));
+		struct initializer *subinit = dynarr_get(list, i);
+		if (subinit->ind != NULL) {
+			panic("global array initialization does not support index yet");
+		}
+		cgasm_initialize_global_var(ctx, type->subtype, subinit);
 	}
 
 	if (size < type->dim) {
@@ -236,13 +262,22 @@ void cgasm_allocate_global_var(struct cgasm_context *ctx, struct global_var_symb
 
 static void cgasm_initialize_local_array(struct cgasm_context *ctx, int base_reg, int offset, struct type *type, struct initializer *initializer) {
 	assert(type->tag == T_ARRAY);
+	assert(type->dim >= 0);
 	struct dynarr *initz_list = initializer->initz_list->list;
 	struct type *subtype = type->subtype;
 	int compsize = type_get_size(subtype);
+	int arr_dim = type->dim;
 
+	int nextind = 0;
 	DYNARR_FOREACH_BEGIN(initz_list, initializer, each);
-		cgasm_initialize_local_var(ctx, base_reg, offset, subtype, each);
-		offset += compsize;
+		if (each->ind != NULL) {
+			nextind = cgasm_interpret_const_expr(ctx, each->ind);
+		}
+		if (nextind < 0 || nextind >= arr_dim) {
+			panic("array index out of range");
+		}
+		cgasm_initialize_local_var(ctx, base_reg, offset + nextind * compsize, subtype, each);
+		nextind++;
 	DYNARR_FOREACH_END();
 }
 
