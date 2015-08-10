@@ -462,7 +462,7 @@ static int alignOf(struct type *type) {
 	} else if (is_integer_type(type)) { // integer type other than long long
 		align = type->size;
 	} else if (type->tag == T_ARRAY) { 
-		align = 4; // XXX align for array is always 4?
+		return alignOf(type->subtype);	 // alignment for array is determined by its element type
 	} else if (type->tag == T_PTR) {
 		align = 4;
 	} else if (type->tag == T_STRUCT) {	
