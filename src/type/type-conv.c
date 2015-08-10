@@ -3,22 +3,30 @@
 #include <inc/cgasm.h>
 #include <inc/fp.h>
 
-static struct expr_val type_convert_int_to_ll(struct cgasm_context *ctx, struct expr_val val) {
-	assert(val.ctype->tag == T_INT);
+static struct expr_val type_convert_integer_to_ll(struct cgasm_context *ctx, struct expr_val val) {
+	struct type *oldtype = expr_val_get_type(val);
+	assert(is_integer_type(oldtype));
+	if (oldtype->tag == T_LONG_LONG) {
+		return val;
+	}
+
+	// old type is char, short, int
 	if (val.type == EXPR_VAL_CONST_VAL) {
 		val.ctype = get_long_long_type();
 		val.const_val = wrap_ll_const_to_token(val.const_val.const_val.ival);
 		return val;
 	}
 
-	// panic("type_conv");
-
 	// allocate an temp var
 	struct expr_val temp = cgasm_alloc_temp_var(ctx, get_long_long_type());
 	int offset = cgasm_get_temp_var_offset(ctx, temp.temp_var);
 	int reg = REG_EAX;
 	cgasm_load_val_to_reg(ctx, val, reg);
-	cgasm_println(ctx, "movl %%%s, %d(%%ebp)", get_reg_str_code(reg), offset);
+
+	if (oldtype->size != 4) {
+		cgasm_println(ctx, "movl $0, %d(%%ebp)", offset);
+	}
+	cgasm_println(ctx, "mov%s %%%s, %d(%%ebp)", size_to_suffix(oldtype->size), get_reg_str_code_size(reg, oldtype->size), offset);
 	cgasm_println(ctx, "movl $0, %d(%%ebp)", offset + 4);
 	return temp;
 }
@@ -51,11 +59,11 @@ struct expr_val type_convert(struct cgasm_context *ctx, struct expr_val val, str
 	// for array, the deref flag is not removed
 	struct type *oldtype = expr_val_get_type(val);
 
-	if (oldtype->tag >= T_CHAR && oldtype->tag <= T_LONG_LONG && newtype->tag >= T_CHAR && newtype->tag <= T_LONG_LONG) { // both are integer type
+	if (is_integer_type(oldtype) && is_integer_type(newtype)) { // both are integer type
 		if (oldtype->tag >= newtype->tag) { // change to smaller type
 			// nothing need to do
-		} else if (oldtype->tag == T_INT && newtype->tag == T_LONG_LONG) { // TODO int to long long is not supported yet
-			return type_convert_int_to_ll(ctx, val);
+		} else if (newtype->tag == T_LONG_LONG) { 
+			return type_convert_integer_to_ll(ctx, val);
 		} else {
 			return extend_int_type(ctx, val, newtype);
 		}

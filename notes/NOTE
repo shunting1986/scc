@@ -1,6 +1,4 @@
   =========== the only thing left is to reduce the number of changes made on memcached.c
-	-> support named initializer for struct...
-
 
   ACHIEVEMENT:
 	1. [DONE] util.c
